@@ -2,6 +2,7 @@ package com.example.highload.services.impl;
 
 import com.example.highload.model.inner.User;
 import com.example.highload.repos.UserRepository;
+import com.example.highload.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -9,7 +10,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class UserService {
+public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
 
