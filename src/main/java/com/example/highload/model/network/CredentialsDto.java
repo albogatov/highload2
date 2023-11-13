@@ -5,7 +5,7 @@ import lombok.Data;
 import java.io.Serializable;
 
 @Data
-public class CredentialsNT implements Serializable {
+public class CredentialsDto implements Serializable {
 
     String login;
     String token;

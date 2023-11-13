@@ -4,8 +4,6 @@ import com.example.highload.model.inner.Order;
 import com.example.highload.model.inner.Profile;
 import com.example.highload.model.inner.User;
 import com.example.highload.repos.ImageRepository;
-import com.example.highload.repos.OrderRepository;
-import com.example.highload.repos.ProfileRepository;
 import com.example.highload.repos.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +16,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class AdminService {
+public class AdminServiceImpl {
 
     private final UserRepository userRepository;
     private final ImageRepository imageRepository;

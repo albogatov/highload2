@@ -6,7 +6,7 @@ import lombok.Data;
 import java.io.Serializable;
 
 @Data
-public class UserNT implements Serializable {
+public class UserDto implements Serializable {
 
     String login;
     String password;
