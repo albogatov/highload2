@@ -107,6 +107,7 @@ databaseChangeLog:
                   name: name
                   type: clob
                   constraints:
+                    unique: true
                     nullable: false
   - changeSet:
       id: 5
@@ -215,7 +216,7 @@ databaseChangeLog:
             constraintName: fk_notification_sender_profile
             deferrable: false
             initiallyDeferred: false
-            onDelete: RESTRICT
+            onDelete: CASCADE
             referencedColumnNames: id
             referencedTableName: profile
             referencedTableSchemaName: public
@@ -227,7 +228,7 @@ databaseChangeLog:
             constraintName: fk_notification_receiver_profile
             deferrable: false
             initiallyDeferred: false
-            onDelete: RESTRICT
+            onDelete: CASCADE
             referencedColumnNames: id
             referencedTableName: profile
             referencedTableSchemaName: public
@@ -263,7 +264,7 @@ databaseChangeLog:
             constraintName: fk_review_profile
             deferrable: false
             initiallyDeferred: false
-            onDelete: RESTRICT
+            onDelete: CASCADE
             referencedColumnNames: id
             referencedTableName: profile
             referencedTableSchemaName: public
@@ -303,10 +304,15 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
-                  name: is_closed
-                  type: boolean
+                  name: status
+                  type: varchar(25)
                   constraints:
                     nullable: false
+#              - column:
+#                  name: is_closed
+#                  type: boolean
+#                  constraints:
+#                    nullable: false
         - addForeignKeyConstraint:
             baseColumnNames: user_id
             baseTableName: order
@@ -360,7 +366,7 @@ databaseChangeLog:
             constraintName: fk_response_user
             deferrable: false
             initiallyDeferred: false
-            onDelete: RESTRICT
+            onDelete: CASCADE
             referencedColumnNames: id
             referencedTableName: user
             referencedTableSchemaName: public
@@ -372,103 +378,7 @@ databaseChangeLog:
             constraintName: fk_response_order
             deferrable: false
             initiallyDeferred: false
-            onDelete: RESTRICT
-            referencedColumnNames: id
-            referencedTableName: order
-            referencedTableSchemaName: public
-            validate: true
-  - changeSet:
-      id: 10
-      author: sofia
-      changes:
-        - createTable:
-            tableName: profile_images
-            columns:
-              - column:
-                  name: id
-                  type: int
-                  autoIncrement: true
-                  constraints:
-                    primaryKey: true
-                    nullable: false
-              - column:
-                  name: image_id
-                  type: int
-                  constraints:
-                    nullable: false
-              - column:
-                  name: profile_id
-                  type: int
-                  constraints:
-                    nullable: false
-        - addForeignKeyConstraint:
-            baseColumnNames: image_id
-            baseTableName: profile_images
-            baseTableSchemaName: public
-            constraintName: fk_profile_images_image
-            deferrable: false
-            initiallyDeferred: false
-            onDelete: RESTRICT
-            referencedColumnNames: id
-            referencedTableName: image
-            referencedTableSchemaName: public
-            validate: true
-        - addForeignKeyConstraint:
-            baseColumnNames: profile_id
-            baseTableName: profile_images
-            baseTableSchemaName: public
-            constraintName: fk_profile_images_profile
-            deferrable: false
-            initiallyDeferred: false
-            onDelete: RESTRICT
-            referencedColumnNames: id
-            referencedTableName: profile
-            referencedTableSchemaName: public
-            validate: true
-  - changeSet:
-      id: 11
-      author: sofia
-      changes:
-        - createTable:
-            tableName: order_images
-            columns:
-              - column:
-                  name: id
-                  type: int
-                  autoIncrement: true
-                  constraints:
-                    primaryKey: true
-                    nullable: false
-              - column:
-                  name: image_id
-                  type: int
-                  constraints:
-                    nullable: false
-              - column:
-                  name: order_id
-                  type: int
-                  constraints:
-                    nullable: false
-        - addForeignKeyConstraint:
-            baseColumnNames: image_id
-            baseTableName: order_images
-            baseTableSchemaName: public
-            constraintName: fk_order_images_image
-            deferrable: false
-            initiallyDeferred: false
-            onDelete: RESTRICT
-            referencedColumnNames: id
-            referencedTableName: image
-            referencedTableSchemaName: public
-            validate: true
-        - addForeignKeyConstraint:
-            baseColumnNames: order_id
-            baseTableName: order_images
-            baseTableSchemaName: public
-            constraintName: fk_order_images_order
-            deferrable: false
-            initiallyDeferred: false
-            onDelete: RESTRICT
+            onDelete: CASCADE
             referencedColumnNames: id
             referencedTableName: order
             referencedTableSchemaName: public
@@ -504,7 +414,7 @@ databaseChangeLog:
             constraintName: fk_order_tags_tag
             deferrable: false
             initiallyDeferred: false
-            onDelete: RESTRICT
+            onDelete: CASCADE
             referencedColumnNames: id
             referencedTableName: tag
             referencedTableSchemaName: public
@@ -516,8 +426,74 @@ databaseChangeLog:
             constraintName: fk_order_tags_order
             deferrable: false
             initiallyDeferred: false
+            onDelete: CASCADE
+            referencedColumnNames: id
+            referencedTableName: order
+            referencedTableSchemaName: public
+            validate: true
+  - changeSet:
+      id: 13
+      author: sofia
+      changes:
+        - createTable:
+            tableName: image_object
+            columns:
+              - column:
+                  name: id
+                  type: int
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: image_id
+                  type: int
+                  constraints:
+                    nullable: false
+              - column:
+                  name: order_id
+                  type: int
+              - column:
+                  name: profile_id
+                  type: int
+              - column:
+                  name: type
+                  type: varchar(25)
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseColumnNames: profile_id
+            baseTableName: image_object
+            baseTableSchemaName: public
+            constraintName: fk_image_object_profile
+            deferrable: false
+            initiallyDeferred: false
+            onDelete: RESTRICT
+            referencedColumnNames: id
+            referencedTableName: profile
+            referencedTableSchemaName: public
+            validate: true
+        - addForeignKeyConstraint:
+            baseColumnNames: order_id
+            baseTableName: image_object
+            baseTableSchemaName: public
+            constraintName: fk_image_object_order
+            deferrable: false
+            initiallyDeferred: false
             onDelete: RESTRICT
             referencedColumnNames: id
             referencedTableName: order
+            referencedTableSchemaName: public
+            validate: true
+        - addForeignKeyConstraint:
+            baseColumnNames: image_id
+            baseTableName: image_object
+            baseTableSchemaName: public
+            constraintName: fk_image_object_image
+            deferrable: false
+            initiallyDeferred: false
+            onDelete: CASCADE
+            referencedColumnNames: id
+            referencedTableName: image
             referencedTableSchemaName: public
             validate: true

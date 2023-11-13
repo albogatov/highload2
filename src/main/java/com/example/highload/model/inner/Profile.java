@@ -38,12 +38,8 @@ public class Profile {
     @Column(name = "mail", nullable = false)
     String mail;
 
-    @ManyToMany
-    @JoinTable(
-            name = "profile_images",
-            joinColumns = @JoinColumn(name = "profile_id"),
-            inverseJoinColumns = @JoinColumn(name = "image_id"))
-    List<Image> images;
+    @OneToMany(mappedBy = "profile")
+    List<ImageObject> images;
 
     @OneToMany(mappedBy = "receiverProfile")
     List<Notification> receivedNotifications;

@@ -1,5 +1,6 @@
 package com.example.highload.model.inner;
 
+import com.example.highload.model.enums.OrderStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
@@ -37,13 +38,10 @@ public class Order {
             inverseJoinColumns = @JoinColumn(name = "tag_id"))
     List<Tag> tags;
 
-    @ManyToMany
-    @JoinTable(
-            name = "order_images",
-            joinColumns = @JoinColumn(name = "order_id"),
-            inverseJoinColumns = @JoinColumn(name = "image_id"))
-    List<Image> images;
+    @OneToMany(mappedBy = "order")
+    List<ImageObject> images;
 
-    @Column(name = "is_closed", nullable = false)
-    Boolean isClosed;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    OrderStatus status;
 }

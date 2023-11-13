@@ -19,7 +19,7 @@ public class User {
 
     @NotBlank
     @Size(min = 1, max = 50)
-    @Column(name = "login", nullable = false)
+    @Column(name = "login", nullable = false, unique = true)
     String login;
 
     @NotBlank
