@@ -1,0 +1,523 @@
+databaseChangeLog:
+  - changeSet:
+        id: 1
+        author: sofia
+        changes:
+          - createTable:
+              tableName: role
+              columns:
+                - column:
+                    name: id
+                    type: int
+                    autoIncrement: true
+                    constraints:
+                      primaryKey: true
+                      nullable: false
+                - column:
+                    name: name
+                    type: clob
+                    constraints:
+                      unique: true
+                      nullable: false
+  - changeSet:
+      id: 2
+      author: sofia
+      changes:
+        - createTable:
+            tableName: user
+            columns:
+              - column:
+                  name: id
+                  type: int
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: login
+                  type: varchar(50)
+                  constraints:
+                    unique: true
+                    nullable: false
+              - column:
+                  name: hash_password
+                  type: varchar(512)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: role_id
+                  type: int
+                  constraints:
+                    nullable: false
+              - column:
+                  name: is_actual
+                  type: boolean
+                  constraints:
+                    nullable: false
+              - column:
+                  name: when_deleted_time
+                  type: timestamp
+        - addForeignKeyConstraint:
+            baseColumnNames: role_id
+            baseTableName: user
+            baseTableSchemaName: public
+            constraintName: fk_user_role
+            deferrable: false
+            initiallyDeferred: false
+            onDelete: RESTRICT
+            onUpdate: RESTRICT
+            referencedColumnNames: id
+            referencedTableName: role
+            referencedTableSchemaName: public
+            validate: true
+  - changeSet:
+      id: 3
+      author: sofia
+      changes:
+        - createTable:
+            tableName: image
+            columns:
+              - column:
+                  name: id
+                  type: int
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: url
+                  type: clob
+                  constraints:
+                    nullable: false
+  - changeSet:
+      id: 4
+      author: sofia
+      changes:
+        - createTable:
+            tableName: tag
+            columns:
+              - column:
+                  name: id
+                  type: int
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: clob
+                  constraints:
+                    nullable: false
+  - changeSet:
+      id: 5
+      author: sofia
+      changes:
+        - createTable:
+            tableName: profile
+            columns:
+              - column:
+                  name: id
+                  type: int
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: clob
+                  constraints:
+                    nullable: false
+              - column:
+                  name: about
+                  type: clob
+              - column:
+                  name: experience
+                  type: clob
+              - column:
+                  name: education
+                  type: clob
+              - column:
+                  name: mail
+                  type: varchar(250)
+                  constraints:
+                    unique: true
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: int
+                  constraints:
+                    nullable: false
+              - column:
+                  name: img_id
+                  type: int
+        - addForeignKeyConstraint:
+            baseColumnNames: user_id
+            baseTableName: profile
+            baseTableSchemaName: public
+            constraintName: fk_profile_user
+            deferrable: false
+            initiallyDeferred: false
+            onDelete: RESTRICT
+            referencedColumnNames: id
+            referencedTableName: user
+            referencedTableSchemaName: public
+            validate: true
+        - addForeignKeyConstraint:
+            baseColumnNames: img_id
+            baseTableName: profile
+            baseTableSchemaName: public
+            constraintName: fk_profile_img
+            deferrable: false
+            initiallyDeferred: false
+            onDelete: RESTRICT
+            referencedColumnNames: id
+            referencedTableName: user
+            referencedTableSchemaName: public
+            validate: true # ???
+  - changeSet:
+      id: 6
+      author: sofia
+      changes:
+        - createTable:
+            tableName: notification
+            columns:
+              - column:
+                  name: id
+                  type: int
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: sender_profile_id
+                  type: int
+                  constraints:
+                    nullable: false
+              - column:
+                  name: receiver_profile_id
+                  type: int
+                  constraints:
+                    nullable: false
+              - column:
+                  name: is_read
+                  type: boolean
+                  constraints:
+                    nullable: false
+              - column:
+                  name: time
+                  type: timestamp
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseColumnNames: sender_profile_id
+            baseTableName: notification
+            baseTableSchemaName: public
+            constraintName: fk_notification_sender_profile
+            deferrable: false
+            initiallyDeferred: false
+            onDelete: RESTRICT
+            referencedColumnNames: id
+            referencedTableName: profile
+            referencedTableSchemaName: public
+            validate: true
+        - addForeignKeyConstraint:
+            baseColumnNames: receiver_profile_id
+            baseTableName: notification
+            baseTableSchemaName: public
+            constraintName: fk_notification_receiver_profile
+            deferrable: false
+            initiallyDeferred: false
+            onDelete: RESTRICT
+            referencedColumnNames: id
+            referencedTableName: profile
+            referencedTableSchemaName: public
+            validate: true
+  - changeSet:
+      id: 7
+      author: sofia
+      changes:
+        - createTable:
+            tableName: review
+            columns:
+              - column:
+                  name: id
+                  type: int
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: text
+                  type: clob
+                  constraints:
+                    nullable: false
+              - column:
+                  name: profile_id
+                  type: int
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseColumnNames: profile_id
+            baseTableName: review
+            baseTableSchemaName: public
+            constraintName: fk_review_profile
+            deferrable: false
+            initiallyDeferred: false
+            onDelete: RESTRICT
+            referencedColumnNames: id
+            referencedTableName: profile
+            referencedTableSchemaName: public
+            validate: true
+  - changeSet:
+      id: 8
+      author: sofia
+      changes:
+        - createTable:
+            tableName: order
+            columns:
+              - column:
+                  name: id
+                  type: int
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: int
+                  constraints:
+                    nullable: false
+              - column:
+                  name: price
+                  type: int
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: clob
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created
+                  type: timestamp
+                  constraints:
+                    nullable: false
+              - column:
+                  name: is_closed
+                  type: boolean
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseColumnNames: user_id
+            baseTableName: order
+            baseTableSchemaName: public
+            constraintName: fk_order_user
+            deferrable: false
+            initiallyDeferred: false
+            onDelete: RESTRICT
+            referencedColumnNames: id
+            referencedTableName: user
+            referencedTableSchemaName: public
+            validate: true
+  - changeSet:
+      id: 9
+      author: sofia
+      changes:
+        - createTable:
+            tableName: response
+            columns:
+              - column:
+                  name: id
+                  type: int
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: int
+                  constraints:
+                    nullable: false
+              - column:
+                  name: order_id
+                  type: int
+                  constraints:
+                    nullable: false
+              - column:
+                  name: text
+                  type: clob
+#                  constraints:
+#                    nullable: false
+              - column:
+                  name: is_approved
+                  type: boolean
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseColumnNames: user_id
+            baseTableName: response
+            baseTableSchemaName: public
+            constraintName: fk_response_user
+            deferrable: false
+            initiallyDeferred: false
+            onDelete: RESTRICT
+            referencedColumnNames: id
+            referencedTableName: user
+            referencedTableSchemaName: public
+            validate: true
+        - addForeignKeyConstraint:
+            baseColumnNames: order_id
+            baseTableName: response
+            baseTableSchemaName: public
+            constraintName: fk_response_order
+            deferrable: false
+            initiallyDeferred: false
+            onDelete: RESTRICT
+            referencedColumnNames: id
+            referencedTableName: order
+            referencedTableSchemaName: public
+            validate: true
+  - changeSet:
+      id: 10
+      author: sofia
+      changes:
+        - createTable:
+            tableName: profile_images
+            columns:
+              - column:
+                  name: id
+                  type: int
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: image_id
+                  type: int
+                  constraints:
+                    nullable: false
+              - column:
+                  name: profile_id
+                  type: int
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseColumnNames: image_id
+            baseTableName: profile_images
+            baseTableSchemaName: public
+            constraintName: fk_profile_images_image
+            deferrable: false
+            initiallyDeferred: false
+            onDelete: RESTRICT
+            referencedColumnNames: id
+            referencedTableName: image
+            referencedTableSchemaName: public
+            validate: true
+        - addForeignKeyConstraint:
+            baseColumnNames: profile_id
+            baseTableName: profile_images
+            baseTableSchemaName: public
+            constraintName: fk_profile_images_profile
+            deferrable: false
+            initiallyDeferred: false
+            onDelete: RESTRICT
+            referencedColumnNames: id
+            referencedTableName: profile
+            referencedTableSchemaName: public
+            validate: true
+  - changeSet:
+      id: 11
+      author: sofia
+      changes:
+        - createTable:
+            tableName: order_images
+            columns:
+              - column:
+                  name: id
+                  type: int
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: image_id
+                  type: int
+                  constraints:
+                    nullable: false
+              - column:
+                  name: order_id
+                  type: int
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseColumnNames: image_id
+            baseTableName: order_images
+            baseTableSchemaName: public
+            constraintName: fk_order_images_image
+            deferrable: false
+            initiallyDeferred: false
+            onDelete: RESTRICT
+            referencedColumnNames: id
+            referencedTableName: image
+            referencedTableSchemaName: public
+            validate: true
+        - addForeignKeyConstraint:
+            baseColumnNames: order_id
+            baseTableName: order_images
+            baseTableSchemaName: public
+            constraintName: fk_order_images_order
+            deferrable: false
+            initiallyDeferred: false
+            onDelete: RESTRICT
+            referencedColumnNames: id
+            referencedTableName: order
+            referencedTableSchemaName: public
+            validate: true
+  - changeSet:
+      id: 12
+      author: sofia
+      changes:
+        - createTable:
+            tableName: order_tags
+            columns:
+              - column:
+                  name: id
+                  type: int
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: tag_id
+                  type: int
+                  constraints:
+                    nullable: false
+              - column:
+                  name: order_id
+                  type: int
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseColumnNames: tag_id
+            baseTableName: order_tags
+            baseTableSchemaName: public
+            constraintName: fk_order_tags_tag
+            deferrable: false
+            initiallyDeferred: false
+            onDelete: RESTRICT
+            referencedColumnNames: id
+            referencedTableName: tag
+            referencedTableSchemaName: public
+            validate: true
+        - addForeignKeyConstraint:
+            baseColumnNames: order_id
+            baseTableName: order_tags
+            baseTableSchemaName: public
+            constraintName: fk_order_tags_order
+            deferrable: false
+            initiallyDeferred: false
+            onDelete: RESTRICT
+            referencedColumnNames: id
+            referencedTableName: order
+            referencedTableSchemaName: public
+            validate: true

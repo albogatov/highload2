@@ -1,0 +1,24 @@
+package com.example.highload.model.inner;
+
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import lombok.Data;
+
+import java.util.List;
+
+@Data
+@Entity
+@Table(name = "tag", schema = "public")
+public class Tag {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    Integer id;
+
+    @NotBlank
+    @Column(name = "name", nullable = false)
+    String name;
+
+    @ManyToMany(mappedBy = "tags")
+    List<Order> orders;
+}
