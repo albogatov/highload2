@@ -22,6 +22,9 @@ public class User {
     @Column(name = "login", nullable = false, unique = true)
     String login;
 
+    @OneToOne
+    Profile profile;
+
     @NotBlank
     @Column(name = "hash_password", nullable = false)
     String hashPassword;

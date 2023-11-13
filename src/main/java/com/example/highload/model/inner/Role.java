@@ -1,5 +1,7 @@
 package com.example.highload.model.inner;
 
+import com.example.highload.model.enums.OrderStatus;
+import com.example.highload.model.enums.RoleType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
@@ -13,7 +15,7 @@ public class Role {
     @GeneratedValue(strategy = GenerationType.AUTO)
     Integer id;
 
-    @NotBlank
+    @Enumerated(EnumType.STRING)
     @Column(name = "name", nullable = false)
-    String name;
+    RoleType name;
 }

@@ -14,6 +14,9 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
     Optional<User> findByLogin(String login);
     List<User> findAllByIsActualFalseAndWhenDeletedTimeLessThan(LocalDateTime timeLTDelete, Pageable pageable);
+
+//    List<User> findAllByIsActualFalseAndWhenDeletedTimeLessThan(LocalDateTime timeLTDelete);
+
     void deleteAllByIsActualFalseAndWhenDeletedTimeLessThan(LocalDateTime timeLTDelete);
 
 }
