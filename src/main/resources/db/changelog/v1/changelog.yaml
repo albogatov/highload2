@@ -148,7 +148,7 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
-                  name: img_id
+                  name: image_id
                   type: int
         - addForeignKeyConstraint:
             baseColumnNames: user_id
@@ -163,15 +163,15 @@ databaseChangeLog:
             referencedTableSchemaName: public
             validate: true
         - addForeignKeyConstraint:
-            baseColumnNames: img_id
+            baseColumnNames: image_id
             baseTableName: profile
             baseTableSchemaName: public
-            constraintName: fk_profile_img
+            constraintName: fk_profile_image
             deferrable: false
             initiallyDeferred: false
             onDelete: RESTRICT
             referencedColumnNames: id
-            referencedTableName: user
+            referencedTableName: image
             referencedTableSchemaName: public
             validate: true # ???
   - changeSet:
