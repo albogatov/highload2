@@ -3,10 +3,12 @@ package com.example.highload.controllers;
 import com.example.highload.model.inner.Order;
 import com.example.highload.model.inner.Tag;
 import com.example.highload.model.network.OrderDto;
+import com.example.highload.model.network.TagDto;
 import com.example.highload.repos.TagRepository;
 import com.example.highload.services.TagService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,15 +18,13 @@ import java.util.List;
 public class TagController {
 
     @Autowired
-    private TagRepository tagRepository;
-
-    @Autowired
     private TagService tagService;
 
     @CrossOrigin
     @PostMapping("/save")
-    public ResponseEntity save(@RequestBody OrderDto data){
-        if(tagRepository.save(tagService.prepareEntity(data)) != null)
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
+    public ResponseEntity save(@RequestBody TagDto data){
+        if(tagService.saveTag(data) != null)
             return ResponseEntity.ok("");
         else return ResponseEntity.badRequest().body("Couldn't save tag, check data");
     }
@@ -32,7 +32,7 @@ public class TagController {
     @CrossOrigin
     @GetMapping("/all")
     public ResponseEntity getAllQueries(){
-        List<Tag> entityList = tagRepository.findAll();
+        List<TagDto> entityList = tagService.findAll();
         return ResponseEntity.ok(entityList);
     }
 

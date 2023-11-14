@@ -24,13 +24,7 @@ import java.util.Optional;
 public class UserController {
 
     @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
     private UserService userService;
-
-    @Autowired
-    private ProfileRepository profileRepository;
 
     @Autowired
     private ProfileService profileService;
@@ -38,7 +32,6 @@ public class UserController {
     @PostMapping("/login")
     public ResponseEntity login(@RequestBody UserDto user){
         if (user.getLogin() == null || user.getPassword() == null) {
-            logger.error("Absent login or password");
             return new ResponseEntity<>("Absent login or password", HttpStatus.BAD_REQUEST);
         }
         try {
@@ -46,8 +39,8 @@ public class UserController {
             String login = user.getLogin();
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(login, user.getPassword()));
             String token = jwtUtil.resolveToken(login);
-            Optional<User> userEntity = userRepository.findByLogin(user.getLogin());
-            return new ResponseEntity<>(new ResponseMessageEntity(token, user.getRole(), HttpStatus.OK));
+            UserDto userEntity = userService.findByLogin(user.getLogin());
+            return new ResponseEntity<>(new ResponseMessageEntity(token, userEntity.getRole(), HttpStatus.OK));
         } catch (AuthenticationException e) {
             return new ResponseEntity<>("Wrong login or password", HttpStatus.UNAUTHORIZED);
         }
@@ -55,29 +48,21 @@ public class UserController {
 
     @PostMapping("/register")
     public ResponseEntity register(@RequestBody UserDto user){
-        logger.debug("registering user");
         try {
-            logger.debug(user.toString());
             if (user.getLogin() == null || user.getPassword() == null || user.getLogin().trim().equals("")
                     || user.getPassword().trim().equals("")) {
-                logger.error("Absent login or password");
                 throw new IllegalArgumentException();
             }
 
-            if (userService.find(user.getLogin()) != null) {
-                logger.error("Already registered" + userService.find(user.getLogin()));
+            if (userService.findByLogin(user.getLogin()) != null) {
                 return new ResponseEntity<>("User already registered", HttpStatus.CONFLICT);
             }
             //TODO: SECURITY
             user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-            User userEntity = userRepository.save(userRepository.prepareEntity(user));
-            Profile userProfile = profileService.prepareEntity();
-            userProfile.setUser(userEntity);
-            profileRepository.save(userProfile);
-            userRepository.save(userService.prepareEntity(user));
+            profileService.saveProfileForUser(user);
+            userService.save(user);
             return new ResponseEntity<>("User successfully registered", HttpStatus.OK);
         } catch (IllegalArgumentException e) {
-            logger.error("Invalid register");
             return new ResponseEntity<>("Invalid login or password", HttpStatus.BAD_REQUEST);
         }
     }

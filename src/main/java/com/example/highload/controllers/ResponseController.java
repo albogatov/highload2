@@ -5,10 +5,12 @@ import com.example.highload.model.inner.Order;
 import com.example.highload.model.inner.Response;
 import com.example.highload.model.network.IdDto;
 import com.example.highload.model.network.OrderDto;
+import com.example.highload.model.network.ResponseDto;
 import com.example.highload.repos.ResponseRepository;
 import com.example.highload.services.ResponseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,31 +20,38 @@ import java.util.List;
 public class ResponseController {
 
     @Autowired
-    private ResponseRepository responseRepository;
-
-    @Autowired
     private ResponseService responseService;
 
     @CrossOrigin
     @PostMapping("/save")
-    public ResponseEntity save(@RequestBody OrderDto data){
-        if(responseRepository.save(responseService.prepareEntity(data)) != null)
+    public ResponseEntity save(@RequestBody ResponseDto data){
+        if(responseService.saveResponse(data) != null)
             return ResponseEntity.ok("");
-        else return ResponseEntity.badRequest().body("Couldn't save review, check data");
+        else return ResponseEntity.badRequest().body("Couldn't save response, check data");
     }
 
     @CrossOrigin
-    @GetMapping("/all")
-    public ResponseEntity getAllQueries(){
-        List<Response> entityList = responseRepository.findAll();
+    @GetMapping("/all/{orderId}")
+    @PreAuthorize("hasAnyAuthority('CLIENT')")
+    public ResponseEntity getAllQueriesOrder(@PathVariable int orderId){
+        List<ResponseDto> entityList = responseService.findAllForOrder(orderId);
         return ResponseEntity.ok(entityList);
     }
 
     @CrossOrigin
-    @GetMapping("/single")
-    public ResponseEntity getById(@RequestBody IdDto data){
-        Order entity = responseRepository.findById(data.getId()).get();
-        return ResponseEntity.ok(responseService.prepareDto(entity));
+    @GetMapping("/all/{profileId}")
+    @PreAuthorize("hasAnyAuthority('ARTIST')")
+    public ResponseEntity getAllQueriesProfile(@PathVariable int profileId){
+        List<ResponseDto> entityList = responseService.findAllForProfile(profileId);
+        return ResponseEntity.ok(entityList);
+    }
+
+    @CrossOrigin
+    @GetMapping("/single/{id}")
+    @PreAuthorize("hasAnyAuthority('CLIENT', 'ARTIST')")
+    public ResponseEntity getById(@PathVariable int id){
+        ResponseDto entity = responseService.findById(id);
+        return ResponseEntity.ok(entity);
     }
 
 

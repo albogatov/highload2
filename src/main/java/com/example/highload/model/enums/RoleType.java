@@ -1,7 +1,15 @@
 package com.example.highload.model.enums;
 
-public enum RoleType {
+import org.springframework.security.core.GrantedAuthority;
+
+public enum RoleType implements GrantedAuthority {
     ARTIST,
     CLIENT,
-    ADMIN
+    ADMIN;
+
+    @Override
+    public String getAuthority() {
+        return name();
+    }
+
 }
