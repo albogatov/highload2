@@ -14,8 +14,11 @@ import java.util.List;
 @Repository
 public interface ImageRepository extends JpaRepository<Image, Integer> {
 
-    Page<Image> findAllByImageObject_Order(Order order, Pageable pageable);
-    Page<Image> findAllByImageObject_Profile(Profile profile, Pageable pageable);
+//    Page<Image> findAllByImageObject_Order(Order order, Pageable pageable);
+//    Page<Image> findAllByImageObject_Profile(Profile profile, Pageable pageable);
+
+    Page<Image> findAllByImageObject_Order_Id(Integer orderId, Pageable pageable);
+    Page<Image> findAllByImageObject_Profile_Id(Integer profileId, Pageable pageable);
 
     void deleteAllByImageObject_Order(Order order);
     void deleteAllByImageObject_Profile(Profile profile);

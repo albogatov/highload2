@@ -40,11 +40,11 @@ public class ResponseController {
     }
 
     @CrossOrigin
-    @GetMapping("/all/{profileId}")
+    @GetMapping("/all/{userId}")
     @PreAuthorize("hasAnyAuthority('ARTIST')")
     // todo: "запрос, который вернет findAll с пагинацией и с указанием общего количества записей в http хедере."
-    public ResponseEntity getAllByProfile(@PathVariable int profileId){
-        List<Response> entityList = responseService.findAllForProfile(profileId);
+    public ResponseEntity getAllByProfile(@PathVariable int userId){
+        List<Response> entityList = responseService.findAllForUser(userId);
         List<ResponseDto> dtoList = dataTransformer.responseListToDto(entityList);
         return ResponseEntity.ok(dtoList);
     }

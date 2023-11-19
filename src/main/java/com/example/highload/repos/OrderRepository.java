@@ -27,7 +27,9 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
 
     @Query(value = "select * from order where id in (select order.id from order " +
             "join order_tags on order.id = order_tags.order_id " +
-            "where order_tags.tag_id in :tagIds and order.is_closed = false)" , nativeQuery = true)
-    Page<Order> findAllByMultipleTagsIdsAndIsClosedFalse(@Param("tagIds") Page<Integer> tagIds, Pageable pageable);
+            "where order_tags.tag_id in :tagIds and order.status = :orderStatus)" , nativeQuery = true)
+    Page<Order> findAllByMultipleTagsIdsAndStatus(@Param("tagIds") List<Integer> tagIds,
+                                                  @Param("orderStatus")String status,
+                                                  Pageable pageable);
 
 }

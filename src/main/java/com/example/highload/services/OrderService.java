@@ -21,8 +21,6 @@ public interface OrderService {
 
     Page<Order> getUserOpenOrders(int userId, Pageable pageable);
 
-    Page<Image> getImagesForOrder(int id, Pageable pageable);
-
     Page<Order> getOrdersByTags(List<Integer> tagIds, Pageable pageable);
 
     Page<Order> getOpenOrdersByTags(List<Integer> tagIds, Pageable pageable);

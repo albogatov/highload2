@@ -13,7 +13,7 @@ public interface ResponseService {
 
     Page<Response> findAllForOrder(int orderId, Pageable pageable);
 
-    Page<Response> findAllForProfile(int profileId, Pageable pageable);
+    Page<Response> findAllForUser(int userId, Pageable pageable);
 
     Response findById(int id);
 }

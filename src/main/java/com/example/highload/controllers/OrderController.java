@@ -5,6 +5,7 @@ import com.example.highload.model.inner.Order;
 import com.example.highload.model.network.ImageDto;
 import com.example.highload.model.network.OrderDto;
 import com.example.highload.model.network.ReviewDto;
+import com.example.highload.services.ImageService;
 import com.example.highload.services.OrderService;
 import com.example.highload.utils.DataTransformer;
 import com.example.highload.utils.PaginationHeadersCreator;
@@ -26,6 +27,7 @@ import java.util.List;
 public class OrderController {
 
     private OrderService orderService;
+    private ImageService imageService;
     private PaginationHeadersCreator paginationHeadersCreator;
     private final DataTransformer dataTransformer;
 
@@ -88,12 +90,13 @@ public class OrderController {
         return ResponseEntity.ok(dataTransformer.orderToDto(entity));
     }
 
+
     @CrossOrigin
     @GetMapping("/single/{orderId}/images")
     @PreAuthorize("hasAnyAuthority('CLIENT', 'ARTIST')")
     // todo: "запрос, который вернет findAll с пагинацией и с указанием общего количества записей в http хедере."
     public ResponseEntity getOrderImages(@RequestBody int id){
-        List<Image> entityList = orderService.getImagesForOrder(id);
+        List<Image> entityList = imageService.findAllOrderImages(id);
         List<ImageDto> dtoList = dataTransformer.imageListToDto(entityList);
         return ResponseEntity.ok(dtoList);
     }
