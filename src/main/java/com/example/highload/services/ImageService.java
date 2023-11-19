@@ -9,7 +9,9 @@ import java.util.List;
 
 public interface ImageService {
 
-    Page<ImageDto> findAllProfileImages(int id, Pageable pageable);
+    Page<Image> findAllProfileImages(int id, Pageable pageable);
+
+    Image saveImage(ImageDto imageDto);
 
 //    Page<ImageDto> getPage(List<ImageDto> images, Pageable pageable);
 }

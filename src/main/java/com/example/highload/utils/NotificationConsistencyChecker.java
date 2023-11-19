@@ -6,13 +6,15 @@ import jakarta.annotation.Nonnull;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
+import java.util.Objects;
+
 @Component("notificationConsistencyChecker")
 public class NotificationConsistencyChecker {
 
     NotificationService notificationService;
 
     public boolean mayReadNotification(@Nonnull final UserDetails principal, final int notificationId) {
-        return notificationService.readNotification(notificationId).getReceiverId() == ((User)principal).getId();
+        return Objects.equals(notificationService.readNotification(notificationId).getReceiverProfile().getId(), ((User) principal).getId());
     }
 
 }

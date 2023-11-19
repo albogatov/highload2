@@ -1,9 +1,14 @@
 package com.example.highload.controllers;
 
+import com.example.highload.model.inner.Image;
+import com.example.highload.model.inner.Order;
 import com.example.highload.model.network.ImageDto;
 import com.example.highload.model.network.OrderDto;
+import com.example.highload.model.network.ReviewDto;
 import com.example.highload.services.OrderService;
+import com.example.highload.utils.DataTransformer;
 import com.example.highload.utils.PaginationHeadersCreator;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -17,12 +22,12 @@ import java.util.List;
 
 @RestController
 @RequestMapping(value = "/api/app/order/")
+@RequiredArgsConstructor
 public class OrderController {
 
-    @Autowired
     private OrderService orderService;
-    @Autowired
     private PaginationHeadersCreator paginationHeadersCreator;
+    private final DataTransformer dataTransformer;
 
     @CrossOrigin
     @PostMapping("/save")
@@ -56,12 +61,12 @@ public class OrderController {
     public ResponseEntity getAllUserOrders(@PathVariable int userId, @PathVariable int page){
 
         Pageable pageable = PageRequest.of(page, 50);
-        Page<OrderDto> entityList = orderService.getUserOrders(userId, pageable);
+        Page<Order> entityList = orderService.getUserOrders(userId, pageable);
 
         HttpHeaders responseHeaders = paginationHeadersCreator.endlessSwipeHeadersCreate(entityList);
         // "findAll в виде бесконечной прокрутки без указания общего количества записей"
 
-        return ResponseEntity.ok().headers(responseHeaders).body(entityList.getContent());
+        return ResponseEntity.ok().headers(responseHeaders).body(dataTransformer.orderListToDto(entityList.getContent()));
 
     }
 
@@ -70,16 +75,17 @@ public class OrderController {
     @PreAuthorize("hasAnyAuthority('CLIENT', 'ARTIST')")
     // todo: "findAll в виде бесконечной прокрутки без указания общего количества записей"
     public ResponseEntity getAllUserOpenOrders(@PathVariable int userId){
-        List<OrderDto> entityList = orderService.getUserOpenOrders(userId);
-        return ResponseEntity.ok(entityList);
+        List<Order> entityList = orderService.getUserOpenOrders(userId);
+        List<OrderDto> dtoList = dataTransformer.orderListToDto(entityList);
+        return ResponseEntity.ok(dtoList);
     }
 
     @CrossOrigin
     @GetMapping("/single/{orderId}")
     @PreAuthorize("hasAnyAuthority('CLIENT', 'ARTIST')")
     public ResponseEntity getById(@RequestBody int id){
-        OrderDto entity = orderService.getOrderById(id);
-        return ResponseEntity.ok(entity);
+        Order entity = orderService.getOrderById(id);
+        return ResponseEntity.ok(dataTransformer.orderToDto(entity));
     }
 
     @CrossOrigin
@@ -87,8 +93,9 @@ public class OrderController {
     @PreAuthorize("hasAnyAuthority('CLIENT', 'ARTIST')")
     // todo: "запрос, который вернет findAll с пагинацией и с указанием общего количества записей в http хедере."
     public ResponseEntity getOrderImages(@RequestBody int id){
-        List<ImageDto> entity = orderService.getImagesForOrder(id);
-        return ResponseEntity.ok(entity);
+        List<Image> entityList = orderService.getImagesForOrder(id);
+        List<ImageDto> dtoList = dataTransformer.imageListToDto(entityList);
+        return ResponseEntity.ok(dtoList);
     }
 
 
@@ -98,12 +105,12 @@ public class OrderController {
     public ResponseEntity getAllOrdersByTags(@RequestBody List<Integer> tags, @PathVariable int page){
 
         Pageable pageable = PageRequest.of(page, 50);
-        Page<OrderDto> entityList = orderService.getOrdersByTags(tags, pageable);
+        Page<Order> entityList = orderService.getOrdersByTags(tags, pageable);
 
         HttpHeaders responseHeaders = paginationHeadersCreator.endlessSwipeHeadersCreate(entityList);
         //"findAll в виде бесконечной прокрутки без указания общего количества записей"
 
-        return ResponseEntity.ok().headers(responseHeaders).body(entityList.getContent());
+        return ResponseEntity.ok().headers(responseHeaders).body(dataTransformer.orderListToDto(entityList.getContent()));
     }
 
 
@@ -113,12 +120,12 @@ public class OrderController {
     public ResponseEntity getAllOpenOrdersByTags(@RequestBody List<Integer> tags, @PathVariable int page){
 
         Pageable pageable = PageRequest.of(page, 50);
-        Page<OrderDto> entityList = orderService.getOpenOrdersByTags(tags, pageable);
+        Page<Order> entityList = orderService.getOpenOrdersByTags(tags, pageable);
 
         HttpHeaders responseHeaders = paginationHeadersCreator.endlessSwipeHeadersCreate(entityList);
         //"findAll в виде бесконечной прокрутки без указания общего количества записей"
 
-        return ResponseEntity.ok().headers(responseHeaders).body(entityList.getContent());
+        return ResponseEntity.ok().headers(responseHeaders).body(dataTransformer.orderListToDto(entityList.getContent()));
     }
 
 
@@ -127,8 +134,9 @@ public class OrderController {
     @PreAuthorize("hasAnyAuthority('CLIENT', 'ARTIST')")
     // todo: "findAll в виде бесконечной прокрутки без указания общего количества записей"
     public ResponseEntity getAllOrders(){
-        List<ImageDto> entity = orderService.getAllOrders();
-        return ResponseEntity.ok(entity);
+        List<Order> entityList = orderService.getAllOrders();
+        List<OrderDto> dtoList = dataTransformer.orderListToDto(entityList);
+        return ResponseEntity.ok(dtoList);
     }
 
 

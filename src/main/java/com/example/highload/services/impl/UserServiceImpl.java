@@ -1,8 +1,10 @@
 package com.example.highload.services.impl;
 
 import com.example.highload.model.inner.User;
+import com.example.highload.model.network.UserDto;
 import com.example.highload.repos.UserRepository;
 import com.example.highload.services.UserService;
+import com.example.highload.utils.DataTransformer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -13,17 +15,21 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final DataTransformer dataTransformer;
 
-    public Optional<User> findByLogin(String login) {
-        return userRepository.findByLogin(login);
+    public User findByLogin(String login) {
+        return userRepository.findByLogin(login).orElse(null);
     }
 
-    public Optional<User> findById(Integer id) {
-        return userRepository.findById(id);
+    @Override
+    public User saveUser(UserDto userDto) {
+        return userRepository.save(dataTransformer.userFromDto(userDto));
     }
 
-    public User save(User user) {
-        return userRepository.save(user);
+    public User findById(Integer id) {
+        return userRepository.findById(id).orElse(null);
     }
+
+
 
 }

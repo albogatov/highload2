@@ -9,11 +9,11 @@ import java.util.List;
 
 public interface ResponseService {
 
-    ResponseDto saveResponse(ResponseDto data);
+    Response saveResponse(ResponseDto responseDto);
 
-    Page<ResponseDto> findAllForOrder(int orderId, Pageable pageable);
+    Page<Response> findAllForOrder(int orderId, Pageable pageable);
 
-    Page<ResponseDto> findAllForProfile(int profileId, Pageable pageable);
+    Page<Response> findAllForProfile(int profileId, Pageable pageable);
 
-    ResponseDto findById(int id);
+    Response findById(int id);
 }

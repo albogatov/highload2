@@ -11,23 +11,23 @@ import java.util.List;
 
 public interface OrderService {
 
-    OrderDto saveOrder(OrderDto orderDto);
+    Order saveOrder(OrderDto orderDto);
 
-    OrderDto updateOrder(OrderDto orderDto, int id);
+    Order updateOrder(OrderDto orderDto, int id);
 
-    OrderDto getOrderById(int id);
+    Order getOrderById(int id);
 
-    Page<OrderDto> getUserOrders(int userId, Pageable pageable);
+    Page<Order> getUserOrders(int userId, Pageable pageable);
 
-    Page<OrderDto> getUserOpenOrders(int userId, Pageable pageable);
+    Page<Order> getUserOpenOrders(int userId, Pageable pageable);
 
-    Page<ImageDto> getImagesForOrder(int id, Pageable pageable);
+    Page<Image> getImagesForOrder(int id, Pageable pageable);
 
-    Page<OrderDto> getOrdersByTags(List<Integer> tagIds, Pageable pageable);
+    Page<Order> getOrdersByTags(List<Integer> tagIds, Pageable pageable);
 
-    Page<OrderDto> getOpenOrdersByTags(List<Integer> tagIds, Pageable pageable);
+    Page<Order> getOpenOrdersByTags(List<Integer> tagIds, Pageable pageable);
 
-    Page<OrderDto> getAllOrders(Pageable pageable);
+    Page<Order> getAllOrders(Pageable pageable);
 
 
 }

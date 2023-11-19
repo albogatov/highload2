@@ -11,10 +11,12 @@ import java.util.List;
 
 public interface ProfileService {
 
-    ProfileDto saveProfileForUser(UserDto data);
-    ProfileDto editProfile(ProfileDto data, int id);
+    Profile saveProfileForUser(ProfileDto profileDto);
+    Profile editProfile(ProfileDto data, int id);
 
-    ProfileDto findById(int id);
+    Profile findById(int id);
 
-    Page<ProfileDto> findAllProfiles(Pageable pageable);
+    Profile findByUserId(int userId);
+
+    Page<Profile> findAllProfiles(Pageable pageable);
 }

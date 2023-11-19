@@ -9,14 +9,14 @@ import java.util.List;
 
 public interface NotificationService {
 
-    NotificationDto saveNotification(NotificationDto notificationDto);
+    Notification saveNotification(NotificationDto notificationDto);
 
 //    NotificationDto updateNotification(NotificationDto notificationDto, int id);
 
-    NotificationDto readNotification(int id);
+    Notification readNotification(int id);
 
-    Page<NotificationDto> getAllUserNotifications(int userId, Pageable pageable);
+    Page<Notification> getAllUserNotifications(int userId, Pageable pageable);
 
-    Page<NotificationDto> getNewUserNotifications(int userId, Pageable pageable);
+    Page<Notification> getNewUserNotifications(int userId, Pageable pageable);
 
 }

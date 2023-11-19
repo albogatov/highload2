@@ -1,7 +1,11 @@
 package com.example.highload.controllers;
 
+import com.example.highload.model.inner.Review;
 import com.example.highload.model.network.ReviewDto;
+import com.example.highload.model.network.TagDto;
 import com.example.highload.services.ReviewService;
+import com.example.highload.utils.DataTransformer;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -11,10 +15,11 @@ import java.util.List;
 
 @RestController
 @RequestMapping(value = "/api/app/review/")
+@RequiredArgsConstructor
 public class ReviewController {
 
-    @Autowired
     private ReviewService reviewService;
+    private final DataTransformer dataTransformer;
 
     @CrossOrigin
     @PostMapping("/save")
@@ -30,15 +35,17 @@ public class ReviewController {
     @PreAuthorize("hasAnyAuthority('CLIENT', 'ARTIST')")
     // todo: "запрос, который вернет findAll с пагинацией и с указанием общего количества записей в http хедере."
     public ResponseEntity getAllByProfile(@PathVariable int profileId){
-        List<ReviewDto> entityList = reviewService.findAllProfileReviews(profileId);
-        return ResponseEntity.ok(entityList);
+        List<Review> entityList = reviewService.findAllProfileReviews(profileId);
+        List<ReviewDto> dtoList = dataTransformer.reviewListToDto(entityList);
+        return ResponseEntity.ok(dtoList);
     }
 
     @CrossOrigin
     @GetMapping("/single/{id}")
     @PreAuthorize("hasAnyAuthority('CLIENT', 'ARTIST')")
     public ResponseEntity getById(@PathVariable int id){
-        ReviewDto entity = reviewService.findById(id);
-        return ResponseEntity.ok(entity);
+        Review entity = reviewService.findById(id);
+        ReviewDto reviewDto = dataTransformer.reviewToDto(entity);
+        return ResponseEntity.ok(reviewDto);
     }
 }

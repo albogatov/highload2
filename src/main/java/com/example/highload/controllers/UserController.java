@@ -1,8 +1,12 @@
 package com.example.highload.controllers;
 
+import com.example.highload.model.inner.User;
+import com.example.highload.model.network.ProfileDto;
 import com.example.highload.model.network.UserDto;
 import com.example.highload.services.ProfileService;
 import com.example.highload.services.UserService;
+import com.example.highload.utils.DataTransformer;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,16 +21,15 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping(value = "/api/app/user/")
+@RequiredArgsConstructor
 public class UserController {
 
-    @Autowired
     private UserService userService;
-
-    @Autowired
     private ProfileService profileService;
+    private final DataTransformer dataTransformer;
 
     @PostMapping("/login")
-    public ResponseEntity login(@RequestBody UserDto user){
+    public ResponseEntity login(@RequestBody UserDto user) {
         if (user.getLogin() == null || user.getPassword() == null) {
             return new ResponseEntity<>("Absent login or password", HttpStatus.BAD_REQUEST);
         }
@@ -35,15 +38,16 @@ public class UserController {
             String login = user.getLogin();
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(login, user.getPassword()));
             String token = jwtUtil.resolveToken(login);
-            UserDto userEntity = userService.findByLogin(user.getLogin());
-            return new ResponseEntity<>(new ResponseMessageEntity(token, userEntity.getRole(), HttpStatus.OK));
+            User userEntity = userService.findByLogin(user.getLogin());
+            UserDto userDto = dataTransformer.userToDto(userEntity);
+            return new ResponseEntity<>(new ResponseMessageEntity(token, userDto.getRole(), HttpStatus.OK));
         } catch (AuthenticationException e) {
             return new ResponseEntity<>("Wrong login or password", HttpStatus.UNAUTHORIZED);
         }
     }
 
     @PostMapping("/register")
-    public ResponseEntity register(@RequestBody UserDto user){
+    public ResponseEntity register(@RequestBody UserDto user) {
         try {
             if (user.getLogin() == null || user.getPassword() == null || user.getLogin().trim().equals("")
                     || user.getPassword().trim().equals("")) {
@@ -55,10 +59,22 @@ public class UserController {
             }
             //TODO: SECURITY
             user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-            profileService.saveProfileForUser(user);
-            userService.save(user);
+//            profileService.saveProfileForUser(user);
+            // todo решить, каким образом передавать профиль при регистрации
+            userService.saveUser(user);
             return new ResponseEntity<>("User successfully registered", HttpStatus.OK);
         } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>("Invalid login or password", HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PostMapping("/profile/add")
+    public ResponseEntity addProfile(@RequestBody ProfileDto profile) {
+
+        if (profileService.findByUserId(profile.getUserId()) == null) {
+            profileService.saveProfileForUser(profile);
+            return new ResponseEntity<>("Profile successfully added", HttpStatus.OK);
+        } else {
             return new ResponseEntity<>("Invalid login or password", HttpStatus.BAD_REQUEST);
         }
     }

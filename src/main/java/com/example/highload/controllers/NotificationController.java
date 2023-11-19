@@ -1,7 +1,11 @@
 package com.example.highload.controllers;
 
+import com.example.highload.model.inner.Notification;
 import com.example.highload.model.network.NotificationDto;
+import com.example.highload.model.network.OrderDto;
 import com.example.highload.services.NotificationService;
+import com.example.highload.utils.DataTransformer;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -11,10 +15,11 @@ import java.util.List;
 
 @RestController
 @RequestMapping(value = "/api/app/notification/")
+@RequiredArgsConstructor
 public class NotificationController {
 
-    @Autowired
     private NotificationService notificationService;
+    private final DataTransformer dataTransformer;
 
     @CrossOrigin
     @PostMapping("/save")
@@ -38,8 +43,9 @@ public class NotificationController {
     @PreAuthorize("hasAnyAuthority('CLIENT', 'ARTIST')")
     // todo: "запрос, который вернет findAll с пагинацией и с указанием общего количества записей в http хедере."
     public ResponseEntity getAllQueries(@PathVariable int userId) {
-        List<NotificationDto> entityList = notificationService.getAllUserNotifications(userId);
-        return ResponseEntity.ok(entityList);
+        List<Notification> entityList = notificationService.getAllUserNotifications(userId);
+        List<NotificationDto> dtoList = dataTransformer.notificationListToDto(entityList);
+        return ResponseEntity.ok(dtoList);
     }
 
 
@@ -48,7 +54,8 @@ public class NotificationController {
     @PreAuthorize("hasAnyAuthority('CLIENT', 'ARTIST')")
     // todo: "запрос, который вернет findAll с пагинацией и с указанием общего количества записей в http хедере."
     public ResponseEntity getNewQueries(@PathVariable int userId) {
-        List<NotificationDto> entityList = notificationService.getNewUserNotifications(userId);
-        return ResponseEntity.ok(entityList);
+        List<Notification> entityList = notificationService.getNewUserNotifications(userId);
+        List<NotificationDto> dtoList = dataTransformer.notificationListToDto(entityList);
+        return ResponseEntity.ok(dtoList);
     }
 }

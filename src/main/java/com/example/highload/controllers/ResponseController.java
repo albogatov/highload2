@@ -1,7 +1,11 @@
 package com.example.highload.controllers;
 
+import com.example.highload.model.inner.Response;
 import com.example.highload.model.network.ResponseDto;
+import com.example.highload.model.network.ReviewDto;
 import com.example.highload.services.ResponseService;
+import com.example.highload.utils.DataTransformer;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -11,10 +15,11 @@ import java.util.List;
 
 @RestController
 @RequestMapping(value = "/api/app/response/")
+@RequiredArgsConstructor
 public class ResponseController {
 
-    @Autowired
     private ResponseService responseService;
+    private final DataTransformer dataTransformer;
 
     @CrossOrigin
     @PostMapping("/save")
@@ -29,8 +34,9 @@ public class ResponseController {
     @PreAuthorize("hasAnyAuthority('CLIENT')")
     // todo: "findAll в виде бесконечной прокрутки без указания общего количества записей"
     public ResponseEntity getAllByOrder(@PathVariable int orderId){
-        List<ResponseDto> entityList = responseService.findAllForOrder(orderId);
-        return ResponseEntity.ok(entityList);
+        List<Response> entityList = responseService.findAllForOrder(orderId);
+        List<ResponseDto> dtoList = dataTransformer.responseListToDto(entityList);
+        return ResponseEntity.ok(dtoList);
     }
 
     @CrossOrigin
@@ -38,16 +44,17 @@ public class ResponseController {
     @PreAuthorize("hasAnyAuthority('ARTIST')")
     // todo: "запрос, который вернет findAll с пагинацией и с указанием общего количества записей в http хедере."
     public ResponseEntity getAllByProfile(@PathVariable int profileId){
-        List<ResponseDto> entityList = responseService.findAllForProfile(profileId);
-        return ResponseEntity.ok(entityList);
+        List<Response> entityList = responseService.findAllForProfile(profileId);
+        List<ResponseDto> dtoList = dataTransformer.responseListToDto(entityList);
+        return ResponseEntity.ok(dtoList);
     }
 
     @CrossOrigin
     @GetMapping("/single/{id}")
     @PreAuthorize("hasAnyAuthority('CLIENT', 'ARTIST')")
     public ResponseEntity getById(@PathVariable int id){
-        ResponseDto entity = responseService.findById(id);
-        return ResponseEntity.ok(entity);
+        Response entity = responseService.findById(id);
+        return ResponseEntity.ok(dataTransformer.responseToDto(entity));
     }
 
 

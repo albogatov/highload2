@@ -1,10 +1,15 @@
 package com.example.highload.controllers;
 
+import com.example.highload.model.inner.Image;
+import com.example.highload.model.inner.Profile;
 import com.example.highload.model.network.ImageDto;
 import com.example.highload.model.network.ProfileDto;
+import com.example.highload.model.network.TagDto;
 import com.example.highload.services.ImageService;
 import com.example.highload.services.ProfileService;
+import com.example.highload.utils.DataTransformer;
 import com.example.highload.utils.PaginationHeadersCreator;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -17,16 +22,13 @@ import java.util.List;
 
 @RestController
 @RequestMapping(value = "/api/app/profile/")
+@RequiredArgsConstructor
 public class ProfileController {
 
-    @Autowired
     private ProfileService profileService;
-
-    @Autowired
     private ImageService imageService;
-
-    @Autowired
     private PaginationHeadersCreator paginationHeadersCreator;
+    private final DataTransformer dataTransformer;
 
     @CrossOrigin
     @PostMapping("/edit/{id}")
@@ -40,15 +42,16 @@ public class ProfileController {
     @GetMapping("/all")
     // todo: "запрос, который вернет findAll с пагинацией и с указанием общего количества записей в http хедере."
     public ResponseEntity getAll(){
-        List<ProfileDto> entityList = profileService.findAllProfiles();
-        return ResponseEntity.ok(entityList);
+        List<Profile> entityList = profileService.findAllProfiles();
+        List<ProfileDto> dtoList = dataTransformer.profileListToDto(entityList);
+        return ResponseEntity.ok(dtoList);
     }
 
     @CrossOrigin
     @GetMapping("/single/{id}")
     public ResponseEntity getById(@PathVariable int id){
-        ProfileDto entity = profileService.findById(id);
-        return ResponseEntity.ok(entity);
+        Profile entity = profileService.findById(id);
+        return ResponseEntity.ok(dataTransformer.profileToDto(entity));
     }
 
     @CrossOrigin
@@ -56,11 +59,11 @@ public class ProfileController {
     public ResponseEntity getProfileImagesByIdAndPageNumber(@PathVariable int id, @PathVariable int page){
 
         Pageable pageable = PageRequest.of(page, 50);
-        Page<ImageDto> images = imageService.findAllProfileImages(id, pageable);
+        Page<Image> images = imageService.findAllProfileImages(id, pageable);
         // TODO вынести 50 в константы из хардкода
         HttpHeaders responseHeaders = paginationHeadersCreator.pageWithTotalElementsHeadersCreate(images);
         // "запрос, который вернет findAll с пагинацией и с указанием общего количества записей в http хедере."
-        return ResponseEntity.ok().headers(responseHeaders).body(images.getContent());
+        return ResponseEntity.ok().headers(responseHeaders).body(dataTransformer.imageListToDto(images.getContent()));
 
     }
 }
