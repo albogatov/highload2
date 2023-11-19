@@ -1,14 +1,9 @@
 package com.example.highload.controllers;
 
-import com.example.highload.model.inner.Image;
-import com.example.highload.model.inner.Profile;
 import com.example.highload.model.network.ImageDto;
 import com.example.highload.model.network.ProfileDto;
-import com.example.highload.repos.ImageRepository;
-import com.example.highload.repos.ProfileRepository;
 import com.example.highload.services.ImageService;
 import com.example.highload.services.ProfileService;
-import com.example.highload.services.impl.ImageServiceImpl;
 import com.example.highload.utils.PaginationHeadersCreator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -16,7 +11,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

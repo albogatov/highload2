@@ -7,6 +7,7 @@ import java.io.Serializable;
 @Data
 public class ImageDto implements Serializable {
 
+    int id;
     String url;
 
 }

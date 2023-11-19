@@ -1,11 +1,6 @@
 package com.example.highload.controllers;
 
-import com.example.highload.model.inner.Order;
-import com.example.highload.model.inner.Review;
-import com.example.highload.model.network.IdDto;
-import com.example.highload.model.network.OrderDto;
 import com.example.highload.model.network.ReviewDto;
-import com.example.highload.repos.ReviewRepository;
 import com.example.highload.services.ReviewService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

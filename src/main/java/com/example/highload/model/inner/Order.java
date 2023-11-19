@@ -3,6 +3,7 @@ package com.example.highload.model.inner;
 import com.example.highload.model.enums.OrderStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -36,6 +37,7 @@ public class Order {
             name = "order_tags",
             joinColumns = @JoinColumn(name = "order_id"),
             inverseJoinColumns = @JoinColumn(name = "tag_id"))
+    @Size(max=10)
     List<Tag> tags;
 
     @OneToMany(mappedBy = "order")

@@ -1,12 +1,6 @@
 package com.example.highload.controllers;
 
-import com.example.highload.model.inner.Notification;
-import com.example.highload.model.inner.Order;
-import com.example.highload.model.inner.Review;
-import com.example.highload.model.network.IdDto;
 import com.example.highload.model.network.NotificationDto;
-import com.example.highload.model.network.OrderDto;
-import com.example.highload.repos.NotificationRepository;
 import com.example.highload.services.NotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

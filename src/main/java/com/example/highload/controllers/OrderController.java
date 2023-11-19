@@ -1,12 +1,7 @@
 package com.example.highload.controllers;
 
-import com.example.highload.model.inner.Image;
-import com.example.highload.model.inner.Order;
-import com.example.highload.model.inner.Tag;
-import com.example.highload.model.network.IdDto;
 import com.example.highload.model.network.ImageDto;
 import com.example.highload.model.network.OrderDto;
-import com.example.highload.repos.OrderRepository;
 import com.example.highload.services.OrderService;
 import com.example.highload.utils.PaginationHeadersCreator;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,10 +1,6 @@
 package com.example.highload.controllers;
 
-import com.example.highload.model.inner.Profile;
-import com.example.highload.model.inner.User;
 import com.example.highload.model.network.UserDto;
-import com.example.highload.repos.ProfileRepository;
-import com.example.highload.repos.UserRepository;
 import com.example.highload.services.ProfileService;
 import com.example.highload.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;

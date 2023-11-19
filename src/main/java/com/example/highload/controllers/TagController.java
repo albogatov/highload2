@@ -1,10 +1,6 @@
 package com.example.highload.controllers;
 
-import com.example.highload.model.inner.Order;
-import com.example.highload.model.inner.Tag;
-import com.example.highload.model.network.OrderDto;
 import com.example.highload.model.network.TagDto;
-import com.example.highload.repos.TagRepository;
 import com.example.highload.services.TagService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
