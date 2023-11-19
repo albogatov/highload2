@@ -9,6 +9,7 @@ import com.example.highload.repos.ProfileRepository;
 import com.example.highload.services.ImageService;
 import com.example.highload.services.ProfileService;
 import com.example.highload.services.impl.ImageServiceImpl;
+import com.example.highload.utils.PaginationHeadersCreator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -30,6 +31,9 @@ public class ProfileController {
     @Autowired
     private ImageService imageService;
 
+    @Autowired
+    private PaginationHeadersCreator paginationHeadersCreator;
+
     @CrossOrigin
     @PostMapping("/edit/{id}")
     public ResponseEntity edit(@RequestBody ProfileDto data, @PathVariable int id){
@@ -40,7 +44,8 @@ public class ProfileController {
 
     @CrossOrigin
     @GetMapping("/all")
-    public ResponseEntity getAllQueries(){
+    // todo: "запрос, который вернет findAll с пагинацией и с указанием общего количества записей в http хедере."
+    public ResponseEntity getAll(){
         List<ProfileDto> entityList = profileService.findAllProfiles();
         return ResponseEntity.ok(entityList);
     }
@@ -52,34 +57,16 @@ public class ProfileController {
         return ResponseEntity.ok(entity);
     }
 
-//    @CrossOrigin
-//    @GetMapping("/single/{id}/images")
-//    public ResponseEntity getPortfolioById(@PathVariable int id, Pageable pageable){
-//        ProfileDto entity = profileService.findById(id);
-//        List<ImageDto> images = imageService.findAllProfileImages(id, pageable);
-//        // TODO Сонь ты лучше за pageable шаришь посмотри пж
-//        Page<ImageDto> pageImages = imageService.getPage(images, pageable);
-//        return ResponseEntity.ok(pageImages);
-//    }
-
     @CrossOrigin
     @GetMapping("/single/{id}/images/{page}")
     public ResponseEntity getProfileImagesByIdAndPageNumber(@PathVariable int id, @PathVariable int page){
 
         Pageable pageable = PageRequest.of(page, 50);
         Page<ImageDto> images = imageService.findAllProfileImages(id, pageable);
-
-        // TODO наверное имеет смысл сделать вызов по номеру страницы с фоточками, на каждой странице до 50 фото
         // TODO вынести 50 в константы из хардкода
-
-        HttpHeaders responseHeaders = new HttpHeaders();
-        responseHeaders.set("app-total-page-num", String.valueOf(images.getTotalPages()));
-        responseHeaders.set("app-total-items-num", String.valueOf(images.getTotalElements()));
-        responseHeaders.set("app-current-page-num", String.valueOf(images.getNumber()));
-        responseHeaders.set("app-current-items-num", String.valueOf(images.getNumberOfElements()));
-
-        // todo: "запрос, который вернет findAll с пагинацией и с указанием общего количества записей в http хедере."
-
+        HttpHeaders responseHeaders = paginationHeadersCreator.pageWithTotalElementsHeadersCreate(images);
+        // "запрос, который вернет findAll с пагинацией и с указанием общего количества записей в http хедере."
         return ResponseEntity.ok().headers(responseHeaders).body(images.getContent());
+
     }
 }

@@ -31,7 +31,8 @@ public class TagController {
 
     @CrossOrigin
     @GetMapping("/all")
-    public ResponseEntity getAllQueries(){
+    // todo: "findAll в виде бесконечной прокрутки без указания общего количества записей"
+    public ResponseEntity getAll(){
         List<TagDto> entityList = tagService.findAll();
         return ResponseEntity.ok(entityList);
     }

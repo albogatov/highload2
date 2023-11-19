@@ -42,14 +42,17 @@ public class NotificationController {
     @CrossOrigin
     @GetMapping("/all/{userId}")
     @PreAuthorize("hasAnyAuthority('CLIENT', 'ARTIST')")
+    // todo: "запрос, который вернет findAll с пагинацией и с указанием общего количества записей в http хедере."
     public ResponseEntity getAllQueries(@PathVariable int userId) {
         List<NotificationDto> entityList = notificationService.getAllUserNotifications(userId);
         return ResponseEntity.ok(entityList);
     }
 
+
     @CrossOrigin
     @GetMapping("/new/{userId}")
     @PreAuthorize("hasAnyAuthority('CLIENT', 'ARTIST')")
+    // todo: "запрос, который вернет findAll с пагинацией и с указанием общего количества записей в http хедере."
     public ResponseEntity getNewQueries(@PathVariable int userId) {
         List<NotificationDto> entityList = notificationService.getNewUserNotifications(userId);
         return ResponseEntity.ok(entityList);

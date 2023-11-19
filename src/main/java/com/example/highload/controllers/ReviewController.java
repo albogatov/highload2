@@ -33,7 +33,8 @@ public class ReviewController {
     @CrossOrigin
     @GetMapping("/all/{profileId}")
     @PreAuthorize("hasAnyAuthority('CLIENT', 'ARTIST')")
-    public ResponseEntity getAllQueriesProfile(@PathVariable int profileId){
+    // todo: "запрос, который вернет findAll с пагинацией и с указанием общего количества записей в http хедере."
+    public ResponseEntity getAllByProfile(@PathVariable int profileId){
         List<ReviewDto> entityList = reviewService.findAllProfileReviews(profileId);
         return ResponseEntity.ok(entityList);
     }

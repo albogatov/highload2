@@ -33,7 +33,8 @@ public class ResponseController {
     @CrossOrigin
     @GetMapping("/all/{orderId}")
     @PreAuthorize("hasAnyAuthority('CLIENT')")
-    public ResponseEntity getAllQueriesOrder(@PathVariable int orderId){
+    // todo: "findAll в виде бесконечной прокрутки без указания общего количества записей"
+    public ResponseEntity getAllByOrder(@PathVariable int orderId){
         List<ResponseDto> entityList = responseService.findAllForOrder(orderId);
         return ResponseEntity.ok(entityList);
     }
@@ -41,7 +42,8 @@ public class ResponseController {
     @CrossOrigin
     @GetMapping("/all/{profileId}")
     @PreAuthorize("hasAnyAuthority('ARTIST')")
-    public ResponseEntity getAllQueriesProfile(@PathVariable int profileId){
+    // todo: "запрос, который вернет findAll с пагинацией и с указанием общего количества записей в http хедере."
+    public ResponseEntity getAllByProfile(@PathVariable int profileId){
         List<ResponseDto> entityList = responseService.findAllForProfile(profileId);
         return ResponseEntity.ok(entityList);
     }
