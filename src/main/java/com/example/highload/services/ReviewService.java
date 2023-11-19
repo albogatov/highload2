@@ -1,12 +1,12 @@
 package com.example.highload.services;
 
 import com.example.highload.model.network.ReviewDto;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface ReviewService {
 
-    List<ReviewDto> findAllProfileReviews(int profileId);
+    Page<ReviewDto> findAllProfileReviews(int profileId, Pageable pageable);
 
     ReviewDto findById(int id);
 

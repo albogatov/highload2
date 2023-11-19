@@ -7,6 +7,7 @@ import com.example.highload.repos.ImageRepository;
 import com.example.highload.repos.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -24,14 +25,14 @@ public class AdminServiceImpl {
     @Transactional
     public void deleteLogicallyDeletedUsers(Integer daysToExpire) {
         LocalDateTime dateTimeLTDelete = LocalDateTime.now().minusDays(daysToExpire);
-        List<User> usersToDelete;
+        Page<User> usersToDelete;
         Pageable pageable;
         int i = 0;
         do {
             pageable = PageRequest.of(i, 50);
             usersToDelete = userRepository.findAllByIsActualFalseAndWhenDeletedTimeLessThan(dateTimeLTDelete, pageable);
             for (User user :
-                    usersToDelete) {
+                    usersToDelete.getContent()) {
 
                 Profile profile = user.getProfile();
                 imageRepository.deleteAllByImageObject_Profile(profile);
@@ -41,7 +42,7 @@ public class AdminServiceImpl {
                 orders.forEach(imageRepository::deleteAllByImageObject_Order);
             }
             i++;
-        } while (usersToDelete.size() == 50);
+        } while (usersToDelete.getContent().size() == 50);
 
         userRepository.deleteAllByIsActualFalseAndWhenDeletedTimeLessThan(dateTimeLTDelete);
 

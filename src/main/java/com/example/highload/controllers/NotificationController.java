@@ -31,9 +31,10 @@ public class NotificationController {
     }
 
     @CrossOrigin
-    @PostMapping("/save/{id}")
-    public ResponseEntity update(@RequestBody NotificationDto data, @PathVariable int id){
-        if(notificationService.updateNotification(data, id) != null)
+    @PostMapping("/update/{id}")
+    @PreAuthorize("hasAnyAuthority('CLIENT', 'ARTIST') and notificationConsistencyChecker.mayReadNotification(authentication.principal, #id)")
+    public ResponseEntity setRead(@PathVariable int id){
+        if(notificationService.readNotification(id) != null)
             return ResponseEntity.ok("");
         else return ResponseEntity.badRequest().body("Couldn't change notification, check data");
     }
@@ -42,7 +43,15 @@ public class NotificationController {
     @GetMapping("/all/{userId}")
     @PreAuthorize("hasAnyAuthority('CLIENT', 'ARTIST')")
     public ResponseEntity getAllQueries(@PathVariable int userId) {
-        List<NotificationDto> entityList = notificationService.getUserNotifications(userId);
+        List<NotificationDto> entityList = notificationService.getAllUserNotifications(userId);
+        return ResponseEntity.ok(entityList);
+    }
+
+    @CrossOrigin
+    @GetMapping("/new/{userId}")
+    @PreAuthorize("hasAnyAuthority('CLIENT', 'ARTIST')")
+    public ResponseEntity getNewQueries(@PathVariable int userId) {
+        List<NotificationDto> entityList = notificationService.getNewUserNotifications(userId);
         return ResponseEntity.ok(entityList);
     }
 }
