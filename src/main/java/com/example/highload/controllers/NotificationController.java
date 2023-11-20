@@ -5,8 +5,13 @@ import com.example.highload.model.network.NotificationDto;
 import com.example.highload.model.network.OrderDto;
 import com.example.highload.services.NotificationService;
 import com.example.highload.utils.DataTransformer;
+import com.example.highload.utils.PaginationHeadersCreator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +24,8 @@ import java.util.List;
 public class NotificationController {
 
     private NotificationService notificationService;
+
+    private PaginationHeadersCreator paginationHeadersCreator;
     private final DataTransformer dataTransformer;
 
     @CrossOrigin
@@ -39,23 +46,25 @@ public class NotificationController {
     }
 
     @CrossOrigin
-    @GetMapping("/all/{userId}")
+    @GetMapping("/all/{userId}/{page}")
     @PreAuthorize("hasAnyAuthority('CLIENT', 'ARTIST')")
-    // todo: "запрос, который вернет findAll с пагинацией и с указанием общего количества записей в http хедере."
-    public ResponseEntity getAllQueries(@PathVariable int userId) {
-        List<Notification> entityList = notificationService.getAllUserNotifications(userId);
-        List<NotificationDto> dtoList = dataTransformer.notificationListToDto(entityList);
-        return ResponseEntity.ok(dtoList);
+    public ResponseEntity getAllQueries(@PathVariable int userId, @PathVariable int page) {
+        Pageable pageable = PageRequest.of(page, 50);
+        Page<Notification> entityList = notificationService.getAllUserNotifications(userId,pageable);
+        List<NotificationDto> dtoList = dataTransformer.notificationListToDto(entityList.getContent());
+        HttpHeaders responseHeaders = paginationHeadersCreator.pageWithTotalElementsHeadersCreate(entityList);
+        return ResponseEntity.ok().headers(responseHeaders).body(dtoList);
     }
 
 
     @CrossOrigin
-    @GetMapping("/new/{userId}")
+    @GetMapping("/new/{userId}/{page}")
     @PreAuthorize("hasAnyAuthority('CLIENT', 'ARTIST')")
-    // todo: "запрос, который вернет findAll с пагинацией и с указанием общего количества записей в http хедере."
-    public ResponseEntity getNewQueries(@PathVariable int userId) {
-        List<Notification> entityList = notificationService.getNewUserNotifications(userId);
-        List<NotificationDto> dtoList = dataTransformer.notificationListToDto(entityList);
-        return ResponseEntity.ok(dtoList);
+    public ResponseEntity getNewQueries(@PathVariable int userId, @PathVariable int page) {
+        Pageable pageable = PageRequest.of(page, 50);
+        Page<Notification> entityList = notificationService.getNewUserNotifications(userId, pageable);
+        List<NotificationDto> dtoList = dataTransformer.notificationListToDto(entityList.getContent());
+        HttpHeaders responseHeaders = paginationHeadersCreator.pageWithTotalElementsHeadersCreate(entityList);
+        return ResponseEntity.ok().headers(responseHeaders).body(dtoList);
     }
 }

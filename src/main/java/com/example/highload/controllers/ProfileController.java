@@ -39,12 +39,13 @@ public class ProfileController {
     }
 
     @CrossOrigin
-    @GetMapping("/all")
-    // todo: "запрос, который вернет findAll с пагинацией и с указанием общего количества записей в http хедере."
-    public ResponseEntity getAll(){
-        List<Profile> entityList = profileService.findAllProfiles();
-        List<ProfileDto> dtoList = dataTransformer.profileListToDto(entityList);
-        return ResponseEntity.ok(dtoList);
+    @GetMapping("/all/{page}")
+    public ResponseEntity getAll(@PathVariable int page){
+        Pageable pageable = PageRequest.of(page, 50);
+        Page<Profile> entityList = profileService.findAllProfiles(pageable);
+        List<ProfileDto> dtoList = dataTransformer.profileListToDto(entityList.getContent());
+        HttpHeaders responseHeaders = paginationHeadersCreator.pageWithTotalElementsHeadersCreate(entityList);
+        return ResponseEntity.ok().headers(responseHeaders).body(dtoList);
     }
 
     @CrossOrigin

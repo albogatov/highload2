@@ -5,8 +5,13 @@ import com.example.highload.model.network.ReviewDto;
 import com.example.highload.model.network.TagDto;
 import com.example.highload.services.ReviewService;
 import com.example.highload.utils.DataTransformer;
+import com.example.highload.utils.PaginationHeadersCreator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +24,7 @@ import java.util.List;
 public class ReviewController {
 
     private ReviewService reviewService;
+    private PaginationHeadersCreator paginationHeadersCreator;
     private final DataTransformer dataTransformer;
 
     @CrossOrigin
@@ -31,13 +37,14 @@ public class ReviewController {
     }
 
     @CrossOrigin
-    @GetMapping("/all/{profileId}")
+    @GetMapping("/all/{profileId}/{page}")
     @PreAuthorize("hasAnyAuthority('CLIENT', 'ARTIST')")
-    // todo: "запрос, который вернет findAll с пагинацией и с указанием общего количества записей в http хедере."
-    public ResponseEntity getAllByProfile(@PathVariable int profileId){
-        List<Review> entityList = reviewService.findAllProfileReviews(profileId);
-        List<ReviewDto> dtoList = dataTransformer.reviewListToDto(entityList);
-        return ResponseEntity.ok(dtoList);
+    public ResponseEntity getAllByProfile(@PathVariable int profileId, @PathVariable int page) {
+        Pageable pageable = PageRequest.of(page, 50);
+        Page<Review> entityList = reviewService.findAllProfileReviews(profileId, pageable);
+        List<ReviewDto> dtoList = dataTransformer.reviewListToDto(entityList.getContent());
+        HttpHeaders responseHeaders = paginationHeadersCreator.pageWithTotalElementsHeadersCreate(entityList);
+        return ResponseEntity.ok().headers(responseHeaders).body(dtoList);
     }
 
     @CrossOrigin

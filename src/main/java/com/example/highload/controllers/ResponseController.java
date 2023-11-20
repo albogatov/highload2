@@ -1,12 +1,18 @@
 package com.example.highload.controllers;
 
 import com.example.highload.model.inner.Response;
+import com.example.highload.model.network.OrderDto;
 import com.example.highload.model.network.ResponseDto;
 import com.example.highload.model.network.ReviewDto;
 import com.example.highload.services.ResponseService;
 import com.example.highload.utils.DataTransformer;
+import com.example.highload.utils.PaginationHeadersCreator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +25,8 @@ import java.util.List;
 public class ResponseController {
 
     private ResponseService responseService;
+
+    private PaginationHeadersCreator paginationHeadersCreator;
     private final DataTransformer dataTransformer;
 
     @CrossOrigin
@@ -30,23 +38,25 @@ public class ResponseController {
     }
 
     @CrossOrigin
-    @GetMapping("/all/{orderId}")
+    @GetMapping("/all/{orderId}/{page}")
     @PreAuthorize("hasAnyAuthority('CLIENT')")
-    // todo: "findAll в виде бесконечной прокрутки без указания общего количества записей"
-    public ResponseEntity getAllByOrder(@PathVariable int orderId){
-        List<Response> entityList = responseService.findAllForOrder(orderId);
-        List<ResponseDto> dtoList = dataTransformer.responseListToDto(entityList);
-        return ResponseEntity.ok(dtoList);
+    public ResponseEntity getAllByOrder(@PathVariable int orderId, @PathVariable int page){
+        Pageable pageable = PageRequest.of(page, 50);
+        Page<Response> entityList = responseService.findAllForOrder(orderId, pageable);
+        List<ResponseDto> dtoList = dataTransformer.responseListToDto(entityList.getContent());
+        HttpHeaders responseHeaders = paginationHeadersCreator.endlessSwipeHeadersCreate(entityList);
+        return ResponseEntity.ok().headers(responseHeaders).body(dtoList);
     }
 
     @CrossOrigin
-    @GetMapping("/all/{userId}")
+    @GetMapping("/all/{userId}/{page}")
     @PreAuthorize("hasAnyAuthority('ARTIST')")
-    // todo: "запрос, который вернет findAll с пагинацией и с указанием общего количества записей в http хедере."
-    public ResponseEntity getAllByProfile(@PathVariable int userId){
-        List<Response> entityList = responseService.findAllForUser(userId);
-        List<ResponseDto> dtoList = dataTransformer.responseListToDto(entityList);
-        return ResponseEntity.ok(dtoList);
+    public ResponseEntity getAllByProfile(@PathVariable int userId, @PathVariable int page){
+        Pageable pageable = PageRequest.of(page, 50);
+        Page<Response> entityList = responseService.findAllForUser(userId, pageable);
+        List<ResponseDto> dtoList = dataTransformer.responseListToDto(entityList.getContent());
+        HttpHeaders responseHeaders = paginationHeadersCreator.pageWithTotalElementsHeadersCreate(entityList);
+        return ResponseEntity.ok().headers(responseHeaders).body(dtoList);
     }
 
     @CrossOrigin

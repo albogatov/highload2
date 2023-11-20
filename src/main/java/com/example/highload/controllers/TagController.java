@@ -4,8 +4,13 @@ import com.example.highload.model.inner.Tag;
 import com.example.highload.model.network.TagDto;
 import com.example.highload.services.TagService;
 import com.example.highload.utils.DataTransformer;
+import com.example.highload.utils.PaginationHeadersCreator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +23,7 @@ import java.util.List;
 public class TagController {
 
     private TagService tagService;
+    private PaginationHeadersCreator paginationHeadersCreator;
     private final DataTransformer dataTransformer;
 
     @CrossOrigin
@@ -30,12 +36,14 @@ public class TagController {
     }
 
     @CrossOrigin
-    @GetMapping("/all")
+    @GetMapping("/all/{page}")
     // todo: "findAll в виде бесконечной прокрутки без указания общего количества записей"
-    public ResponseEntity getAll(){
-        List<Tag> entityList = tagService.findAll();
-        List<TagDto> dtoList = dataTransformer.tagListToDto(entityList);
-        return ResponseEntity.ok(dtoList);
+    public ResponseEntity getAll(@PathVariable int page) {
+        Pageable pageable = PageRequest.of(page, 50);
+        Page<Tag> entityList = tagService.findAll(pageable);
+        List<TagDto> dtoList = dataTransformer.tagListToDto(entityList.getContent());
+        HttpHeaders responseHeaders = paginationHeadersCreator.endlessSwipeHeadersCreate(entityList);
+        return ResponseEntity.ok().headers(responseHeaders).body(dtoList);
     }
 
 }
