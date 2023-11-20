@@ -24,7 +24,6 @@ import java.util.List;
 public class NotificationController {
 
     private NotificationService notificationService;
-
     private PaginationHeadersCreator paginationHeadersCreator;
     private final DataTransformer dataTransformer;
 

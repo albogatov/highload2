@@ -37,7 +37,6 @@ public class TagController {
 
     @CrossOrigin
     @GetMapping("/all/{page}")
-    // todo: "findAll в виде бесконечной прокрутки без указания общего количества записей"
     public ResponseEntity getAll(@PathVariable int page) {
         Pageable pageable = PageRequest.of(page, 50);
         Page<Tag> entityList = tagService.findAll(pageable);

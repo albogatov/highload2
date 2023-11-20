@@ -40,6 +40,7 @@ public class UserController {
             String token = jwtUtil.resolveToken(login);
             User userEntity = userService.findByLogin(user.getLogin());
             UserDto userDto = dataTransformer.userToDto(userEntity);
+            // TODO Remove ResponseMessageEntity
             return new ResponseEntity<>(new ResponseMessageEntity(token, userDto.getRole(), HttpStatus.OK));
         } catch (AuthenticationException e) {
             return new ResponseEntity<>("Wrong login or password", HttpStatus.UNAUTHORIZED);
