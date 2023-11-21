@@ -27,7 +27,13 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Order updateOrder(OrderDto orderDto, int id) {
-        // TODO UPDATES IN REPOS
+        Order order = orderRepository.findById(id).orElseThrow();
+        order.setPrice(orderDto.getPrice());
+        order.setDescription(orderDto.getDescription());
+        order.setStatus(orderDto.getStatus());
+        // TODO TAGS ADD/DELETE
+        orderRepository.save(order);
+        return order;
     }
 
     @Override

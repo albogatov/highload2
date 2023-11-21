@@ -67,4 +67,7 @@ public class ProfileController {
         return ResponseEntity.ok().headers(responseHeaders).body(dataTransformer.imageListToDto(images.getContent()));
 
     }
+
+    /*TODO PROFILE IMAGE CHANGE/DELETE WITH IMAGE CONSISTENCY VALIDATION (delete old & set new in transactional in img service)
+    may be in ImageController */
 }

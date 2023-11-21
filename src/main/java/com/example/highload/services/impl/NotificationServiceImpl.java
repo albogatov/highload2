@@ -25,7 +25,10 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public Notification readNotification(int id) {
-        // TODO UPDATES IN REPOS
+        Notification notification = notificationRepository.findById(id).orElseThrow();
+        notification.setIsRead(true);
+        notificationRepository.save(notification);
+        return notification;
     }
 
     @Override

@@ -1,7 +1,9 @@
 package com.example.highload.services.impl;
 
+import com.example.highload.model.inner.Image;
 import com.example.highload.model.inner.Profile;
 import com.example.highload.model.network.ProfileDto;
+import com.example.highload.repos.ImageRepository;
 import com.example.highload.repos.ProfileRepository;
 import com.example.highload.services.ProfileService;
 import com.example.highload.utils.DataTransformer;
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Service;
 public class ProfileServiceImpl implements ProfileService {
 
     private final ProfileRepository profileRepository;
+    private final ImageRepository imageRepository;
     private final DataTransformer dataTransformer;
 
     @Override
@@ -23,8 +26,20 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
-    public Profile editProfile(ProfileDto data, int id) {
-        // TODO UPDATES IN REPOS
+    public Profile editProfile(ProfileDto profileDto, int id) {
+        Profile profile = profileRepository.findById(id).orElseThrow();
+        profile.setAbout(profileDto.getAbout());
+        profile.setEducation(profileDto.getEducation());
+        profile.setExperience(profileDto.getExperience());
+        profile.setMail(profileDto.getMail());
+        profile.setName(profileDto.getName());
+//        if (!profile.getImage().getId().equals(profileDto.getImage().getId())) {
+//            // TODO IMAGE UPDATE
+//            Image newImage = imageRepository.findById(profileDto.getImage().getId()).orElseThrow();
+//            profile.setImage(newImage);
+//        }
+        profileRepository.save(profile);
+        return profile;
     }
 
     @Override
