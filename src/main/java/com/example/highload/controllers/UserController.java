@@ -1,23 +1,25 @@
 package com.example.highload.controllers;
 
-import com.example.highload.model.inner.User;
+import com.example.highload.exceptions.AppError;
+import com.example.highload.model.network.JwtResponse;
 import com.example.highload.model.network.ProfileDto;
 import com.example.highload.model.network.UserDto;
+import com.example.highload.security.jwt.JwtUtil;
+import com.example.highload.services.AuthenticationService;
 import com.example.highload.services.ProfileService;
 import com.example.highload.services.UserService;
 import com.example.highload.utils.DataTransformer;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Optional;
 
 @RestController
 @RequestMapping(value = "/api/app/user/")
@@ -27,28 +29,35 @@ public class UserController {
     private UserService userService;
     private ProfileService profileService;
     private final DataTransformer dataTransformer;
+    private final AuthenticationService authenticationService;
+    private final AuthenticationManager authenticationManager;
+    private final JwtUtil jwtUtil;
+    private final PasswordEncoder passwordEncoder;
 
     @PostMapping("/login")
-    public ResponseEntity login(@RequestBody UserDto user) {
+    public ResponseEntity<?> login(@RequestBody UserDto user) {
         if (user.getLogin() == null || user.getPassword() == null) {
             return new ResponseEntity<>("Absent login or password", HttpStatus.BAD_REQUEST);
         }
         try {
-            // TODO: SECURITY
-            String login = user.getLogin();
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(login, user.getPassword()));
-            String token = jwtUtil.resolveToken(login);
-            User userEntity = userService.findByLogin(user.getLogin());
-            UserDto userDto = dataTransformer.userToDto(userEntity);
-            // TODO Remove ResponseMessageEntity
-            return new ResponseEntity<>(new ResponseMessageEntity(token, userDto.getRole(), HttpStatus.OK));
-        } catch (AuthenticationException e) {
-            return new ResponseEntity<>("Wrong login or password", HttpStatus.UNAUTHORIZED);
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getLogin(), user.getPassword()));
+        } catch (BadCredentialsException e) {
+            return new ResponseEntity<>(new AppError(HttpStatus.UNAUTHORIZED.value(), "Неправильный логин или пароль"), HttpStatus.UNAUTHORIZED);
         }
+        // TODO: SECURITY
+        //String login = user.getLogin();
+        //authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(login, user.getPassword()));
+        //String token = jwtUtil.resolveToken(login);
+        //User userEntity = userService.findByLogin(user.getLogin());
+        //UserDto userDto = dataTransformer.userToDto(userEntity);
+        // TODO Remove ResponseMessageEntity
+        JwtResponse response = JwtResponse.builder().token(authenticationService.Auth(user.getLogin(), user.getPassword())).build();
+        return ResponseEntity.ok(response);
+        //return new ResponseEntity<>(new ResponseMessageEntity(token, userDto.getRole(), HttpStatus.OK));
     }
 
     @PostMapping("/register")
-    public ResponseEntity register(@RequestBody UserDto user) {
+    public ResponseEntity<?> register(@RequestBody UserDto user) {
         try {
             if (user.getLogin() == null || user.getPassword() == null || user.getLogin().trim().equals("")
                     || user.getPassword().trim().equals("")) {
@@ -56,10 +65,10 @@ public class UserController {
             }
 
             if (userService.findByLogin(user.getLogin()) != null) {
-                return new ResponseEntity<>("User already registered", HttpStatus.CONFLICT);
+                return new ResponseEntity<>(new AppError(HttpStatus.CONFLICT.value(), "This user already exists"), HttpStatus.CONFLICT);
             }
             //TODO: SECURITY
-            user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
 //            profileService.saveProfileForUser(user);
             // todo решить, каким образом передавать профиль при регистрации
             userService.saveUser(user);
