@@ -1,9 +1,11 @@
 package com.example.highload.controllers;
 
 import com.example.highload.exceptions.AppError;
+import com.example.highload.model.inner.UserRequest;
 import com.example.highload.model.network.JwtResponse;
 import com.example.highload.model.network.ProfileDto;
 import com.example.highload.model.network.UserDto;
+import com.example.highload.model.network.UserRequestDto;
 import com.example.highload.security.jwt.JwtUtil;
 import com.example.highload.services.AuthenticationService;
 import com.example.highload.services.ProfileService;
@@ -44,34 +46,26 @@ public class UserController {
         } catch (BadCredentialsException e) {
             return new ResponseEntity<>(new AppError(HttpStatus.UNAUTHORIZED.value(), "Неправильный логин или пароль"), HttpStatus.UNAUTHORIZED);
         }
-        // TODO: SECURITY
-        //String login = user.getLogin();
-        //authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(login, user.getPassword()));
-        //String token = jwtUtil.resolveToken(login);
-        //User userEntity = userService.findByLogin(user.getLogin());
-        //UserDto userDto = dataTransformer.userToDto(userEntity);
-        // TODO Remove ResponseMessageEntity
         JwtResponse response = JwtResponse.builder().token(authenticationService.Auth(user.getLogin(), user.getPassword())).build();
         return ResponseEntity.ok(response);
-        //return new ResponseEntity<>(new ResponseMessageEntity(token, userDto.getRole(), HttpStatus.OK));
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody UserDto user) {
+    public ResponseEntity<?> register(@RequestBody UserRequestDto user) {
         try {
             if (user.getLogin() == null || user.getPassword() == null || user.getLogin().trim().equals("")
                     || user.getPassword().trim().equals("")) {
                 throw new IllegalArgumentException();
             }
 
-            if (userService.findByLogin(user.getLogin()) != null) {
-                return new ResponseEntity<>(new AppError(HttpStatus.CONFLICT.value(), "This user already exists"), HttpStatus.CONFLICT);
+            if (userService.findByLogin(user.getLogin()) != null || userService.findUserRequestByLogin(user.getLogin()) != null) {
+                return new ResponseEntity<>(new AppError(HttpStatus.CONFLICT.value(), "This user already exists or is awaiting approval"), HttpStatus.CONFLICT);
             }
             //TODO: SECURITY
             user.setPassword(passwordEncoder.encode(user.getPassword()));
 //            profileService.saveProfileForUser(user);
             // todo решить, каким образом передавать профиль при регистрации
-            userService.saveUser(user);
+            userService.addUserRequest(user);
             return new ResponseEntity<>("User successfully registered", HttpStatus.OK);
         } catch (IllegalArgumentException e) {
             return new ResponseEntity<>("Invalid login or password", HttpStatus.BAD_REQUEST);

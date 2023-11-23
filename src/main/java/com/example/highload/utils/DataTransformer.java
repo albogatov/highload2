@@ -226,4 +226,12 @@ public class DataTransformer {
     public List<ImageDto> imageListToDto(List<Image> entities) {
         return entities.stream().map(this::imageToDto).toList();
     }
+
+    public UserRequest dtoToUserRequest(UserRequestDto userRequestDto) {
+        return null;
+    }
+
+    public UserRequestDto userRequestToDto(UserRequest userRequest) {
+        return null;
+    }
 }
