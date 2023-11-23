@@ -26,4 +26,9 @@ public class TagServiceImpl implements TagService {
     public Page<Tag> findAll(Pageable pageable) {
         return tagRepository.findAll(pageable);
     }
+
+    @Override
+    public void removeTagFromOrder(int tagId, int orderId) {
+
+    }
 }

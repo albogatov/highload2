@@ -13,4 +13,6 @@ public interface TagService {
 
     Page<Tag> findAll(Pageable pageable);
 
+    void removeTagFromOrder(int tagId, int orderId);
+
 }

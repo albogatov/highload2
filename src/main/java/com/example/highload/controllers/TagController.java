@@ -45,4 +45,11 @@ public class TagController {
         return ResponseEntity.ok().headers(responseHeaders).body(dtoList);
     }
 
+    @CrossOrigin
+    @PostMapping("/remove/{orderId}/{tagId}")
+    public ResponseEntity removeTagFromOrder(@PathVariable int orderId, @PathVariable int tagId) {
+        tagService.removeTagFromOrder(tagId, orderId);
+        return ResponseEntity.ok("");
+    }
+
 }

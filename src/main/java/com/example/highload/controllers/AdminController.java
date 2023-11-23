@@ -41,7 +41,6 @@ public class AdminController {
     public ResponseEntity approveUserRequest(@PathVariable int id) {
         UserRequest userRequest = adminService.findUserRequest(id);
         adminService.approveUser(dataTransformer.userRequestToDto(userRequest));
-        profileService.sav
         return ResponseEntity.ok("User approved");
     }
 
