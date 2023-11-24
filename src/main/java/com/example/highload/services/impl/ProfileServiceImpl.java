@@ -33,11 +33,6 @@ public class ProfileServiceImpl implements ProfileService {
         profile.setExperience(profileDto.getExperience());
         profile.setMail(profileDto.getMail());
         profile.setName(profileDto.getName());
-//        if (!profile.getImage().getId().equals(profileDto.getImage().getId())) {
-//            // TODO IMAGE UPDATE
-//            Image newImage = imageRepository.findById(profileDto.getImage().getId()).orElseThrow();
-//            profile.setImage(newImage);
-//        }
         profileRepository.save(profile);
         return profile;
     }

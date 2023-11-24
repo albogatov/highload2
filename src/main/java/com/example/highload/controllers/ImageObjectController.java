@@ -53,6 +53,4 @@ public class ImageObjectController {
         return ResponseEntity.ok("");
     }
 
-
-    /*TODO PROFILE IMAGE CHANGE/DELETE WITH IMAGE CONSISTENCY VALIDATION*/
 }
