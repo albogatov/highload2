@@ -3,13 +3,18 @@ package com.example.highload.utils;
 import com.example.highload.model.inner.*;
 import com.example.highload.model.network.*;
 import com.example.highload.repos.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @Component("dataTransformer")
-@RequiredArgsConstructor
+@Data
+@AllArgsConstructor
 public class DataTransformer {
 
     private final RoleRepository roleRepository;
