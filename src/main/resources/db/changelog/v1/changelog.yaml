@@ -497,3 +497,46 @@ databaseChangeLog:
             referencedTableName: image
             referencedTableSchemaName: public
             validate: true
+  - changeSet:
+      id: 14
+      author: sofia
+      changes:
+        - createTable:
+            tableName: user_request
+            columns:
+              - column:
+                  name: id
+                  type: int
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: login
+                  type: varchar(50)
+                  constraints:
+                    unique: true
+                    nullable: false
+              - column:
+                  name: hash_password
+                  type: varchar(512)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: role_id
+                  type: int
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseColumnNames: role_id
+            baseTableName: user_request
+            baseTableSchemaName: public
+            constraintName: fk_user_request_role
+            deferrable: false
+            initiallyDeferred: false
+            onDelete: RESTRICT
+            onUpdate: RESTRICT
+            referencedColumnNames: id
+            referencedTableName: role
+            referencedTableSchemaName: public
+            validate: true
