@@ -51,10 +51,6 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "user")
     List<Order> orders;
 
-    @Column(name = "auth_token")
-    private String authToken;
-
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<SimpleGrantedAuthority> authorities = new ArrayList<>();
