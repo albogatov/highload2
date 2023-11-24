@@ -1,9 +1,7 @@
 package com.example.highload.model.inner;
 
-import com.example.highload.model.enums.OrderStatus;
 import com.example.highload.model.enums.RoleType;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
