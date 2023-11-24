@@ -76,18 +76,41 @@ public class OrderController {
     @CrossOrigin
     @GetMapping("/single/{orderId}")
     @PreAuthorize("hasAnyAuthority('CLIENT', 'ARTIST')")
-    public ResponseEntity getById(@RequestBody int id){
-        Order entity = orderService.getOrderById(id);
+    public ResponseEntity getById(@PathVariable int orderId){
+        Order entity = orderService.getOrderById(orderId);
         return ResponseEntity.ok(dataTransformer.orderToDto(entity));
+    }
+
+
+    @CrossOrigin
+    @GetMapping("/single/{orderId}/tags/add")
+    @PreAuthorize("hasAnyAuthority('CLIENT', 'ARTIST')")
+    public ResponseEntity addTagsToOrder(@RequestBody List<Integer> tagIds, @PathVariable int orderId){
+        Order order = orderService.addTagsToOrder( tagIds, orderId);
+        if (order != null) {
+            return ResponseEntity.ok(dataTransformer.orderToDto(order));
+        }
+        return ResponseEntity.badRequest().body("Invalid total tag number (should be not more than 10)!");
+    }
+
+    @CrossOrigin
+    @GetMapping("/single/{orderId}/tags/delete")
+    @PreAuthorize("hasAnyAuthority('CLIENT', 'ARTIST')")
+    public ResponseEntity deleteTagsFromOrder(@RequestBody List<Integer> tagIds, @PathVariable int orderId){
+        Order order = orderService.deleteTagsFromOrder( tagIds, orderId);
+        if (order != null) {
+            return ResponseEntity.ok(dataTransformer.orderToDto(order));
+        }
+        return ResponseEntity.badRequest().body("Invalid tag ids!");
     }
 
 
     @CrossOrigin
     @GetMapping("/single/{orderId}/images/{page}")
     @PreAuthorize("hasAnyAuthority('CLIENT', 'ARTIST')")
-    public ResponseEntity getOrderImages(@RequestBody int id, @PathVariable int page){
+    public ResponseEntity getOrderImages(@RequestBody int orderId, @PathVariable int page){
         Pageable pageable = PageRequest.of(page, 50);
-        Page<Image> entityList = imageService.findAllOrderImages(id, pageable);
+        Page<Image> entityList = imageService.findAllOrderImages(orderId, pageable);
         List<ImageDto> dtoList = dataTransformer.imageListToDto(entityList.getContent());
         HttpHeaders responseHeaders = paginationHeadersCreator.pageWithTotalElementsHeadersCreate(entityList);
         return ResponseEntity.ok().headers(responseHeaders).body(dtoList);
@@ -135,7 +158,5 @@ public class OrderController {
         return ResponseEntity.ok().headers(responseHeaders).body(dtoList);
     }
 
-
-    // TODO TAGS ADD/DELETE (<=10 tags per order)
 
 }

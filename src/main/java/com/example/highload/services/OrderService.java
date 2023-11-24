@@ -27,5 +27,7 @@ public interface OrderService {
 
     Page<Order> getAllOrders(Pageable pageable);
 
+    Order addTagsToOrder(List<Integer> tagIds, int orderId);
 
+    Order deleteTagsFromOrder(List<Integer> tagIds, int orderId);
 }
