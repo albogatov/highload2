@@ -22,9 +22,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ProfileController {
 
-    private ProfileService profileService;
-    private ImageService imageService;
-    private PaginationHeadersCreator paginationHeadersCreator;
+    private final ProfileService profileService;
+    private final ImageService imageService;
+    private final PaginationHeadersCreator paginationHeadersCreator;
     private final DataTransformer dataTransformer;
 
     @CrossOrigin

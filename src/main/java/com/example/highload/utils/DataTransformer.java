@@ -12,11 +12,12 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DataTransformer {
 
-    RoleRepository roleRepository;
-    ProfileRepository profileRepository;
-    UserRepository userRepository;
-    OrderRepository orderRepository;
-    ImageRepository imageRepository;
+    private final RoleRepository roleRepository;
+    private final ProfileRepository profileRepository;
+    private final UserRepository userRepository;
+    private final OrderRepository orderRepository;
+    private final ImageRepository imageRepository;
+
     /* users */
 
     public UserDto userToDto(User user) {

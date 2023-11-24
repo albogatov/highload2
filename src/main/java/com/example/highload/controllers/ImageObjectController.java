@@ -13,7 +13,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ImageObjectController {
 
-    private ImageService imageService;
+    private final ImageService imageService;
 
     @CrossOrigin
     @PostMapping("/add/order/{orderId}")

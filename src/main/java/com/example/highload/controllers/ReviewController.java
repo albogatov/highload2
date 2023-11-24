@@ -2,12 +2,10 @@ package com.example.highload.controllers;
 
 import com.example.highload.model.inner.Review;
 import com.example.highload.model.network.ReviewDto;
-import com.example.highload.model.network.TagDto;
 import com.example.highload.services.ReviewService;
 import com.example.highload.utils.DataTransformer;
 import com.example.highload.utils.PaginationHeadersCreator;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -23,8 +21,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ReviewController {
 
-    private ReviewService reviewService;
-    private PaginationHeadersCreator paginationHeadersCreator;
+    private final ReviewService reviewService;
+    private final PaginationHeadersCreator paginationHeadersCreator;
     private final DataTransformer dataTransformer;
 
     @CrossOrigin

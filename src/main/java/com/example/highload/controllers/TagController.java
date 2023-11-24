@@ -22,8 +22,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TagController {
 
-    private TagService tagService;
-    private PaginationHeadersCreator paginationHeadersCreator;
+    private final TagService tagService;
+    private final PaginationHeadersCreator paginationHeadersCreator;
     private final DataTransformer dataTransformer;
 
     @CrossOrigin

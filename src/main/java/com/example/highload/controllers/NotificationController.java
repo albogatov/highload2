@@ -2,12 +2,10 @@ package com.example.highload.controllers;
 
 import com.example.highload.model.inner.Notification;
 import com.example.highload.model.network.NotificationDto;
-import com.example.highload.model.network.OrderDto;
 import com.example.highload.services.NotificationService;
 import com.example.highload.utils.DataTransformer;
 import com.example.highload.utils.PaginationHeadersCreator;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -23,8 +21,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class NotificationController {
 
-    private NotificationService notificationService;
-    private PaginationHeadersCreator paginationHeadersCreator;
+    private final NotificationService notificationService;
+    private final PaginationHeadersCreator paginationHeadersCreator;
     private final DataTransformer dataTransformer;
 
     @CrossOrigin

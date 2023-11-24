@@ -4,13 +4,11 @@ import com.example.highload.model.inner.Image;
 import com.example.highload.model.inner.Order;
 import com.example.highload.model.network.ImageDto;
 import com.example.highload.model.network.OrderDto;
-import com.example.highload.model.network.ReviewDto;
 import com.example.highload.services.ImageService;
 import com.example.highload.services.OrderService;
 import com.example.highload.utils.DataTransformer;
 import com.example.highload.utils.PaginationHeadersCreator;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -26,9 +24,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class OrderController {
 
-    private OrderService orderService;
-    private ImageService imageService;
-    private PaginationHeadersCreator paginationHeadersCreator;
+    private final OrderService orderService;
+    private final ImageService imageService;
+    private final PaginationHeadersCreator paginationHeadersCreator;
     private final DataTransformer dataTransformer;
 
     @CrossOrigin

@@ -1,8 +1,6 @@
 package com.example.highload.controllers;
 
-import com.example.highload.model.inner.Order;
 import com.example.highload.model.inner.UserRequest;
-import com.example.highload.model.network.OrderDto;
 import com.example.highload.model.network.UserDto;
 import com.example.highload.model.network.UserRequestDto;
 import com.example.highload.services.AdminService;
@@ -26,10 +24,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AdminController {
 
-    private UserService userService;
-    private AdminService adminService;
+    private final UserService userService;
+    private final AdminService adminService;
     private final DataTransformer dataTransformer;
-    private PaginationHeadersCreator paginationHeadersCreator;
+    private final PaginationHeadersCreator paginationHeadersCreator;
 
     @PostMapping("/user-request/approve/{userRequestId}")
     @CrossOrigin

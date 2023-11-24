@@ -5,7 +5,6 @@ import com.example.highload.model.network.JwtResponse;
 import com.example.highload.model.network.ProfileDto;
 import com.example.highload.model.network.UserDto;
 import com.example.highload.model.network.UserRequestDto;
-import com.example.highload.security.jwt.JwtUtil;
 import com.example.highload.services.AuthenticationService;
 import com.example.highload.services.ProfileService;
 import com.example.highload.services.UserService;
@@ -26,11 +25,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class UserController {
 
-    private UserService userService;
-    private ProfileService profileService;
+    private final UserService userService;
+    private final ProfileService profileService;
     private final AuthenticationService authenticationService;
     private final AuthenticationManager authenticationManager;
-    private final JwtUtil jwtUtil;
     private final PasswordEncoder passwordEncoder;
 
     @PostMapping("/login")

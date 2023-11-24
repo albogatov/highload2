@@ -1,14 +1,11 @@
 package com.example.highload.controllers;
 
 import com.example.highload.model.inner.Response;
-import com.example.highload.model.network.OrderDto;
 import com.example.highload.model.network.ResponseDto;
-import com.example.highload.model.network.ReviewDto;
 import com.example.highload.services.ResponseService;
 import com.example.highload.utils.DataTransformer;
 import com.example.highload.utils.PaginationHeadersCreator;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -24,9 +21,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ResponseController {
 
-    private ResponseService responseService;
-
-    private PaginationHeadersCreator paginationHeadersCreator;
+    private final ResponseService responseService;
+    private final PaginationHeadersCreator paginationHeadersCreator;
     private final DataTransformer dataTransformer;
 
     @CrossOrigin
