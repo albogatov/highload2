@@ -1,17 +1,16 @@
 package com.example.highload.services;
 
 import com.example.highload.model.inner.User;
-import com.example.highload.model.inner.UserRequest;
 import com.example.highload.model.network.UserDto;
-import com.example.highload.model.network.UserRequestDto;
 
 public interface AdminService {
 
-    UserRequest findUserRequest(int id);
-    User approveUser(UserRequestDto userRequestDto);
+    User approveUser(int userRequestId);
 
     User addUser(UserDto userDto);
 
-    void deleteUser(UserDto userDto);
+    void deleteUser(int userId);
+
+    void deleteLogicallyDeletedUsers(int daysToExpire);
 
 }

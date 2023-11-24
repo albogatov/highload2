@@ -9,5 +9,6 @@ public class UserRequestDto {
     int id;
     String login;
     String password;
+    RoleType role;
 
 }

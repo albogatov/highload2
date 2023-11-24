@@ -1,64 +1,81 @@
 package com.example.highload.controllers;
 
-import com.example.highload.exceptions.AppError;
-import com.example.highload.model.inner.User;
+import com.example.highload.model.inner.Order;
 import com.example.highload.model.inner.UserRequest;
-import com.example.highload.model.network.JwtResponse;
-import com.example.highload.model.network.ProfileDto;
+import com.example.highload.model.network.OrderDto;
 import com.example.highload.model.network.UserDto;
 import com.example.highload.model.network.UserRequestDto;
-import com.example.highload.repos.UserRequestRepo;
-import com.example.highload.security.jwt.JwtUtil;
 import com.example.highload.services.AdminService;
-import com.example.highload.services.AuthenticationService;
-import com.example.highload.services.ProfileService;
 import com.example.highload.services.UserService;
 import com.example.highload.utils.DataTransformer;
+import com.example.highload.utils.PaginationHeadersCreator;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
+@PreAuthorize("hasAuthority('ADMIN')")
 @RequestMapping(value = "/api/app/admin/")
 @RequiredArgsConstructor
 public class AdminController {
 
     private UserService userService;
     private AdminService adminService;
-
-    private ProfileService profileService;
     private final DataTransformer dataTransformer;
+    private PaginationHeadersCreator paginationHeadersCreator;
 
-    @PostMapping("/user/approve/{id}")
+    @PostMapping("/user-request/approve/{userRequestId}")
     @CrossOrigin
-    @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity approveUserRequest(@PathVariable int id) {
-        UserRequest userRequest = adminService.findUserRequest(id);
-        adminService.approveUser(dataTransformer.userRequestToDto(userRequest));
+//    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity approveUserRequest(@PathVariable int userRequestId) {
+        adminService.approveUser(userRequestId);
         return ResponseEntity.ok("User approved");
     }
 
     @PostMapping("/user/delete/{id}")
     @CrossOrigin
-    @PreAuthorize("hasAuthority('ADMIN')")
+//    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity deleteUser(@PathVariable int id) {
-        User user = userService.findById(id);
-        adminService.deleteUser(dataTransformer.userToDto(user));
-        return ResponseEntity.ok("User delete");
+        adminService.deleteUser(id);
+        return ResponseEntity.ok("User deleted");
+    }
+
+    @PostMapping("/user/all/delete-expired")
+    @CrossOrigin
+//    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity deleteLogicallyDeletedAccountsExpired(@RequestBody int days) {
+        adminService.deleteLogicallyDeletedUsers(days);
+        return ResponseEntity.ok("User deleted");
     }
 
     @PostMapping("/user/add/")
     @CrossOrigin
-    @PreAuthorize("hasAuthority('ADMIN')")
+//    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity addUser(@RequestBody UserDto user) {
-        adminService.addUser(user);
-        return ResponseEntity.ok("User delete");
+        if (userService.findByLogin(user.getLogin()) == null) {
+            adminService.addUser(user);
+            return ResponseEntity.ok("User added");
+        }
+        return ResponseEntity.badRequest().body("User already exists!");
+
+    }
+
+    @GetMapping("/user-request/all/{page}")
+    @CrossOrigin
+//    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity getAllUserRequests(@PathVariable int page) {
+        Pageable pageable = PageRequest.of(page, 50);
+        Page<UserRequest> entityList = userService.getAllUserRequests(pageable);
+        List<UserRequestDto> dtoList = dataTransformer.userRequestListToDto(entityList.getContent());
+        HttpHeaders responseHeaders = paginationHeadersCreator.pageWithTotalElementsHeadersCreate(entityList);
+        return ResponseEntity.ok().headers(responseHeaders).body(dtoList);
     }
 
 }

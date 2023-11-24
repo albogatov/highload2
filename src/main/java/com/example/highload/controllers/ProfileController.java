@@ -2,15 +2,12 @@ package com.example.highload.controllers;
 
 import com.example.highload.model.inner.Image;
 import com.example.highload.model.inner.Profile;
-import com.example.highload.model.network.ImageDto;
 import com.example.highload.model.network.ProfileDto;
-import com.example.highload.model.network.TagDto;
 import com.example.highload.services.ImageService;
 import com.example.highload.services.ProfileService;
 import com.example.highload.utils.DataTransformer;
 import com.example.highload.utils.PaginationHeadersCreator;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -68,6 +65,4 @@ public class ProfileController {
 
     }
 
-    /*TODO PROFILE IMAGE CHANGE/DELETE WITH IMAGE CONSISTENCY VALIDATION (delete old & set new in transactional in img service)
-    may be in ImageController */
 }

@@ -15,14 +15,14 @@ public interface ImageService {
 
     Image saveImage(ImageDto imageDto);
 
-    Image saveImageForOrder(ImageDto imageDto, int orderId);
+    List<Image> saveImagesForOrder(List<ImageDto> imageDtos, int orderId);
 
-    Image saveImageForProfile(ImageDto imageDto, int profileId);
+    List<Image> saveImageForProfile(List<ImageDto> imageDtos, int profileId);
 
     void removeImageForOrder(int imageId, int orderId);
 
     void removeImageForProfile(int imageId, int profileId);
 
+    Image changeMainImageOfProfile(ImageDto imageDto, int profileId);
 
-//    Page<ImageDto> getPage(List<ImageDto> images, Pageable pageable);
 }

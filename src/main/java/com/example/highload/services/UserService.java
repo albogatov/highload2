@@ -4,6 +4,8 @@ import com.example.highload.model.inner.User;
 import com.example.highload.model.inner.UserRequest;
 import com.example.highload.model.network.UserDto;
 import com.example.highload.model.network.UserRequestDto;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
 public interface UserService {
@@ -19,5 +21,7 @@ public interface UserService {
     User findById(int id);
 
     User saveUser(UserDto userDto);
+
+    Page<UserRequest> getAllUserRequests(Pageable pageable);
 
 }

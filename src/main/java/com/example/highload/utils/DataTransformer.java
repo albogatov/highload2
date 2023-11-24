@@ -113,6 +113,31 @@ public class DataTransformer {
         return entities.stream().map(this::responseToDto).toList();
     }
 
+    /* user requests */
+
+    public UserRequestDto userRequestToDto(UserRequest userRequest) {
+        UserRequestDto userRequestDto = new UserRequestDto();
+        userRequestDto.setId(userRequest.getId());
+        userRequestDto.setLogin(userRequest.getLogin());
+        userRequestDto.setPassword(userRequest.getHashPassword());
+        userRequestDto.setRole(userRequest.getRole().getName());
+        return userRequestDto;
+    }
+
+    public UserRequest userRequestFromDto(UserRequestDto userRequestDto) {
+        UserRequest userRequest = new UserRequest();
+        userRequest.setId(userRequestDto.getId());
+        userRequest.setLogin(userRequestDto.getLogin());
+        userRequest.setHashPassword(userRequestDto.getPassword());
+        Role role = roleRepository.findByName(userRequestDto.getRole().toString()).orElseThrow();
+        userRequest.setRole(role);
+        return userRequest;
+    }
+
+    public List<UserRequestDto> userRequestListToDto(List<UserRequest> entities) {
+        return entities.stream().map(this::userRequestToDto).toList();
+    }
+
 
     /* profiles */
 
@@ -227,11 +252,4 @@ public class DataTransformer {
         return entities.stream().map(this::imageToDto).toList();
     }
 
-    public UserRequest dtoToUserRequest(UserRequestDto userRequestDto) {
-        return null;
-    }
-
-    public UserRequestDto userRequestToDto(UserRequest userRequest) {
-        return null;
-    }
 }

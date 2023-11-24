@@ -1,7 +1,9 @@
 package com.example.highload.model.inner;
 
+import com.example.highload.model.enums.RoleType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
@@ -22,5 +24,9 @@ public class UserRequest {
     @NotBlank
     @Column(name = "hash_password", nullable = false)
     String hashPassword;
+
+    @ManyToOne
+    @JoinColumn(name = "role_id", referencedColumnName = "id", insertable = false, updatable = false)
+    Role role;
 
 }
