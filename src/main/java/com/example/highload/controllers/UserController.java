@@ -1,6 +1,7 @@
 package com.example.highload.controllers;
 
 import com.example.highload.exceptions.AppError;
+import com.example.highload.model.inner.User;
 import com.example.highload.model.network.JwtResponse;
 import com.example.highload.model.network.ProfileDto;
 import com.example.highload.model.network.UserDto;
@@ -15,10 +16,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(value = "/api/app/user/")
@@ -75,5 +73,12 @@ public class UserController {
     }
 
     /* TODO let user logically delete his account (not from db but change status) */
+
+    @PostMapping("/deactivate/{id}")
+    public ResponseEntity<?> deactivate(@PathVariable int id) {
+        if (userService.deactivateById(id))
+            return new ResponseEntity<>("Profile deactivated", HttpStatus.OK);
+        else return new ResponseEntity<>("An error occurred while deactivating your account, please try again later", HttpStatus.BAD_REQUEST);
+    }
 
 }
