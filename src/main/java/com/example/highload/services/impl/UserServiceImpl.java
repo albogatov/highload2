@@ -55,8 +55,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean deactivateById(int userId) {
-        return false;
+    public void deactivateById(int userId) {
+        User user = userRepository.findById(userId).orElseThrow();
+        user.setIsActual(false);
+        userRepository.save(user);
     }
 
     @Override

@@ -76,9 +76,8 @@ public class UserController {
 
     @PostMapping("/deactivate/{id}")
     public ResponseEntity<?> deactivate(@PathVariable int id) {
-        if (userService.deactivateById(id))
-            return new ResponseEntity<>("Profile deactivated", HttpStatus.OK);
-        else return new ResponseEntity<>("An error occurred while deactivating your account, please try again later", HttpStatus.BAD_REQUEST);
+        userService.deactivateById(id);
+        return new ResponseEntity<>("Profile deactivated", HttpStatus.OK);
     }
 
 }

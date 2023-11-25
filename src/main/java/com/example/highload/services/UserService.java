@@ -24,6 +24,6 @@ public interface UserService {
 
     Page<UserRequest> getAllUserRequests(Pageable pageable);
 
-    boolean deactivateById(int userId);
+    void deactivateById(int userId);
 
 }
