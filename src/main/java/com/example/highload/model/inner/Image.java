@@ -17,7 +17,7 @@ public class Image {
     @Column(name = "url", nullable = false)
     String url;
 
-    @OneToOne
+    @OneToOne(mappedBy = "image")
     ImageObject imageObject;
 
 }

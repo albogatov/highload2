@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping(value = "/api/app/image/")
+@RequestMapping(value = "/api/app/image")
 @RequiredArgsConstructor
 public class ImageObjectController {
 
@@ -32,7 +32,7 @@ public class ImageObjectController {
     }
 
     @CrossOrigin
-    @PostMapping("/add/profile/{profileId}")
+    @PostMapping("/change/profile/{profileId}")
     public ResponseEntity changeMainImageOfProfile(@RequestBody ImageDto imageDto, @PathVariable int profileId){
         if (imageService.changeMainImageOfProfile(imageDto, profileId) != null)
             return ResponseEntity.ok("");

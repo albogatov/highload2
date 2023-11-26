@@ -540,3 +540,94 @@ databaseChangeLog:
             referencedTableName: role
             referencedTableSchemaName: public
             validate: true
+  - changeSet:
+      id: 15
+      author: sofia
+      changes:
+        - insert:
+            schemaName: public
+            tableName: role
+            columns:
+              - column:
+                  name: name
+                  value: ADMIN
+            dbms: 'postgresql'
+        - insert:
+            schemaName: public
+            tableName: role
+            columns:
+              - column:
+                  name: name
+                  value: ARTIST
+            dbms: 'postgresql'
+        - insert:
+            schemaName: public
+            tableName: role
+            columns:
+              - column:
+                  name: name
+                  value: CLIENT
+            dbms: 'postgresql'
+  - changeSet:
+      id: -1
+      author: sofia
+      changes:
+        - insert:
+            schemaName: public
+            tableName: user
+            columns:
+              - column:
+                  name: login
+                  value: admin1
+              - column:
+                  name: hash_password
+                  value: $2a$10$gpPRdGlBW39d/NctTHCbzOSGVQFtw2cXiJCQNIg7UhtWVh0GqgZ7i
+              - column:
+                  name: role_id
+                  valueNumeric: "1"
+              - column:
+                  name: is_actual
+                  valueBoolean: "true"
+            dbms: 'postgresql'
+        - insert:
+            schemaName: public
+            tableName: user
+            columns:
+              - column:
+                  name: login
+                  value: artist1
+              - column:
+                  name: hash_password
+                  value: $2a$10$P0UyMvHoBaXlF6T6BVhSi.pXg6TnWDLXt5rqEl13DyYTdI9c46z.W
+              - column:
+                  name: role_id
+                  valueNumeric: "2"
+              - column:
+                  name: is_actual
+                  valueBoolean: "true"
+            dbms: 'postgresql'
+        - insert:
+            schemaName: public
+            tableName: user
+            columns:
+              - column:
+                  name: login
+                  value: client1
+              - column:
+                  name: hash_password
+                  value: $2a$10$f48q3v8oBBiZzyPqBgZ2Q.Ovz4NmT6wIDU8b21m3yh7UE6kIdDLZ6
+              - column:
+                  name: role_id
+                  valueNumeric: "3"
+              - column:
+                  name: is_actual
+                  valueBoolean: "true"
+            dbms: 'postgresql'
+
+
+#            insert into public.user(login, hash_password, role_id, is_actual)
+#            values
+#            ('admin1', '$2a$10$gpPRdGlBW39d/NctTHCbzOSGVQFtw2cXiJCQNIg7UhtWVh0GqgZ7i', 1, TRUE),
+#            ('artist1', '$2a$10$P0UyMvHoBaXlF6T6BVhSi.pXg6TnWDLXt5rqEl13DyYTdI9c46z.W', 2, TRUE),
+#            ('client1', '$2a$10$f48q3v8oBBiZzyPqBgZ2Q.Ovz4NmT6wIDU8b21m3yh7UE6kIdDLZ6', 3, TRUE)
+#            ;

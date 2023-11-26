@@ -19,7 +19,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping(value = "/api/app/user/")
+@RequestMapping(value = "/api/app/user")
 @RequiredArgsConstructor
 public class UserController {
 
@@ -29,27 +29,29 @@ public class UserController {
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
 
+    @CrossOrigin
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody UserDto user) {
         if (user.getLogin() == null || user.getPassword() == null) {
             return new ResponseEntity<>("Absent login or password", HttpStatus.BAD_REQUEST);
         }
-        try {
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getLogin(), user.getPassword()));
-        } catch (BadCredentialsException e) {
-            return new ResponseEntity<>(new AppError(HttpStatus.UNAUTHORIZED.value(), "Invalid login or password"), HttpStatus.UNAUTHORIZED);
-        }
-        JwtResponse response = JwtResponse.builder().token(authenticationService.Auth(user.getLogin(), user.getPassword())).build();
+//        try {
+//            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getLogin(), user.getPassword()));
+//        } catch (BadCredentialsException e) {
+//            return new ResponseEntity<>(new AppError(HttpStatus.UNAUTHORIZED.value(), "Invalid login or password"), HttpStatus.UNAUTHORIZED);
+//        }
+        JwtResponse response = JwtResponse.builder().token(authenticationService.Auth(user.getLogin(), user.getPassword(), user.getRole().toString())).build();
         return ResponseEntity.ok(response);
     }
 
+    @CrossOrigin
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody UserRequestDto user) {
         try {
-            if (user.getLogin() == null || user.getPassword() == null || user.getLogin().trim().isEmpty()
-                    || user.getPassword().trim().isEmpty()) {
-                throw new IllegalArgumentException();
-            }
+//            if (user.getLogin() == null || user.getPassword() == null || user.getLogin().trim().isEmpty()
+//                    || user.getPassword().trim().isEmpty()) {
+//                throw new IllegalArgumentException();
+//            }
 
             if (userService.findByLogin(user.getLogin()) != null || userService.findUserRequestByLogin(user.getLogin()) != null) {
                 return new ResponseEntity<>(new AppError(HttpStatus.CONFLICT.value(), "This user already exists or is awaiting approval"), HttpStatus.CONFLICT);
@@ -62,6 +64,7 @@ public class UserController {
         }
     }
 
+    @CrossOrigin
     @PostMapping("/profile/add")
     public ResponseEntity addProfile(@RequestBody ProfileDto profile) {
 
@@ -72,8 +75,7 @@ public class UserController {
         return new ResponseEntity<>("Profile already added", HttpStatus.BAD_REQUEST);
     }
 
-    /* TODO let user logically delete his account (not from db but change status) */
-
+    @CrossOrigin
     @PostMapping("/deactivate/{id}")
     public ResponseEntity<?> deactivate(@PathVariable int id) {
         userService.deactivateById(id);

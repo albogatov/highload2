@@ -19,6 +19,7 @@ public class Profile {
     @OneToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     User user;
+
     @OneToOne
     @JoinColumn(name = "image_id", referencedColumnName = "id")
     Image image;
