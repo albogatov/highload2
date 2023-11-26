@@ -24,7 +24,7 @@ public class JwtUtil {
 
     public String generateToken(User user) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("roles", user.getRole());
+        claims.put("role", user.getRole());
 
         Date issuedDate = new Date();
         Date expiredDate = new Date((new Date()).getTime() + jwtExpiration);
@@ -49,7 +49,7 @@ public class JwtUtil {
     }
 
     public List<String> getRoleFromJwtToken(String token) {
-        return getClaimsFromToken(token).get("roles", List.class);
+        return getClaimsFromToken(token).get("role", List.class);
     }
 
 
