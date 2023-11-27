@@ -83,24 +83,29 @@ public class AdminAPITests {
         postgreSQLContainer.stop();
     }
 
-    @Test
-    public void addUser() {
-        User admin = userRepository.findByLogin("admin1").orElseThrow();
-        String tokenResponse =
-                given()
+    private String getToken(String userName) {
+        User user = userRepository.findByLogin(userName).orElseThrow();
+        return given()
                         .header("Content-type", "application/json")
                         .and()
-                        .body(new JwtRequest(admin.getLogin(), "admin1", admin.getRole().getName().toString()))
+                        .body(new JwtRequest(userName, userName, user.getRole().getName().toString()))
                         .when()
                         .post("/api/app/user/login")
                         .then()
                         .extract().body().as(JwtResponse.class).getToken();
+    }
+
+    @Test
+    public void addUser() {
+
+        String tokenResponse = getToken("admin1");
+
+        /*add correct user*/
+
         UserDto userDto = new UserDto();
         userDto.setLogin("admin_test_client1");
         userDto.setPassword("admin_test_client1");
         userDto.setRole(RoleType.CLIENT);
-
-        /*add correct user*/
 
         ExtractableResponse<Response> response1 =
                 given()
@@ -157,8 +162,9 @@ public class AdminAPITests {
         );
     }
 
+
     @Test
-    public void approveUser() {
+    public void approveUser() { /*TODO: RUN*/
         // create user request using repo
 
         Role clientRole = roleRepository.findByName(RoleType.CLIENT).orElseThrow();
@@ -172,17 +178,7 @@ public class AdminAPITests {
 
         // get token
 
-        User admin = userRepository.findByLogin("admin1").orElseThrow();
-
-        String tokenResponse =
-                given()
-                        .header("Content-type", "application/json")
-                        .and()
-                        .body(new JwtRequest(admin.getLogin(), "admin1", admin.getRole().getName().toString()))
-                        .when()
-                        .post("/api/app/user/login")
-                        .then()
-                        .extract().body().as(JwtResponse.class).getToken();
+        String tokenResponse = getToken("admin1");
 
         // approve existing
 
@@ -218,5 +214,57 @@ public class AdminAPITests {
 
     }
 
+
+    @Test
+    public void deleteUser() { /*TODO: RUN*/
+        // create user using repo
+
+        Role clientRole = roleRepository.findByName(RoleType.CLIENT).orElseThrow();
+
+        User user = new User();
+        user.setLogin("admin_test_client3");
+        user.setHashPassword(bCryptPasswordEncoder.encode("admin_test_client3"));
+        user.setRole(clientRole);
+        user.setIsActual(true);
+
+        User userWithId = userRepository.save(user);
+
+        // get token
+
+        String tokenResponse = getToken("admin1");
+
+        // delete existing
+
+        String id = userWithId.getId().toString();
+
+        ExtractableResponse<Response> response1 =
+                given()
+                        .header("Authorization", "Bearer " + tokenResponse)
+                        .header("Content-type", "application/json")
+                        .when()
+                        .post("/api/app/admin/user/delete/" + id)
+                        .then()
+                        .extract();
+        Assertions.assertAll(
+                () -> Assertions.assertEquals("User deleted", response1.body().asString()),
+                () -> Assertions.assertEquals(HttpStatus.OK.value(), response1.statusCode())
+        );
+
+        // delete not existing (on prev step user was deleted)
+
+        ExtractableResponse<Response> response2 =
+                given()
+                        .header("Authorization", "Bearer " + tokenResponse)
+                        .header("Content-type", "application/json")
+                        .when()
+                        .post("/api/app/admin/user/delete/" + id)
+                        .then()
+                        .extract();
+        Assertions.assertAll(
+                () -> Assertions.assertEquals("Wrong ids in path!", response2.body().asString()),
+                () -> Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), response2.statusCode())
+        );
+
+    }
 }
 
