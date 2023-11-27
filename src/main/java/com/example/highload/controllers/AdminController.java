@@ -15,10 +15,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @RestController
 @PreAuthorize("hasAuthority('ADMIN')")
@@ -81,6 +83,11 @@ public class AdminController {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity handleValidationExceptions(){
         return ResponseEntity.badRequest().body("Request body validation failed!");
+    }
+
+    @ExceptionHandler(NoSuchElementException.class)
+    public ResponseEntity handleServiceExceptions(){
+        return ResponseEntity.badRequest().body("Wrong ids in path!");
     }
 
 }

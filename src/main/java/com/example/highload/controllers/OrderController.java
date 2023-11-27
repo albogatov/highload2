@@ -20,6 +20,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @RestController
 @RequestMapping(value = "/api/app/order")
@@ -163,6 +164,11 @@ public class OrderController {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity handleValidationExceptions(){
         return ResponseEntity.badRequest().body("Request body validation failed!");
+    }
+
+    @ExceptionHandler(NoSuchElementException.class)
+    public ResponseEntity handleServiceExceptions(){
+        return ResponseEntity.badRequest().body("Wrong ids in path!");
     }
 
 }

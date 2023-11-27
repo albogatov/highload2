@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -23,6 +24,7 @@ public class DataTransformer {
     private final UserRepository userRepository;
     private final OrderRepository orderRepository;
     private final ImageRepository imageRepository;
+    BCryptPasswordEncoder bCryptPasswordEncoder;
 
     /* users */
 
@@ -30,7 +32,7 @@ public class DataTransformer {
         UserDto userDto = new UserDto();
         userDto.setId(user.getId());
         userDto.setLogin(user.getLogin());
-        userDto.setPassword(user.getHashPassword());
+//        userDto.setPassword(user.getHashPassword());
         userDto.setRole(user.getRole().getName());
         return userDto;
     }
@@ -39,7 +41,7 @@ public class DataTransformer {
         User user = new User();
         user.setId(userDto.getId());
         user.setLogin(userDto.getLogin());
-        user.setHashPassword(userDto.getPassword());
+        user.setHashPassword(bCryptPasswordEncoder.encode(userDto.getPassword()));
         RoleType roleName = userDto.getRole();
         Role role = roleRepository.findByName(roleName).orElseThrow();
         user.setRole(role);
@@ -128,7 +130,7 @@ public class DataTransformer {
         UserRequestDto userRequestDto = new UserRequestDto();
         userRequestDto.setId(userRequest.getId());
         userRequestDto.setLogin(userRequest.getLogin());
-        userRequestDto.setPassword(userRequest.getHashPassword());
+//        userRequestDto.setPassword(userRequest.getHashPassword());
         userRequestDto.setRole(userRequest.getRole().getName());
         return userRequestDto;
     }
@@ -137,7 +139,7 @@ public class DataTransformer {
         UserRequest userRequest = new UserRequest();
         userRequest.setId(userRequestDto.getId());
         userRequest.setLogin(userRequestDto.getLogin());
-        userRequest.setHashPassword(userRequestDto.getPassword());
+        userRequest.setHashPassword(bCryptPasswordEncoder.encode(userRequestDto.getPassword()));
         Role role = roleRepository.findByName(userRequestDto.getRole()).orElseThrow();
         userRequest.setRole(role);
         return userRequest;
