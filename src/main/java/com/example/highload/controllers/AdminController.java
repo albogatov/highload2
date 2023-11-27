@@ -7,6 +7,7 @@ import com.example.highload.services.AdminService;
 import com.example.highload.services.UserService;
 import com.example.highload.utils.DataTransformer;
 import com.example.highload.utils.PaginationHeadersCreator;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -14,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -56,7 +58,7 @@ public class AdminController {
     @PostMapping("/user/add")
     @CrossOrigin
 //    @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity addUser(@RequestBody UserDto user) {
+    public ResponseEntity addUser(@Valid @RequestBody UserDto user) {
         if (userService.findByLogin(user.getLogin()) == null) {
             adminService.addUser(user);
             return ResponseEntity.ok("User added");
@@ -74,6 +76,11 @@ public class AdminController {
         List<UserRequestDto> dtoList = dataTransformer.userRequestListToDto(entityList.getContent());
         HttpHeaders responseHeaders = paginationHeadersCreator.pageWithTotalElementsHeadersCreate(entityList);
         return ResponseEntity.ok().headers(responseHeaders).body(dtoList);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity handleValidationExceptions(){
+        return ResponseEntity.badRequest().body("Request body validation failed!");
     }
 
 }

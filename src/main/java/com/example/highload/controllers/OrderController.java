@@ -8,6 +8,7 @@ import com.example.highload.services.ImageService;
 import com.example.highload.services.OrderService;
 import com.example.highload.utils.DataTransformer;
 import com.example.highload.utils.PaginationHeadersCreator;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -15,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -32,7 +34,7 @@ public class OrderController {
     @CrossOrigin
     @PostMapping("/save")
     @PreAuthorize("hasAuthority('CLIENT')")
-    public ResponseEntity save(@RequestBody OrderDto data){
+    public ResponseEntity save(@Valid @RequestBody OrderDto data){
         if(orderService.saveOrder(data) != null)
             return ResponseEntity.ok("");
         else return ResponseEntity.badRequest().body("Couldn't save order, check data");
@@ -41,7 +43,7 @@ public class OrderController {
     @CrossOrigin
     @PostMapping("/update/{orderId}")
     @PreAuthorize("hasAuthority('CLIENT')")
-    public ResponseEntity update(@RequestBody OrderDto data, @PathVariable int orderId){
+    public ResponseEntity update(@Valid @RequestBody OrderDto data, @PathVariable int orderId){
         if(orderService.updateOrder(data, orderId) != null)
             return ResponseEntity.ok("");
         else return ResponseEntity.badRequest().body("Couldn't save order, check data");
@@ -85,7 +87,7 @@ public class OrderController {
     @CrossOrigin
     @GetMapping("/single/{orderId}/tags/add")
     @PreAuthorize("hasAnyAuthority('CLIENT', 'ARTIST')")
-    public ResponseEntity addTagsToOrder(@RequestBody List<Integer> tagIds, @PathVariable int orderId){
+    public ResponseEntity addTagsToOrder(@Valid @RequestBody List<Integer> tagIds, @PathVariable int orderId){
         Order order = orderService.addTagsToOrder( tagIds, orderId);
         if (order != null) {
             return ResponseEntity.ok(dataTransformer.orderToDto(order));
@@ -96,7 +98,7 @@ public class OrderController {
     @CrossOrigin
     @GetMapping("/single/{orderId}/tags/delete")
     @PreAuthorize("hasAnyAuthority('CLIENT', 'ARTIST')")
-    public ResponseEntity deleteTagsFromOrder(@RequestBody List<Integer> tagIds, @PathVariable int orderId){
+    public ResponseEntity deleteTagsFromOrder(@Valid @RequestBody List<Integer> tagIds, @PathVariable int orderId){
         Order order = orderService.deleteTagsFromOrder( tagIds, orderId);
         if (order != null) {
             return ResponseEntity.ok(dataTransformer.orderToDto(order));
@@ -108,7 +110,7 @@ public class OrderController {
     @CrossOrigin
     @GetMapping("/single/{orderId}/images/{page}")
     @PreAuthorize("hasAnyAuthority('CLIENT', 'ARTIST')")
-    public ResponseEntity getOrderImages(@RequestBody int orderId, @PathVariable int page){
+    public ResponseEntity getOrderImages(@Valid @PathVariable int orderId, @PathVariable int page){
         Pageable pageable = PageRequest.of(page, 50);
         Page<Image> entityList = imageService.findAllOrderImages(orderId, pageable);
         List<ImageDto> dtoList = dataTransformer.imageListToDto(entityList.getContent());
@@ -120,7 +122,7 @@ public class OrderController {
     @CrossOrigin
     @GetMapping("/all/tag/{page}")
     @PreAuthorize("hasAnyAuthority('ARTIST')")
-    public ResponseEntity getAllOrdersByTags(@RequestBody List<Integer> tags, @PathVariable int page){
+    public ResponseEntity getAllOrdersByTags(@Valid @RequestBody List<Integer> tags, @PathVariable int page){
 
         Pageable pageable = PageRequest.of(page, 50);
         Page<Order> entityList = orderService.getOrdersByTags(tags, pageable);
@@ -135,7 +137,7 @@ public class OrderController {
     @CrossOrigin
     @GetMapping("/open/tag/{page}")
     @PreAuthorize("hasAnyAuthority('ARTIST')")
-    public ResponseEntity getAllOpenOrdersByTags(@RequestBody List<Integer> tags, @PathVariable int page){
+    public ResponseEntity getAllOpenOrdersByTags(@Valid @RequestBody List<Integer> tags, @PathVariable int page){
 
         Pageable pageable = PageRequest.of(page, 50);
         Page<Order> entityList = orderService.getOpenOrdersByTags(tags, pageable);
@@ -158,5 +160,9 @@ public class OrderController {
         return ResponseEntity.ok().headers(responseHeaders).body(dtoList);
     }
 
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity handleValidationExceptions(){
+        return ResponseEntity.badRequest().body("Request body validation failed!");
+    }
 
 }

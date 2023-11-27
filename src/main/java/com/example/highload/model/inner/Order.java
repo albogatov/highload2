@@ -2,6 +2,7 @@ package com.example.highload.model.inner;
 
 import com.example.highload.model.enums.OrderStatus;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
@@ -25,6 +26,7 @@ public class Order {
     @Column(name = "created", columnDefinition = "TIMESTAMP", nullable = false)
     LocalDateTime created;
 
+    @Min(0)
     @Column(name = "price", nullable = false)
     Integer price;
 

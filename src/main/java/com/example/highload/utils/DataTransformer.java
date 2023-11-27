@@ -222,6 +222,7 @@ public class DataTransformer {
         notificationDto.setTime(notification.getTime());
         notificationDto.setReceiverId(notification.getReceiverProfile().getId());
         notificationDto.setSenderId(notification.getSenderProfile().getId());
+        notificationDto.setSenderMail(notification.getSenderProfile().getMail());
         return notificationDto;
     }
 

@@ -129,7 +129,27 @@ public class AdminAPITests {
                 ()->Assertions.assertEquals( HttpStatus.BAD_REQUEST.value(), response2.statusCode())
         );
 
-        /*TODO : add user with wrong name (empty) */
+        /* add user with wrong name (empty) */
+
+        UserDto wrongUserDto = new UserDto();
+        wrongUserDto.setLogin("");
+        wrongUserDto.setPassword("-");
+        wrongUserDto.setRole(RoleType.CLIENT);
+
+        ExtractableResponse<Response> response3 =
+                given()
+                        .header("Authorization", "Bearer " + tokenResponse)
+                        .header("Content-type", "application/json")
+                        .and()
+                        .body(wrongUserDto)
+                        .when()
+                        .post("/api/app/admin/user/add")
+                        .then()
+                        .extract();
+        Assertions.assertAll(
+                ()->Assertions.assertEquals( "Request body validation failed!", response3.body().asString()),
+                ()->Assertions.assertEquals( HttpStatus.BAD_REQUEST.value(), response3.statusCode())
+        );
     }
 
 }

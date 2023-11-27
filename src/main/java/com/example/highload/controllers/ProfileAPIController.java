@@ -7,12 +7,14 @@ import com.example.highload.services.ImageService;
 import com.example.highload.services.ProfileService;
 import com.example.highload.utils.DataTransformer;
 import com.example.highload.utils.PaginationHeadersCreator;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -29,7 +31,7 @@ public class ProfileAPIController {
 
     @CrossOrigin
     @PostMapping("/edit/{id}")
-    public ResponseEntity edit(@RequestBody ProfileDto data, @PathVariable int id){
+    public ResponseEntity edit(@Valid @RequestBody ProfileDto data, @PathVariable int id){
         if (profileService.editProfile(data, id) != null)
             return ResponseEntity.ok("");
         else return ResponseEntity.badRequest().body("Couldn't save profile changes, check data");
@@ -63,6 +65,11 @@ public class ProfileAPIController {
         // "запрос, который вернет findAll с пагинацией и с указанием общего количества записей в http хедере."
         return ResponseEntity.ok().headers(responseHeaders).body(dataTransformer.imageListToDto(images.getContent()));
 
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity handleValidationExceptions(){
+        return ResponseEntity.badRequest().body("Request body validation failed!");
     }
 
 }
