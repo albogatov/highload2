@@ -53,7 +53,7 @@ public class AdminController {
         return ResponseEntity.ok("User deleted");
     }
 
-    @PostMapping("/user/add/")
+    @PostMapping("/user/add")
     @CrossOrigin
 //    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity addUser(@RequestBody UserDto user) {
