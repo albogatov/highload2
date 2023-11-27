@@ -8,13 +8,20 @@ import com.example.highload.security.jwt.JwtUtil;
 import com.example.highload.services.AuthenticationService;
 import com.example.highload.services.UserService;
 import io.restassured.RestAssured;
+import io.restassured.parsing.Parser;
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -22,11 +29,12 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import java.util.List;
 import java.util.stream.Stream;
+
 import static io.restassured.RestAssured.given;
 
 @Testcontainers
+@EnableConfigurationProperties
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class AuthTests {
 
@@ -66,6 +74,7 @@ public class AuthTests {
 
 
     @Container
+    @ServiceConnection
     private static final PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>("postgres:latest")
             .withDatabaseName("highload")
             .withUsername("high_user")
@@ -87,6 +96,7 @@ public class AuthTests {
     @BeforeEach
     void setUp() {
         RestAssured.baseURI = "http://localhost:" + port;
+        RestAssured.defaultParser = Parser.JSON;
     }
 
     @AfterAll
@@ -108,57 +118,54 @@ public class AuthTests {
     @ParameterizedTest
     @MethodSource("loginProvider")
     void authAdminBadLogin(String login) {
-        Assertions.assertThrows(BadCredentialsException.class, () -> {
-            authenticationService.authProcess(login, adminPassword, adminRole);
-        });
+        Assertions.assertThrows(BadCredentialsException.class, () ->
+                authenticationService.authProcess(login, adminPassword, adminRole)
+        );
     }
 
     @ParameterizedTest
     @MethodSource("passwordProvider")
     void authAdminBadPassword(String password) {
-        Assertions.assertThrows(BadCredentialsException.class, () -> {
-            authenticationService.authProcess(adminLogin, password, adminRole);
-        });
+        Assertions.assertThrows(BadCredentialsException.class, () ->
+                authenticationService.authProcess(adminLogin, password, adminRole)
+        );
     }
-
-    //                .header("Authorization", "Bearer " + adminToken)
 
     @ParameterizedTest
     @MethodSource("userProvider")
-    void authCorrect(List<String> userClaims) {
-        String tokenResponse =
+    void authRESTCorrect(String login, String password, String role) {
+        ExtractableResponse<Response> response =
                 given()
-                .header("Content-type", "application/json")
-                .and()
-                .body(new JwtRequest(userClaims.get(0), userClaims.get(1), userClaims.get(2)))
-                .when()
-                .post("/api/app/user/login")
-                .then()
-                .extract().as(JwtResponse.class).getToken();
-        User user = userService.findByLogin(userClaims.get(0));
+                        .header("Content-type", "application/json")
+                        .and()
+                        .body(new JwtRequest(login, password, role))
+                        .when()
+                        .post("/api/app/user/login")
+                        .then()
+                        .extract();
+        User user = userService.findByLogin(login);
+        String tokenResponse = response.body().as(JwtResponse.class).getToken();
         Assertions.assertAll(
                 () -> Assertions.assertDoesNotThrow(() -> jwtUtil.getLoginFromJwtToken(tokenResponse)),
                 () -> Assertions.assertEquals(jwtUtil.getLoginFromJwtToken(tokenResponse), user.getLogin()),
-                () -> Assertions.assertTrue(jwtUtil.getRoleFromJwtToken(tokenResponse).contains(user.getRole().getName().toString()))
+                () -> Assertions.assertTrue(jwtUtil.getRoleFromJwtToken(tokenResponse).contains(user.getRole().getName().toString())),
+                () -> Assertions.assertEquals(response.response().getStatusCode(), HttpStatus.OK.value())
         );
     }
 
-    @Test
-    void authBad() {
-
-    }
-
-
-
-    @Test
-    void authAdmin() {
-        String adminJwt = authenticationService.authProcess(adminLogin, adminPassword, adminRole);
-        User user = userService.findByLogin(adminLogin);
-        Assertions.assertAll(
-                () -> Assertions.assertDoesNotThrow(() -> jwtUtil.getLoginFromJwtToken(adminJwt)),
-                () -> Assertions.assertEquals(jwtUtil.getLoginFromJwtToken(adminJwt), adminLogin),
-                () -> Assertions.assertTrue(jwtUtil.getRoleFromJwtToken(adminJwt).contains(user.getRole().getName().toString()))
-        );
+    @ParameterizedTest
+    @MethodSource("userProvider")
+    void authRESTBad(String login, String password, String role) {
+        ExtractableResponse<Response> response =
+                given()
+                        .header("Content-type", "application/json")
+                        .and()
+                        .body(new JwtRequest(login + "1", password, role))
+                        .when()
+                        .post("/api/app/user/login")
+                        .then()
+                        .extract();
+        Assertions.assertEquals(response.response().getStatusCode(), HttpStatus.UNAUTHORIZED.value());
     }
 
     private static Stream<String> loginProvider() {
@@ -179,11 +186,11 @@ public class AuthTests {
         );
     }
 
-    private static Stream<List<String>> userProvider() {
+    private static Stream<?> userProvider() {
         return Stream.of(
-                List.of(adminLogin, adminPassword, adminRole),
-                List.of(artistLogin, artistPassword, artistRole),
-                List.of(clientLogin, clientPassword, clientRole)
+                Arguments.of(adminLogin, adminPassword, adminRole),
+                Arguments.of(artistLogin, artistPassword, artistRole),
+                Arguments.of(clientLogin, clientPassword, clientRole)
         );
     }
 
