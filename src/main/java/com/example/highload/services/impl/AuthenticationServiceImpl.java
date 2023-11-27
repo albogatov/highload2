@@ -18,7 +18,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final JwtUtil jwtUtil;
 
     @Override
-    public String Auth(String login, String password, String role) {
+    public String authProcess(String login, String password, String role) {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(login, password));
         //User user = userService.findByLogin(login);
         //return jwtUtil.generateToken(user);

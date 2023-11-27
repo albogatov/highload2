@@ -8,8 +8,6 @@ import com.example.highload.security.jwt.JwtUtil;
 import com.example.highload.services.AuthenticationService;
 import com.example.highload.services.UserService;
 import io.restassured.RestAssured;
-import io.restassured.response.ExtractableResponse;
-import io.restassured.response.Response;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -69,10 +67,9 @@ public class AuthTests {
 
     @Container
     private static final PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>("postgres:latest")
-            .withDatabaseName("")
-            .withUsername("")
-            .withPassword("")
-            .withInitScript("");
+            .withDatabaseName("highload")
+            .withUsername("high_user")
+            .withPassword("high_user");
 
     @DynamicPropertySource
     static void postgresqlProperties(DynamicPropertyRegistry registry) {
@@ -99,7 +96,7 @@ public class AuthTests {
 
     @Test
     void authAdminCorrect() {
-        String adminJwt = authenticationService.Auth(adminLogin, adminPassword, adminRole);
+        String adminJwt = authenticationService.authProcess(adminLogin, adminPassword, adminRole);
         User user = userService.findByLogin(adminLogin);
         Assertions.assertAll(
                 () -> Assertions.assertDoesNotThrow(() -> jwtUtil.getLoginFromJwtToken(adminJwt)),
@@ -112,7 +109,7 @@ public class AuthTests {
     @MethodSource("loginProvider")
     void authAdminBadLogin(String login) {
         Assertions.assertThrows(BadCredentialsException.class, () -> {
-            authenticationService.Auth(login, adminPassword, adminRole);
+            authenticationService.authProcess(login, adminPassword, adminRole);
         });
     }
 
@@ -120,7 +117,7 @@ public class AuthTests {
     @MethodSource("passwordProvider")
     void authAdminBadPassword(String password) {
         Assertions.assertThrows(BadCredentialsException.class, () -> {
-            authenticationService.Auth(adminLogin, password, adminRole);
+            authenticationService.authProcess(adminLogin, password, adminRole);
         });
     }
 
@@ -155,7 +152,7 @@ public class AuthTests {
 
     @Test
     void authAdmin() {
-        String adminJwt = authenticationService.Auth(adminLogin, adminPassword, adminRole);
+        String adminJwt = authenticationService.authProcess(adminLogin, adminPassword, adminRole);
         User user = userService.findByLogin(adminLogin);
         Assertions.assertAll(
                 () -> Assertions.assertDoesNotThrow(() -> jwtUtil.getLoginFromJwtToken(adminJwt)),
