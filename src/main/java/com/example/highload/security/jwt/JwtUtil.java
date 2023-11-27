@@ -52,7 +52,8 @@ public class JwtUtil {
     }
 
     public List<String> getRoleFromJwtToken(String token) {
-        return getClaimsFromToken(token).get("role", List.class);
+        Claims claims = getClaimsFromToken(token);
+        return List.of(claims.get("roles", String.class));
     }
 
 

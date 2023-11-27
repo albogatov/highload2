@@ -6,10 +6,10 @@ spring:
     password: high_user
   jpa:
     hibernate:
-      ddl-auto: create
-    generate-ddl: true
+      ddl-auto: none
+    generate-ddl: false
   liquibase:
-    enabled: false
+    enabled: true
 admin:
   login: admin1
   password: admin1

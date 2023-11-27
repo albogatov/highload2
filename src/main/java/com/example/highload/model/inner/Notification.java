@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @Table(name = "notification", schema = "public")
 public class Notification {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     Integer id;
 
     @ManyToOne

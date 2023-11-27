@@ -9,10 +9,15 @@ import com.example.highload.model.network.UserDto;
 import com.example.highload.repos.RoleRepository;
 import com.example.highload.repos.UserRepository;
 import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
+import io.restassured.parsing.Parser;
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -49,44 +54,44 @@ public class AdminAPITests {
             .withUsername("high_user")
             .withPassword("high_user");
 
-    @BeforeEach
-    public void initRolesAndUsersIfNotAlready() {
-        if (!testUsersPreparedFlag) {
-
-            Role admin = new Role();
-            admin.setName(RoleType.ADMIN);
-            roleRepository.save(admin);
-            Role artist = new Role();
-            artist.setName(RoleType.ARTIST);
-            roleRepository.save(artist);
-            Role client = new Role();
-            client.setName(RoleType.CLIENT);
-            roleRepository.save(client);
-
-            User admin1 = new User();
-            admin1.setLogin("admin1");
-            admin1.setHashPassword(bCryptPasswordEncoder.encode("admin1"));
-            admin1.setRole(admin);
-            admin1.setIsActual(true);
-            userRepository.save(admin1);
-
-            User artist1 = new User();
-            artist1.setLogin("artist1");
-            artist1.setHashPassword(bCryptPasswordEncoder.encode("artist1"));
-            artist1.setRole(artist);
-            artist1.setIsActual(true);
-            userRepository.save(artist1);
-
-            User client1 = new User();
-            client1.setLogin("client1");
-            client1.setHashPassword(bCryptPasswordEncoder.encode("client1"));
-            client1.setRole(client);
-            client1.setIsActual(true);
-            userRepository.save(client1);
-
-            testUsersPreparedFlag = true;
-        }
-    }
+//    @BeforeEach
+//    public void initRolesAndUsersIfNotAlready() {
+//        if (!testUsersPreparedFlag) {
+//
+//            Role admin = new Role();
+//            admin.setName(RoleType.ADMIN);
+//            roleRepository.save(admin);
+//            Role artist = new Role();
+//            artist.setName(RoleType.ARTIST);
+//            roleRepository.save(artist);
+//            Role client = new Role();
+//            client.setName(RoleType.CLIENT);
+//            roleRepository.save(client);
+//
+//            User admin1 = new User();
+//            admin1.setLogin("admin1");
+//            admin1.setHashPassword(bCryptPasswordEncoder.encode("admin1"));
+//            admin1.setRole(admin);
+//            admin1.setIsActual(true);
+//            userRepository.save(admin1);
+//
+//            User artist1 = new User();
+//            artist1.setLogin("artist1");
+//            artist1.setHashPassword(bCryptPasswordEncoder.encode("artist1"));
+//            artist1.setRole(artist);
+//            artist1.setIsActual(true);
+//            userRepository.save(artist1);
+//
+//            User client1 = new User();
+//            client1.setLogin("client1");
+//            client1.setHashPassword(bCryptPasswordEncoder.encode("client1"));
+//            client1.setRole(client);
+//            client1.setIsActual(true);
+//            userRepository.save(client1);
+//
+//            testUsersPreparedFlag = true;
+//        }
+//    }
 
     @DynamicPropertySource
     static void postgresqlProperties(DynamicPropertyRegistry registry) {
@@ -104,6 +109,7 @@ public class AdminAPITests {
     @BeforeEach
     void setUp() {
         RestAssured.baseURI = "http://localhost:" + port;
+        RestAssured.defaultParser = Parser.JSON;
     }
 
     @AfterAll
@@ -118,11 +124,11 @@ public class AdminAPITests {
                 given()
                         .header("Content-type", "application/json")
                         .and()
-                        .body(new JwtRequest(admin.getLogin(), admin.getHashPassword(), admin.getRole().getName().toString()))
+                        .body(new JwtRequest(admin.getLogin(), "admin1", admin.getRole().getName().toString()))
                         .when()
                         .post("/api/app/user/login")
                         .then()
-                        .extract().as(JwtResponse.class).getToken();
+                        .extract().body().as(JwtResponse.class).getToken();
         UserDto userDto = new UserDto();
         userDto.setLogin("test_client1");
         userDto.setPassword("test_client1");
@@ -130,19 +136,19 @@ public class AdminAPITests {
 
         /*add correct user*/
 
-        ResponseEntity response1 =
+        ExtractableResponse<Response> response1 =
                 given()
                         .header("Authorization", "Bearer " + tokenResponse)
+                        .header("Content-type", "application/json")
                         .and()
                         .body(userDto)
                         .when()
                         .post("/api/app/admin/user/add")
                         .then()
-                        .extract().as(ResponseEntity.class);
+                        .extract();
         Assertions.assertAll(
-                ()->Assertions.assertTrue(response1.hasBody()),
-                ()->Assertions.assertEquals(response1.getStatusCode(), HttpStatusCode.valueOf(200)),
-                ()->Assertions.assertEquals(response1.getBody(), "User added")
+                ()->Assertions.assertEquals( "User added", response1.body().asString()),
+                ()->Assertions.assertEquals( HttpStatus.OK.value(), response1.statusCode())
         );
 
         /*add existing user*/
@@ -150,12 +156,13 @@ public class AdminAPITests {
         ResponseEntity response2 =
                 given()
                         .header("Authorization", "Bearer " + tokenResponse)
+                        .header("Content-type", "application/json")
                         .and()
                         .body(userDto)
                         .when()
                         .post("/api/app/admin/user/add")
                         .then()
-                        .extract().as(ResponseEntity.class);
+                        .extract().body().as(ResponseEntity.class);
         Assertions.assertAll(
                 ()->Assertions.assertTrue(response2.hasBody()),
                 ()->Assertions.assertEquals(response2.getStatusCode(), HttpStatusCode.valueOf(400)),

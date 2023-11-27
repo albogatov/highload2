@@ -1,5 +1,6 @@
 package com.example.highload.utils;
 
+import com.example.highload.model.enums.RoleType;
 import com.example.highload.model.inner.*;
 import com.example.highload.model.network.*;
 import com.example.highload.repos.*;
@@ -39,8 +40,10 @@ public class DataTransformer {
         user.setId(userDto.getId());
         user.setLogin(userDto.getLogin());
         user.setHashPassword(userDto.getPassword());
-        Role role = roleRepository.findByName(userDto.getRole().toString()).orElseThrow();
+        RoleType roleName = userDto.getRole();
+        Role role = roleRepository.findByName(roleName).orElseThrow();
         user.setRole(role);
+        user.setIsActual(true);
         return user;
     }
 
@@ -135,7 +138,7 @@ public class DataTransformer {
         userRequest.setId(userRequestDto.getId());
         userRequest.setLogin(userRequestDto.getLogin());
         userRequest.setHashPassword(userRequestDto.getPassword());
-        Role role = roleRepository.findByName(userRequestDto.getRole().toString()).orElseThrow();
+        Role role = roleRepository.findByName(userRequestDto.getRole()).orElseThrow();
         userRequest.setRole(role);
         return userRequest;
     }
