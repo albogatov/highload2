@@ -54,45 +54,6 @@ public class AdminAPITests {
             .withUsername("high_user")
             .withPassword("high_user");
 
-//    @BeforeEach
-//    public void initRolesAndUsersIfNotAlready() {
-//        if (!testUsersPreparedFlag) {
-//
-//            Role admin = new Role();
-//            admin.setName(RoleType.ADMIN);
-//            roleRepository.save(admin);
-//            Role artist = new Role();
-//            artist.setName(RoleType.ARTIST);
-//            roleRepository.save(artist);
-//            Role client = new Role();
-//            client.setName(RoleType.CLIENT);
-//            roleRepository.save(client);
-//
-//            User admin1 = new User();
-//            admin1.setLogin("admin1");
-//            admin1.setHashPassword(bCryptPasswordEncoder.encode("admin1"));
-//            admin1.setRole(admin);
-//            admin1.setIsActual(true);
-//            userRepository.save(admin1);
-//
-//            User artist1 = new User();
-//            artist1.setLogin("artist1");
-//            artist1.setHashPassword(bCryptPasswordEncoder.encode("artist1"));
-//            artist1.setRole(artist);
-//            artist1.setIsActual(true);
-//            userRepository.save(artist1);
-//
-//            User client1 = new User();
-//            client1.setLogin("client1");
-//            client1.setHashPassword(bCryptPasswordEncoder.encode("client1"));
-//            client1.setRole(client);
-//            client1.setIsActual(true);
-//            userRepository.save(client1);
-//
-//            testUsersPreparedFlag = true;
-//        }
-//    }
-
     @DynamicPropertySource
     static void postgresqlProperties(DynamicPropertyRegistry registry) {
         registry.add("spring.datasource.driver-class-name", postgreSQLContainer::getDriverClassName);
@@ -153,7 +114,7 @@ public class AdminAPITests {
 
         /*add existing user*/
 
-        ResponseEntity response2 =
+        ExtractableResponse<Response> response2 =
                 given()
                         .header("Authorization", "Bearer " + tokenResponse)
                         .header("Content-type", "application/json")
@@ -162,11 +123,10 @@ public class AdminAPITests {
                         .when()
                         .post("/api/app/admin/user/add")
                         .then()
-                        .extract().body().as(ResponseEntity.class);
+                        .extract();
         Assertions.assertAll(
-                ()->Assertions.assertTrue(response2.hasBody()),
-                ()->Assertions.assertEquals(response2.getStatusCode(), HttpStatusCode.valueOf(400)),
-                ()->Assertions.assertEquals(response2.getBody(), "User already exists!")
+                ()->Assertions.assertEquals( "User already exists!", response2.body().asString()),
+                ()->Assertions.assertEquals( HttpStatus.BAD_REQUEST.value(), response2.statusCode())
         );
 
         /*TODO : add user with wrong name (empty) */
