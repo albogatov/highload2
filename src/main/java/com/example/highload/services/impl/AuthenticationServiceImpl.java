@@ -18,13 +18,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final JwtUtil jwtUtil;
 
     @Override
-    public String authProcess(String login, String password, String role) {
-        try {
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(login, password));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-//        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(login, password));
+    public String Auth(String login, String password, String role) {
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(login, password));
         //User user = userService.findByLogin(login);
         //return jwtUtil.generateToken(user);
         return jwtUtil.generateToken(login, role);

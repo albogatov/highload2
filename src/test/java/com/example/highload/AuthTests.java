@@ -2,6 +2,7 @@ package com.example.highload;
 
 import com.example.highload.model.inner.User;
 import com.example.highload.model.network.JwtRequest;
+import com.example.highload.model.network.JwtResponse;
 import com.example.highload.repos.RoleRepository;
 import com.example.highload.security.jwt.JwtUtil;
 import com.example.highload.services.AuthenticationService;
@@ -23,6 +24,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import java.util.List;
 import java.util.stream.Stream;
 import static io.restassured.RestAssured.given;
 
@@ -49,22 +51,28 @@ public class AuthTests {
     private static String adminLogin;
     @Value("${admin.password}")
     private static String adminPassword;
+    @Value("${admin.role}")
+    private static String adminRole;
     @Value("${artist.login}")
     private static String artistLogin;
     @Value("${artist.password}")
     private static String artistPassword;
+    @Value("${artist.role}")
+    private static String artistRole;
     @Value("${client.login}")
     private static String clientLogin;
     @Value("${client.password}")
     private static String clientPassword;
+    @Value("${client.role}")
+    private static String clientRole;
 
 
     @Container
     private static final PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>("postgres:latest")
-            .withDatabaseName("highload")
-            .withUsername("high_user")
-            .withPassword("high_user")
-            .withInitScript("/Users/abogatov/IdeaProjects/highload/src/main/resources/db/changelog/v1/changelog.yaml");
+            .withDatabaseName("")
+            .withUsername("")
+            .withPassword("")
+            .withInitScript("");
 
     @DynamicPropertySource
     static void postgresqlProperties(DynamicPropertyRegistry registry) {
@@ -91,7 +99,7 @@ public class AuthTests {
 
     @Test
     void authAdminCorrect() {
-        String adminJwt = authenticationService.authProcess(adminLogin, adminPassword, "ADMIN");
+        String adminJwt = authenticationService.Auth(adminLogin, adminPassword, adminRole);
         User user = userService.findByLogin(adminLogin);
         Assertions.assertAll(
                 () -> Assertions.assertDoesNotThrow(() -> jwtUtil.getLoginFromJwtToken(adminJwt)),
@@ -104,7 +112,7 @@ public class AuthTests {
     @MethodSource("loginProvider")
     void authAdminBadLogin(String login) {
         Assertions.assertThrows(BadCredentialsException.class, () -> {
-            authenticationService.authProcess(login, adminPassword, "ADMIN");
+            authenticationService.Auth(login, adminPassword, adminRole);
         });
     }
 
@@ -112,24 +120,31 @@ public class AuthTests {
     @MethodSource("passwordProvider")
     void authAdminBadPassword(String password) {
         Assertions.assertThrows(BadCredentialsException.class, () -> {
-            authenticationService.authProcess(adminLogin, password, "ADMIN");
+            authenticationService.Auth(adminLogin, password, adminRole);
         });
     }
 
     //                .header("Authorization", "Bearer " + adminToken)
 
-//    @Test
-//    void authCorrect() {
-//        ExtractableResponse<Response> response =
-//                given().header("Content-type", "application/json").and().body(new JwtRequest(adminLogin, adminPassword))
-//                .when().post("/api/app/user/login")
-//                .then().extract();
-//        Assertions.assertAll(
-//                () ->
-//                () ->
-//                () ->
-//        );
-//    }
+    @ParameterizedTest
+    @MethodSource("userProvider")
+    void authCorrect(List<String> userClaims) {
+        String tokenResponse =
+                given()
+                .header("Content-type", "application/json")
+                .and()
+                .body(new JwtRequest(userClaims.get(0), userClaims.get(1), userClaims.get(2)))
+                .when()
+                .post("/api/app/user/login")
+                .then()
+                .extract().as(JwtResponse.class).getToken();
+        User user = userService.findByLogin(userClaims.get(0));
+        Assertions.assertAll(
+                () -> Assertions.assertDoesNotThrow(() -> jwtUtil.getLoginFromJwtToken(tokenResponse)),
+                () -> Assertions.assertEquals(jwtUtil.getLoginFromJwtToken(tokenResponse), user.getLogin()),
+                () -> Assertions.assertTrue(jwtUtil.getRoleFromJwtToken(tokenResponse).contains(user.getRole().getName().toString()))
+        );
+    }
 
     @Test
     void authBad() {
@@ -140,7 +155,7 @@ public class AuthTests {
 
     @Test
     void authAdmin() {
-        String adminJwt = authenticationService.authProcess(adminLogin, adminPassword, "ADMIN");
+        String adminJwt = authenticationService.Auth(adminLogin, adminPassword, adminRole);
         User user = userService.findByLogin(adminLogin);
         Assertions.assertAll(
                 () -> Assertions.assertDoesNotThrow(() -> jwtUtil.getLoginFromJwtToken(adminJwt)),
@@ -164,6 +179,14 @@ public class AuthTests {
                 artistPassword,
                 adminLogin,
                 adminPassword + "1"
+        );
+    }
+
+    private static Stream<List<String>> userProvider() {
+        return Stream.of(
+                List.of(adminLogin, adminPassword, adminRole),
+                List.of(artistLogin, artistPassword, artistRole),
+                List.of(clientLogin, clientPassword, clientRole)
         );
     }
 

@@ -1,16 +1,24 @@
 spring:
   datasourse:
     driver-class-name: org.postgresql.Driver
-    url:jdbc:postgresql: //db:5432/highload
+    url: jdbc:postgresql://localhost:5432/highload
     username: high_user
     password: high_user
-
+  jpa:
+    hibernate:
+      ddl-auto: create
+    generate-ddl: true
+  liquibase:
+    enabled: false
 admin:
-  login:
-  password:
+  login: admin1
+  password: admin1
+  role: ADMIN
 artist:
-  login:
-  password:
+  login: artist1
+  password: artist1
+  role: ARTIST
 client:
-  login:
-  password:
+  login: client1
+  password: client1
+  role: CLIENT
