@@ -30,6 +30,8 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import java.util.NoSuchElementException;
+
 import static io.restassured.RestAssured.given;
 
 @Testcontainers
@@ -86,13 +88,13 @@ public class AdminAPITests {
     private String getToken(String userName) {
         User user = userRepository.findByLogin(userName).orElseThrow();
         return given()
-                        .header("Content-type", "application/json")
-                        .and()
-                        .body(new JwtRequest(userName, userName, user.getRole().getName().toString()))
-                        .when()
-                        .post("/api/app/user/login")
-                        .then()
-                        .extract().body().as(JwtResponse.class).getToken();
+                .header("Content-type", "application/json")
+                .and()
+                .body(new JwtRequest(userName, userName, user.getRole().getName().toString()))
+                .when()
+                .post("/api/app/user/login")
+                .then()
+                .extract().body().as(JwtResponse.class).getToken();
     }
 
     @Test
@@ -194,7 +196,9 @@ public class AdminAPITests {
                         .extract();
         Assertions.assertAll(
                 () -> Assertions.assertEquals("User approved", response1.body().asString()),
-                () -> Assertions.assertEquals(HttpStatus.OK.value(), response1.statusCode())
+                () -> Assertions.assertEquals(HttpStatus.OK.value(), response1.statusCode()),
+                () -> Assertions.assertThrows(NoSuchElementException.class, () -> userRequestRepository.findByLogin("admin_test_client2")),
+                () -> Assertions.assertDoesNotThrow(() -> userRepository.findByLogin("admin_test_client2"))
         );
 
         // approve not existing (on prev step user request was deleted when accepted)
@@ -247,7 +251,8 @@ public class AdminAPITests {
                         .extract();
         Assertions.assertAll(
                 () -> Assertions.assertEquals("User deleted", response1.body().asString()),
-                () -> Assertions.assertEquals(HttpStatus.OK.value(), response1.statusCode())
+                () -> Assertions.assertEquals(HttpStatus.OK.value(), response1.statusCode()),
+                () -> Assertions.assertThrows(NoSuchElementException.class, () -> userRepository.findByLogin("admin_test_client3"))
         );
 
         // delete not existing (on prev step user was deleted)
@@ -265,6 +270,16 @@ public class AdminAPITests {
                 () -> Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), response2.statusCode())
         );
 
+    }
+
+    @Test
+    public void getAllUserRequests() {
+        /*TODO: implement, RUN*/
+    }
+
+    @Test
+    public void deleteAllExpiredUserDeletedAccounts() {
+        /*TODO: implement, RUN*/
     }
 }
 
