@@ -2,5 +2,5 @@ package com.example.highload.services;
 
 public interface AuthenticationService {
 
-    public String Auth(String username, String password, String role);
+    public String authProcess(String username, String password, String role);
 }

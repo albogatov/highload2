@@ -1,7 +1,6 @@
 package com.example.highload.controllers;
 
 import com.example.highload.exceptions.AppError;
-import com.example.highload.model.inner.User;
 import com.example.highload.model.network.JwtResponse;
 import com.example.highload.model.network.ProfileDto;
 import com.example.highload.model.network.UserDto;
@@ -13,8 +12,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,7 +37,7 @@ public class UserController {
 //        } catch (BadCredentialsException e) {
 //            return new ResponseEntity<>(new AppError(HttpStatus.UNAUTHORIZED.value(), "Invalid login or password"), HttpStatus.UNAUTHORIZED);
 //        }
-        JwtResponse response = JwtResponse.builder().token(authenticationService.Auth(user.getLogin(), user.getPassword(), user.getRole().toString())).build();
+        JwtResponse response = JwtResponse.builder().token(authenticationService.authProcess(user.getLogin(), user.getPassword(), user.getRole().toString())).build();
         return ResponseEntity.ok(response);
     }
 

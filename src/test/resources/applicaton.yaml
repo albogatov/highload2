@@ -1,7 +1,7 @@
 spring:
   datasourse:
     driver-class-name: org.postgresql.Driver
-    url:jdbc:postgresql: //localhost:5432/highload
+    url:jdbc:postgresql: //db:5432/highload
     username: high_user
     password: high_user
 

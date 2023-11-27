@@ -61,10 +61,10 @@ public class AuthTests {
 
     @Container
     private static final PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>("postgres:latest")
-            .withDatabaseName("")
-            .withUsername("")
-            .withPassword("")
-            .withInitScript("");
+            .withDatabaseName("highload")
+            .withUsername("high_user")
+            .withPassword("high_user")
+            .withInitScript("/Users/abogatov/IdeaProjects/highload/src/main/resources/db/changelog/v1/changelog.yaml");
 
     @DynamicPropertySource
     static void postgresqlProperties(DynamicPropertyRegistry registry) {
@@ -91,7 +91,7 @@ public class AuthTests {
 
     @Test
     void authAdminCorrect() {
-        String adminJwt = authenticationService.Auth(adminLogin, adminPassword);
+        String adminJwt = authenticationService.authProcess(adminLogin, adminPassword, "ADMIN");
         User user = userService.findByLogin(adminLogin);
         Assertions.assertAll(
                 () -> Assertions.assertDoesNotThrow(() -> jwtUtil.getLoginFromJwtToken(adminJwt)),
@@ -104,7 +104,7 @@ public class AuthTests {
     @MethodSource("loginProvider")
     void authAdminBadLogin(String login) {
         Assertions.assertThrows(BadCredentialsException.class, () -> {
-            authenticationService.Auth(login, adminPassword);
+            authenticationService.authProcess(login, adminPassword, "ADMIN");
         });
     }
 
@@ -112,24 +112,24 @@ public class AuthTests {
     @MethodSource("passwordProvider")
     void authAdminBadPassword(String password) {
         Assertions.assertThrows(BadCredentialsException.class, () -> {
-            authenticationService.Auth(adminLogin, password);
+            authenticationService.authProcess(adminLogin, password, "ADMIN");
         });
     }
 
     //                .header("Authorization", "Bearer " + adminToken)
 
-    @Test
-    void authCorrect() {
-        ExtractableResponse<Response> response =
-                given().header("Content-type", "application/json").and().body(new JwtRequest(adminLogin, adminPassword))
-                .when().post("/api/app/user/login")
-                .then().extract();
-        Assertions.assertAll(
-                () ->
-                () ->
-                () ->
-        );
-    }
+//    @Test
+//    void authCorrect() {
+//        ExtractableResponse<Response> response =
+//                given().header("Content-type", "application/json").and().body(new JwtRequest(adminLogin, adminPassword))
+//                .when().post("/api/app/user/login")
+//                .then().extract();
+//        Assertions.assertAll(
+//                () ->
+//                () ->
+//                () ->
+//        );
+//    }
 
     @Test
     void authBad() {
@@ -140,7 +140,7 @@ public class AuthTests {
 
     @Test
     void authAdmin() {
-        String adminJwt = authenticationService.Auth(adminLogin, adminPassword);
+        String adminJwt = authenticationService.authProcess(adminLogin, adminPassword, "ADMIN");
         User user = userService.findByLogin(adminLogin);
         Assertions.assertAll(
                 () -> Assertions.assertDoesNotThrow(() -> jwtUtil.getLoginFromJwtToken(adminJwt)),
