@@ -6,11 +6,14 @@ spring:
     password: high_user
 
 admin:
-  login:
-  password:
+  login: admin1
+  password: admin1
+  role: ADMIN
 artist:
-  login:
-  password:
+  login: artist1
+  password: artist1
+  role: ARTIST
 client:
-  login:
-  password:
+  login: client1
+  password: client1
+  role: CLIENT

@@ -10,4 +10,5 @@ import java.io.Serializable;
 public class JwtRequest implements Serializable {
     private String login;
     private String password;
+    private String role;
 }
