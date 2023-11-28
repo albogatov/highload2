@@ -251,7 +251,7 @@ public class ImageObjectAPITests {
                         .extract();
 
         Assertions.assertAll(
-                () -> Assertions.assertEquals(HttpStatus.FORBIDDEN.value(), response1.statusCode())
+                () -> Assertions.assertEquals(HttpStatus.FORBIDDEN.value(), response2.statusCode())
         );
 
     }
