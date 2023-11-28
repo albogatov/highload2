@@ -45,11 +45,14 @@ public class AdminServiceImpl implements AdminService {
                     usersToDelete.getContent()) {
 
                 Profile profile = user.getProfile();
-                imageRepository.deleteAllByImageObject_Profile(profile);
-                imageRepository.deleteById(profile.getImage().getId());
+                if (profile != null) {
+                    imageRepository.deleteAllByImageObject_Profile(profile);
+                    imageRepository.deleteById(profile.getImage().getId());
+                }
 
                 List<Order> orders = user.getOrders();
-                orders.forEach(imageRepository::deleteAllByImageObject_Order);
+                if (orders.size() > 0)
+                    orders.forEach(imageRepository::deleteAllByImageObject_Order);
             }
             i++;
         } while (usersToDelete.getContent().size() == 50);

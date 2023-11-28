@@ -198,8 +198,8 @@ public class AdminAPITests {
         Assertions.assertAll(
                 () -> Assertions.assertEquals("User approved", response1.body().asString()),
                 () -> Assertions.assertEquals(HttpStatus.OK.value(), response1.statusCode()),
-                () -> Assertions.assertThrows(NoSuchElementException.class, () -> userRequestRepository.findByLogin("admin_test_client2")),
-                () -> Assertions.assertDoesNotThrow(() -> userRepository.findByLogin("admin_test_client2"))
+                () -> Assertions.assertThrows(NoSuchElementException.class, () -> userRequestRepository.findByLogin("admin_test_client2").orElseThrow()),
+                () -> Assertions.assertDoesNotThrow(() -> userRepository.findByLogin("admin_test_client2").orElseThrow())
         );
 
         // approve not existing (on prev step user request was deleted when accepted)
@@ -253,7 +253,7 @@ public class AdminAPITests {
         Assertions.assertAll(
                 () -> Assertions.assertEquals("User deleted", response1.body().asString()),
                 () -> Assertions.assertEquals(HttpStatus.OK.value(), response1.statusCode()),
-                () -> Assertions.assertThrows(NoSuchElementException.class, () -> userRepository.findByLogin("admin_test_client3"))
+                () -> Assertions.assertThrows(NoSuchElementException.class, () -> userRepository.findByLogin("admin_test_client3").orElseThrow())
         );
 
         // delete not existing (on prev step user was deleted)
@@ -368,7 +368,7 @@ public class AdminAPITests {
         Assertions.assertAll(
                 () -> Assertions.assertEquals("Users deleted", response1.body().asString()),
                 () -> Assertions.assertEquals(HttpStatus.OK.value(), response1.statusCode()),
-                () -> Assertions.assertThrows(NoSuchElementException.class, () -> userRepository.findByLogin("admin_test_client6"))
+                () -> Assertions.assertThrows(NoSuchElementException.class, () -> userRepository.findByLogin("admin_test_client6").orElseThrow())
         );
 
     }
