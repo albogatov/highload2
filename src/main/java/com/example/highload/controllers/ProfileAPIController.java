@@ -33,9 +33,8 @@ public class ProfileAPIController {
     @CrossOrigin
     @PostMapping("/edit/{id}")
     public ResponseEntity edit(@Valid @RequestBody ProfileDto data, @PathVariable int id){
-        if (profileService.editProfile(data, id) != null)
-            return ResponseEntity.ok("Profile edited");
-        else return ResponseEntity.badRequest().body("Couldn't save profile changes, check data");
+        profileService.editProfile(data, id);
+        return ResponseEntity.ok("Profile edited");
     }
 
     @CrossOrigin

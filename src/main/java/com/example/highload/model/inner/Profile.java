@@ -17,7 +17,7 @@ public class Profile {
     Integer id;
 
     @OneToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    @JoinColumn(name = "user_id", referencedColumnName = "id", updatable = false)
     User user;
 
     @OneToOne

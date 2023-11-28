@@ -1,7 +1,9 @@
 package com.example.highload.services.impl;
 
+import com.example.highload.model.inner.Order;
 import com.example.highload.model.inner.Tag;
 import com.example.highload.model.network.TagDto;
+import com.example.highload.repos.OrderRepository;
 import com.example.highload.repos.TagRepository;
 import com.example.highload.services.TagService;
 import com.example.highload.utils.DataTransformer;
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class TagServiceImpl implements TagService {
 
+    private final OrderRepository orderRepository;
     private final TagRepository tagRepository;
     private final DataTransformer dataTransformer;
 
@@ -29,6 +32,8 @@ public class TagServiceImpl implements TagService {
 
     @Override
     public void removeTagFromOrder(int tagId, int orderId) {
-
+        Order order = orderRepository.findById(orderId).orElseThrow();
+        order.setTags(order.getTags().stream().filter(tag -> tag.getId()!=tagId).toList());
+        orderRepository.save(order);
     }
 }

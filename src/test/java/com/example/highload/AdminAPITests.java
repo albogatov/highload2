@@ -99,7 +99,7 @@ public class AdminAPITests {
     }
 
     @Test
-    public void addUser() { /* TODO: RUN (+) */
+    public void addUser() {
 
         String tokenResponse = getToken("admin1");
 
@@ -167,7 +167,7 @@ public class AdminAPITests {
 
 
     @Test
-    public void approveUser() { /*TODO: RUN (+) */
+    public void approveUser() {
         // create user request using repo
 
         Role clientRole = roleRepository.findByName(RoleType.CLIENT).orElseThrow();
@@ -221,7 +221,7 @@ public class AdminAPITests {
 
 
     @Test
-    public void deleteUser() { /*TODO: RUN (+) */
+    public void deleteUser() {
         // create user using repo
 
         Role clientRole = roleRepository.findByName(RoleType.CLIENT).orElseThrow();
@@ -274,7 +274,7 @@ public class AdminAPITests {
     }
 
     @Test
-    public void getAllUserRequests() { /*TODO: RUN (+) */
+    public void getAllUserRequests() {
 
         // create user request1 using repo
 
@@ -335,7 +335,7 @@ public class AdminAPITests {
     }
 
     @Test
-    public void deleteAllExpiredUserDeletedAccounts() { /*TODO: RUN (? - not tested) */
+    public void deleteAllExpiredUserDeletedAccounts() {
 
         Role clientRole = roleRepository.findByName(RoleType.CLIENT).orElseThrow();
 

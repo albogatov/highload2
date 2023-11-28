@@ -1,22 +1,30 @@
 package com.example.highload;
 
+import com.example.highload.model.inner.Profile;
 import com.example.highload.model.inner.User;
 import com.example.highload.model.network.JwtRequest;
 import com.example.highload.model.network.JwtResponse;
+import com.example.highload.model.network.ProfileDto;
+import com.example.highload.model.network.UserRequestDto;
+import com.example.highload.repos.ProfileRepository;
 import com.example.highload.repos.UserRepository;
+import com.example.highload.utils.DataTransformer;
 import io.restassured.RestAssured;
 import io.restassured.parsing.Parser;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+
+import java.util.List;
 
 import static io.restassured.RestAssured.given;
 
@@ -29,6 +37,13 @@ public class ProfileAPITests {
 
     @Autowired
     UserRepository userRepository;
+
+    @Autowired
+    ProfileRepository profileRepository;
+
+    @Autowired
+    DataTransformer dataTransformer;
+
     @Container
     private static final PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>("postgres:latest")
             .withDatabaseName("highload")
@@ -71,7 +86,170 @@ public class ProfileAPITests {
                 .extract().body().as(JwtResponse.class).getToken();
     }
 
-    /* TODO: ALL TESTS */
+    @Test
+    @Order(1)
+    public void editProfile() { /* TODO: RUN (+) */
 
+        User artist1 = userRepository.findByLogin("artist1").orElseThrow();
+
+        // create profile using repo
+
+        Profile artistProfile = new Profile();
+        artistProfile.setUser(artist1);
+        artistProfile.setName("Artist1");
+        artistProfile.setMail("artist1@gmail.com");
+
+        Profile artistProfileWithId = profileRepository.save(artistProfile);
+
+        // get token
+
+        String tokenResponse = getToken("artist1");
+
+        // edit
+
+        ProfileDto artistProfileDto = dataTransformer.profileToDto(artistProfileWithId);
+        artistProfileDto.setName("Artist1Updated");
+        artistProfileDto.setMail("artist1updated@gmail.com");
+
+        ExtractableResponse<Response> response1 =
+                given()
+                        .header("Authorization", "Bearer " + tokenResponse)
+                        .header("Content-type", "application/json")
+                        .and()
+                        .body(artistProfileDto)
+                        .when()
+                        .post("/api/app/profile/edit/" + artistProfileWithId.getId())
+                        .then()
+                        .extract();
+
+        Profile result = profileRepository.findById(artistProfileWithId.getId()).orElseThrow();
+
+        Assertions.assertAll(
+                () -> Assertions.assertEquals("Profile edited", response1.body().asString()),
+                () -> Assertions.assertEquals(HttpStatus.OK.value(), response1.statusCode()),
+                () -> Assertions.assertEquals("Artist1Updated", result.getName()),
+                () -> Assertions.assertEquals("artist1updated@gmail.com", result.getMail())
+        );
+
+        // edit with wrong data
+        artistProfileDto.setName("");
+        artistProfileDto.setMail("lala");
+
+        ExtractableResponse<Response> response2 =
+                given()
+                        .header("Authorization", "Bearer " + tokenResponse)
+                        .header("Content-type", "application/json")
+                        .and()
+                        .body(artistProfileDto)
+                        .when()
+                        .get("/api/app/profile/edit/" + artistProfileWithId.getId())
+                        .then()
+                        .extract();
+
+        Assertions.assertAll(
+                () -> Assertions.assertEquals("Request body validation failed!", response1.body().asString()),
+                () -> Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), response1.statusCode())
+        );
+
+    }
+
+    @Test
+    @Order(2)
+    public void getProfile() { /* TODO: RUN */
+
+        // create profile using repo
+
+        User client1 = userRepository.findByLogin("client1").orElseThrow();
+
+        Profile clientProfile = new Profile();
+        clientProfile.setUser(client1);
+        clientProfile.setName("Client1");
+        clientProfile.setMail("client1@gmail.com");
+
+        Profile clientProfileWithId = profileRepository.save(clientProfile);
+
+        // get token
+
+        String tokenResponse = getToken("client1");
+
+        // get existing profile
+
+        ExtractableResponse<Response> response1 =
+                given()
+                        .header("Authorization", "Bearer " + tokenResponse)
+                        .header("Content-type", "application/json")
+                        .when()
+                        .get("/api/app/profile/single/" + clientProfileWithId.getId().toString())
+                        .then()
+                        .extract();
+
+        Profile result = response1.body().as(Profile.class);
+
+        Assertions.assertAll(
+                () -> Assertions.assertEquals(HttpStatus.OK.value(), response1.statusCode()),
+                () -> Assertions.assertEquals(clientProfileWithId.getId(), result.getId()),
+                () -> Assertions.assertEquals(clientProfileWithId.getName(), result.getName())
+        );
+
+        // get not existing profile
+
+        int badId = clientProfileWithId.getId() + 1;
+
+        ExtractableResponse<Response> response2 =
+                given()
+                        .header("Authorization", "Bearer " + tokenResponse)
+                        .header("Content-type", "application/json")
+                        .when()
+                        .get("/api/app/profile/single/" + badId)
+                        .then()
+                        .extract();
+
+        Assertions.assertAll(
+                () -> Assertions.assertEquals("Wrong ids in path!", response2.body().asString()),
+                () -> Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), response2.statusCode())
+        );
+    }
+
+    @Test
+    @Order(3)
+    public void getAllProfiles() { /* TODO: RUN */
+
+        // get token
+
+        String tokenResponse = getToken("client1");
+
+        // get all
+
+        ExtractableResponse<Response> response1 =
+                given()
+                        .header("Authorization", "Bearer " + tokenResponse)
+                        .header("Content-type", "application/json")
+                        .when()
+                        .get("/api/app/profile/all/0")
+                        .then()
+                        .extract();
+
+        Assertions.assertAll(
+                () -> Assertions.assertEquals(HttpStatus.OK.value(), response1.statusCode()),
+                () -> Assertions.assertEquals("1",response1.header("app-total-page-num")),
+                () -> Assertions.assertEquals("2",response1.header("app-total-items-num")),
+                () -> Assertions.assertEquals("0",response1.header("app-current-page-num")),
+                () -> Assertions.assertEquals("2",response1.header("app-current-items-num"))
+        );
+
+        List<ProfileDto> profileDtos = response1.body().jsonPath().getList(".", ProfileDto.class);
+
+        Assertions.assertAll(
+                () -> Assertions.assertEquals(2, profileDtos.size()),
+                () -> Assertions.assertEquals("Artist1Updated", profileDtos.get(0).getName()),
+                () -> Assertions.assertEquals("Client1", profileDtos.get(1).getName())
+        );
+    }
+
+    @Test
+    @Order(4)
+    public void getProfileImages() {
+        /* TODO: implement, RUN */
+    }
 
 }
