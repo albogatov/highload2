@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 public class ProfileServiceImpl implements ProfileService {
 
     private final ProfileRepository profileRepository;
-    private final ImageRepository imageRepository;
     private final DataTransformer dataTransformer;
 
     @Override

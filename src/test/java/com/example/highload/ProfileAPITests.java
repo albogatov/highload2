@@ -71,5 +71,7 @@ public class ProfileAPITests {
                 .extract().body().as(JwtResponse.class).getToken();
     }
 
+    /* TODO: ALL TESTS */
+
 
 }

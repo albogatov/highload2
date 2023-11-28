@@ -153,7 +153,9 @@ public class DataTransformer {
         profileDto.setId(profile.getId());
         profileDto.setName(profile.getName());
         profileDto.setAbout(profile.getAbout());
-        profileDto.setImage(imageToDto(profile.getImage()));
+        if (profile.getImage() != null) {
+            profileDto.setImage(imageToDto(profile.getImage()));
+        }
         profileDto.setMail(profile.getMail());
         profileDto.setEducation(profile.getEducation());
         profileDto.setExperience(profile.getExperience());
