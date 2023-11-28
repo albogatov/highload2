@@ -6,10 +6,7 @@ import com.example.highload.model.network.*;
 import com.example.highload.repos.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+//import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -24,7 +21,6 @@ public class DataTransformer {
     private final UserRepository userRepository;
     private final OrderRepository orderRepository;
     private final ImageRepository imageRepository;
-    BCryptPasswordEncoder bCryptPasswordEncoder;
 
     /* users */
 
@@ -41,7 +37,7 @@ public class DataTransformer {
         User user = new User();
         user.setId(userDto.getId());
         user.setLogin(userDto.getLogin());
-        user.setHashPassword(bCryptPasswordEncoder.encode(userDto.getPassword()));
+        user.setHashPassword(userDto.getPassword());
         RoleType roleName = userDto.getRole();
         Role role = roleRepository.findByName(roleName).orElseThrow();
         user.setRole(role);
@@ -139,7 +135,7 @@ public class DataTransformer {
         UserRequest userRequest = new UserRequest();
         userRequest.setId(userRequestDto.getId());
         userRequest.setLogin(userRequestDto.getLogin());
-        userRequest.setHashPassword(bCryptPasswordEncoder.encode(userRequestDto.getPassword()));
+        userRequest.setHashPassword(userRequestDto.getPassword());
         Role role = roleRepository.findByName(userRequestDto.getRole()).orElseThrow();
         userRequest.setRole(role);
         return userRequest;

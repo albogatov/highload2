@@ -56,8 +56,6 @@ public class AdminAPITests {
     @Autowired
     BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    boolean testUsersPreparedFlag = false;
-
     @Container
     private static final PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>("postgres:latest")
             .withDatabaseName("highload")

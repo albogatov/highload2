@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -29,6 +30,7 @@ public class AdminServiceImpl implements AdminService {
     private final UserRequestRepository userRequestRepository;
     private final ImageRepository imageRepository;
     private final DataTransformer dataTransformer;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Transactional(value = Transactional.TxType.REQUIRES_NEW, rollbackOn = {Exception.class})
     public void deleteLogicallyDeletedUsers(int daysToExpire) {
@@ -72,6 +74,7 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public User addUser(UserDto userDto) {
         User user = dataTransformer.userFromDto(userDto);
+        user.setHashPassword(bCryptPasswordEncoder.encode(userDto.getPassword()));
         return userRepository.save(user);
     }
 

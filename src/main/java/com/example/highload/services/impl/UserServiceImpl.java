@@ -13,6 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -33,7 +34,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserRequest addUserRequest(UserRequestDto userRequestDto) {
-        return userRequestRepository.save(dataTransformer.userRequestFromDto(userRequestDto));
+        UserRequest userRequest = dataTransformer.userRequestFromDto(userRequestDto);
+        return userRequestRepository.save(userRequest);
     }
 
     @Override
@@ -47,7 +49,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User saveUser(UserDto userDto) {
-        return userRepository.save(dataTransformer.userFromDto(userDto));
+        User user = dataTransformer.userFromDto(userDto);
+        user.setHashPassword(userDto.getPassword());
+        return userRepository.save(user);
     }
 
     @Override

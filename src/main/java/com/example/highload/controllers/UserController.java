@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
@@ -28,6 +29,7 @@ public class UserController {
     private final UserService userService;
     private final ProfileService profileService;
     private final AuthenticationService authenticationService;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @CrossOrigin
     @PostMapping("/login")
@@ -56,6 +58,7 @@ public class UserController {
             if (userService.findByLogin(user.getLogin()) != null || userService.findUserRequestByLogin(user.getLogin()) != null) {
                 return new ResponseEntity<>(new AppError(HttpStatus.CONFLICT.value(), "This user already exists or is awaiting approval"), HttpStatus.CONFLICT);
             }
+            user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
             userService.addUserRequest(user);
             return new ResponseEntity<>("User successfully registered", HttpStatus.OK);
         } catch (IllegalArgumentException e) {
