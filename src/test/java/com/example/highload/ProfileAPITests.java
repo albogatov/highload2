@@ -315,6 +315,22 @@ public class ProfileAPITests {
                 () -> Assertions.assertEquals("second", imageDtos.get(1).getUrl())
         );
 
+        // get not existing profile images
+
+        ExtractableResponse<Response> response2 =
+                given()
+                        .header("Authorization", "Bearer " + tokenResponse)
+                        .header("Content-type", "application/json")
+                        .when()
+                        .get("/api/app/profile/single/" + (artistProfile.getId() + 1) + "/images/0")
+                        .then()
+                        .extract();
+
+        Assertions.assertAll(
+                () -> Assertions.assertEquals("Wrong ids in path!", response2.body().asString()),
+                () -> Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), response2.statusCode())
+        );
+
     }
 
 }
