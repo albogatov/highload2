@@ -24,15 +24,6 @@ public class DataTransformer {
 
     /* users */
 
-    public UserDto userToDto(User user) {
-        UserDto userDto = new UserDto();
-        userDto.setId(user.getId());
-        userDto.setLogin(user.getLogin());
-//        userDto.setPassword(user.getHashPassword());
-        userDto.setRole(user.getRole().getName());
-        return userDto;
-    }
-
     public User userFromDto(UserDto userDto) {
         User user = new User();
         user.setId(userDto.getId());
