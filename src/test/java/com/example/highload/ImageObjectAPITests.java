@@ -173,6 +173,7 @@ public class ImageObjectAPITests {
     }
 
     @Test
+    @Order(2)
     public void changeMainImageOfProfile() {
         /* TODO: RUN */
 
@@ -208,6 +209,7 @@ public class ImageObjectAPITests {
     }
 
     @Test
+    @Order(3)
     public void removeImageForProfile() {
         /* TODO: RUN */
 
@@ -258,11 +260,13 @@ public class ImageObjectAPITests {
 
 
     @Test
+    @Order(4)
     public void addImagesToOrder() {
         /* TODO: implement, RUN */
     }
 
     @Test
+    @Order(5)
     public void removeImageForOrder() {
         /* TODO: implement, RUN */
     }
