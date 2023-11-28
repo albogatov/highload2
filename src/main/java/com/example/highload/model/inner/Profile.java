@@ -40,7 +40,7 @@ public class Profile {
     @Column(name = "mail", nullable = false)
     String mail;
 
-    @OneToMany(mappedBy = "profile")
+    @OneToMany(mappedBy = "profile", fetch = FetchType.EAGER)
     List<ImageObject> images;
 
     @OneToMany(mappedBy = "receiverProfile")

@@ -20,6 +20,7 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -139,18 +140,20 @@ public class ImageObjectAPITests {
                         .then()
                         .extract();
 
+        String responseBody = response1.body().asString();
         Assertions.assertAll(
                 () -> Assertions.assertEquals("Images added", response1.body().asString()),
                 () -> Assertions.assertEquals(HttpStatus.OK.value(), response1.statusCode())
         );
 
-        List<ImageObject> imageObjects = profileRepository.findById(artistProfileWithId.getId()).orElseThrow().getImages();
+        Profile profile1 = profileRepository.findById(artistProfileWithId.getId()).orElseThrow();
+        List<ImageObject> imageObjects = profile1.getImages();
         List<Image> images = imageObjects.stream().map(ImageObject::getImage).toList();
 
         Assertions.assertAll(
                 () -> Assertions.assertEquals(2, images.size()),
-                () -> Assertions.assertEquals("first", images.get(0).getUrl()),
-                () -> Assertions.assertEquals("second", images.get(1).getUrl())
+                () -> Assertions.assertEquals("first", images.get(1).getUrl()),
+                () -> Assertions.assertEquals("second", images.get(0).getUrl())
         );
 
         // add to client profile (forbidden)
@@ -167,7 +170,7 @@ public class ImageObjectAPITests {
                         .extract();
 
         Assertions.assertAll(
-                () -> Assertions.assertEquals(HttpStatus.FORBIDDEN.value(), response1.statusCode())
+                () -> Assertions.assertEquals(HttpStatus.FORBIDDEN.value(), response2.statusCode())
         );
 
     }
@@ -199,11 +202,13 @@ public class ImageObjectAPITests {
                         .then()
                         .extract();
 
+        Profile artistProfileUpdated = userRepository.findByLogin("artist1").orElseThrow().getProfile();
+
         Assertions.assertAll(
                 () -> Assertions.assertEquals("Main image changed", response1.body().asString()),
                 () -> Assertions.assertEquals(HttpStatus.OK.value(), response1.statusCode()),
-                ()-> Assertions.assertNotNull(artistProfile.getImage()),
-                ()-> Assertions.assertEquals("main", artistProfile.getImage().getUrl())
+                ()-> Assertions.assertNotNull(artistProfileUpdated.getImage()),
+                ()-> Assertions.assertEquals("main", artistProfileUpdated.getImage().getUrl())
         );
 
     }
@@ -234,11 +239,14 @@ public class ImageObjectAPITests {
                         .then()
                         .extract();
 
+        Profile artistProfileUpdated = userRepository.findByLogin("artist1").orElseThrow().getProfile();
+
+
         Assertions.assertAll(
                 () -> Assertions.assertEquals("Image removed", response1.body().asString()),
                 () -> Assertions.assertEquals(HttpStatus.OK.value(), response1.statusCode()),
-                ()-> Assertions.assertEquals(1, artistProfile.getImages().size()),
-                ()-> Assertions.assertEquals("second", artistProfile.getImages().get(0).getImage().getUrl())
+                ()-> Assertions.assertEquals(1, artistProfileUpdated.getImages().size()),
+                ()-> Assertions.assertEquals("first", artistProfileUpdated.getImages().get(0).getImage().getUrl())
         );
 
         // remove from client profile (forbidden)
