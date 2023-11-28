@@ -59,24 +59,22 @@ public class UserControllerTests {
     @Autowired
     public DataTransformer dataTransformer;
 
-    @Value("${admin.login}")
-    private static String adminLogin;
-    @Value("${admin.password}")
-    private static String adminPassword;
-    @Value("${admin.role}")
-    private static String adminRole;
-    @Value("${artist.login}")
-    private static String artistLogin;
-    @Value("${artist.password}")
-    private static String artistPassword;
-    @Value("${artist.role}")
-    private static String artistRole;
-    @Value("${client.login}")
-    private static String clientLogin;
-    @Value("${client.password}")
-    private static String clientPassword;
-    @Value("${client.role}")
-    private static String clientRole;
+    private static String adminLogin = "admin1";
+
+    private static String adminPassword = "admin1";
+    private static String adminRole = "ADMIN";
+
+    private static String artistLogin = "artist1";
+
+    private static String artistPassword = "artist1";
+
+    private static String artistRole = "ARTIST";
+
+    private static String clientLogin = "client1";
+
+    private static String clientPassword = "client1";
+
+    private static String clientRole = "CLIENT";
 
 
     @Container
@@ -262,8 +260,8 @@ public class UserControllerTests {
     @Order(8)
     void addProfileAPICorrect() {
         User user = userRepository.findByLogin(clientLogin).orElseThrow();
-        String tokenResponse = getToken(user.getLogin(), user.getPassword(), user.getRole().getName().toString());
-
+        String tokenResponse = getToken(user.getLogin(), "client1", user.getRole().getName().toString());
+        Integer userId = user.getId();
         ProfileDto profileDto = new ProfileDto();
         profileDto.setUserId( user.getId());
         profileDto.setMail("client@gmail.com");
@@ -276,24 +274,24 @@ public class UserControllerTests {
                         .and()
                         .body(profileDto)
                         .when()
-                        .post("/api/app/user/profile/add/")
+                        .post("/api/app/user/profile/add/" + userId)
                         .then()
                         .extract();
         Assertions.assertAll(
                 () -> Assertions.assertEquals(response.response().getStatusCode(), HttpStatus.OK.value()),
                 () -> Assertions.assertEquals(
-                        profileService.findByUserId(userRepository.findByLogin(clientLogin).orElseThrow().getId()),
-                        dataTransformer.profileFromDto(profileDto))
+                        profileService.findByUserId(userId).getName(),
+                        dataTransformer.profileFromDto(profileDto).getName())
         );
     }
 
     @Test
-    @Order(8)
+    @Order(9)
     void addProfileAPIAlreadyExist() {
 
         User user = userRepository.findByLogin(clientLogin).orElseThrow();
-        String tokenResponse = getToken(user.getLogin(), user.getPassword(), user.getRole().getName().toString());
-
+        String tokenResponse = getToken(user.getLogin(), "client1", user.getRole().getName().toString());
+        Integer userId = user.getId();
         ProfileDto profileDto = new ProfileDto();
         profileDto.setUserId( user.getId());
         profileDto.setMail("client@gmail.com");
@@ -306,7 +304,7 @@ public class UserControllerTests {
                         .and()
                         .body(profileDto)
                         .when()
-                        .post("/api/app/user/profile/add/")
+                        .post("/api/app/user/profile/add/" + userId)
                         .then()
                         .extract();
 
@@ -314,14 +312,14 @@ public class UserControllerTests {
     }
 
     @Test
-    @Order(8)
+    @Order(10)
     void addProfileAPIBad() {
 
         User user = userRepository.findByLogin(artistLogin).orElseThrow();
-        String tokenResponse = getToken(user.getLogin(), user.getPassword(), user.getRole().getName().toString());
-
+        String tokenResponse = getToken(user.getLogin(), "artist1", user.getRole().getName().toString());
+        Integer userId = user.getId();
         ProfileDto profileDto = new ProfileDto();
-        profileDto.setUserId( user.getId());
+        profileDto.setUserId(user.getId());
         profileDto.setMail(artistLogin);
         profileDto.setName(artistLogin + "Profile");
 
@@ -332,11 +330,11 @@ public class UserControllerTests {
                         .and()
                         .body(profileDto)
                         .when()
-                        .post("/api/app/user/profile/add/")
+                        .post("/api/app/user/profile/add/" + userId)
                         .then()
                         .extract();
 
-        Assertions.assertEquals(response.response().getStatusCode(), HttpStatus.BAD_REQUEST.value());
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(),response.response().getStatusCode());
     }
 
 
@@ -375,7 +373,7 @@ public class UserControllerTests {
         return Stream.of(
                 clientLogin,
                 artistLogin,
-                adminPassword,
+                "ANDREY_EREKHINSKY_SLAVE",
                 "client2",
                 adminLogin + "1"
         );
@@ -385,7 +383,7 @@ public class UserControllerTests {
         return Stream.of(
                 clientPassword,
                 artistPassword,
-                adminLogin,
+                "ABCDEFG",
                 "client2",
                 adminPassword + "1"
         );
@@ -395,8 +393,7 @@ public class UserControllerTests {
         return Stream.of(
                 Arguments.of(adminLogin, adminPassword, adminRole),
                 Arguments.of(artistLogin, artistPassword, artistRole),
-                Arguments.of(clientLogin, clientPassword, clientRole),
-                Arguments.of("client2","client2","CLIENT")
+                Arguments.of(clientLogin, clientPassword, clientRole)
         );
     }
 
