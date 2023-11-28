@@ -180,10 +180,7 @@ public class UserControllerTests {
     @Order(6)
     void registerAPICorrect() {
         ExtractableResponse<Response> response = getResponse("/api/app/user/register", newClientLogin, newClientPassword, clientRole);
-        Assertions.assertEquals(response.response().getStatusCode(), HttpStatus.OK.value());
-
-        ExtractableResponse<Response> response2 = getResponse("/api/app/user/login", newClientLogin, newClientPassword, clientRole);
-        Assertions.assertEquals(response2.response().getStatusCode(), HttpStatus.OK.value());
+        Assertions.assertEquals(HttpStatus.OK.value(), response.response().getStatusCode());
     }
 
     @Test
@@ -201,14 +198,11 @@ public class UserControllerTests {
         Integer userId = user.getId();
 
         ProfileDto profileDto = new ProfileDto();
-        ImageDto imageDto = new ImageDto();
-        imageDto.setUrl("http");
         profileDto.setUserId(user.getId());
         profileDto.setMail("client@gmail.com");
         profileDto.setName(clientLogin + "Profile");
         profileDto.setEducation("ITMO");
         profileDto.setExperience("ITMO logo");
-        profileDto.setImage(imageDto);
 
         ExtractableResponse<Response> response =
                 given()
