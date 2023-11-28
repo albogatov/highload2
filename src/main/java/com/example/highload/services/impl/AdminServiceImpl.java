@@ -66,6 +66,7 @@ public class AdminServiceImpl implements AdminService {
         user.setLogin(userRequest.getLogin());
         user.setHashPassword(userRequest.getHashPassword());
         user.setRole(userRequest.getRole());
+        user.setIsActual(true);
         user = userRepository.save(user);
         userRequestRepository.delete(userRequest);
         return user;
