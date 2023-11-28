@@ -47,20 +47,11 @@ public class UserController {
     @CrossOrigin
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody UserRequestDto user) {
-        try {
-//            if (user.getLogin() == null || user.getPassword() == null || user.getLogin().trim().isEmpty()
-//                    || user.getPassword().trim().isEmpty()) {
-//                throw new IllegalArgumentException();
-//            }
-
             if (userService.findByLogin(user.getLogin()) != null || userService.findUserRequestByLogin(user.getLogin()) != null) {
-                return new ResponseEntity<>(new AppError(HttpStatus.CONFLICT.value(), "This user already exists or is awaiting approval"), HttpStatus.CONFLICT);
+                return new ResponseEntity<>("This user already exists or is awaiting approval", HttpStatus.CONFLICT);
             }
             userService.addUserRequest(user);
             return new ResponseEntity<>("User successfully registered", HttpStatus.OK);
-        } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>("Invalid login or password", HttpStatus.BAD_REQUEST);
-        }
     }
 
     @CrossOrigin
