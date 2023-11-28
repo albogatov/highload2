@@ -81,6 +81,7 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public void deleteUser(int userId) {
-        userRepository.deleteById(userId);
+        User user = userRepository.findById(userId).orElseThrow();
+        userRepository.deleteById(user.getId());
     }
 }

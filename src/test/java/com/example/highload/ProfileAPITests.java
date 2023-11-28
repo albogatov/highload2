@@ -22,7 +22,7 @@ import static io.restassured.RestAssured.given;
 
 @Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class ImageObjectAPITests {
+public class ProfileAPITests {
 
     @LocalServerPort
     private Integer port;
@@ -71,5 +71,5 @@ public class ImageObjectAPITests {
                 .extract().body().as(JwtResponse.class).getToken();
     }
 
-    /* TODO: ALL TESTS */
+
 }

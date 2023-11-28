@@ -5,6 +5,7 @@ import com.example.highload.services.ImageService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,6 +20,7 @@ public class ImageObjectController {
     private final ImageService imageService;
 
     @CrossOrigin
+    @PreAuthorize("hasAuthority('CLIENT')")
     @PostMapping("/add/order/{orderId}")
     public ResponseEntity addImagesToOrder(@Valid @RequestBody List<ImageDto> imageDtos, @PathVariable int orderId){
         if (imageService.saveImagesForOrder(imageDtos, orderId) != null)
@@ -27,6 +29,7 @@ public class ImageObjectController {
     }
 
     @CrossOrigin
+    @PreAuthorize("hasAuthority('ARTIST')")
     @PostMapping("/add/profile/{profileId}")
     public ResponseEntity addImagesToProfile(@Valid @RequestBody List<ImageDto> imageDtos, @PathVariable int profileId){
         if (imageService.saveImageForProfile(imageDtos, profileId) != null)
@@ -43,6 +46,7 @@ public class ImageObjectController {
     }
 
     @CrossOrigin
+    @PreAuthorize("hasAuthority('CLIENT')")
     @PostMapping("/remove/order/{orderId}/{imageId}")
     public ResponseEntity removeImageForOrder(@PathVariable int imageId, @PathVariable int orderId){
         imageService.removeImageForOrder(imageId, orderId);
@@ -50,6 +54,7 @@ public class ImageObjectController {
     }
 
     @CrossOrigin
+    @PreAuthorize("hasAuthority('ARTIST')")
     @PostMapping("/remove/profile/{profileId}/{imageId}")
     public ResponseEntity removeImageForProfile(@PathVariable int imageId, @PathVariable int profileId){
         imageService.removeImageForProfile(imageId, profileId);
