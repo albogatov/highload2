@@ -1,11 +1,13 @@
 package com.example.highload;
 
+import com.example.highload.model.enums.ImageObjectType;
+import com.example.highload.model.inner.Image;
+import com.example.highload.model.inner.ImageObject;
 import com.example.highload.model.inner.Profile;
 import com.example.highload.model.inner.User;
-import com.example.highload.model.network.JwtRequest;
-import com.example.highload.model.network.JwtResponse;
-import com.example.highload.model.network.ProfileDto;
-import com.example.highload.model.network.UserRequestDto;
+import com.example.highload.model.network.*;
+import com.example.highload.repos.ImageObjectRepository;
+import com.example.highload.repos.ImageRepository;
 import com.example.highload.repos.ProfileRepository;
 import com.example.highload.repos.UserRepository;
 import com.example.highload.utils.DataTransformer;
@@ -40,6 +42,12 @@ public class ProfileAPITests {
 
     @Autowired
     ProfileRepository profileRepository;
+
+    @Autowired
+    ImageRepository imageRepository;
+
+    @Autowired
+    ImageObjectRepository imageObjectRepository;
 
     @Autowired
     DataTransformer dataTransformer;
@@ -231,10 +239,10 @@ public class ProfileAPITests {
 
         Assertions.assertAll(
                 () -> Assertions.assertEquals(HttpStatus.OK.value(), response1.statusCode()),
-                () -> Assertions.assertEquals("1",response1.header("app-total-page-num")),
-                () -> Assertions.assertEquals("2",response1.header("app-total-items-num")),
-                () -> Assertions.assertEquals("0",response1.header("app-current-page-num")),
-                () -> Assertions.assertEquals("2",response1.header("app-current-items-num"))
+                () -> Assertions.assertEquals("1", response1.header("app-total-page-num")),
+                () -> Assertions.assertEquals("2", response1.header("app-total-items-num")),
+                () -> Assertions.assertEquals("0", response1.header("app-current-page-num")),
+                () -> Assertions.assertEquals("2", response1.header("app-current-items-num"))
         );
 
         List<ProfileDto> profileDtos = response1.body().jsonPath().getList(".", ProfileDto.class);
@@ -248,8 +256,65 @@ public class ProfileAPITests {
 
     @Test
     @Order(4)
-    public void getProfileImages() {
-        /* TODO: implement, RUN */
+    public void getProfileImages() { /* TODO: RUN */
+
+        Profile artistProfile = userRepository.findByLogin("artist1").orElseThrow().getProfile();
+
+        // add images to profile using repos
+
+        Image image1 = new Image();
+        image1.setUrl("first");
+        image1 = imageRepository.save(image1);
+
+        ImageObject imageObject1 = new ImageObject();
+        imageObject1.setImage(image1);
+        imageObject1.setProfile(artistProfile);
+        imageObject1.setType(ImageObjectType.PROFILE_IMAGE);
+
+        ImageObject imageObject1WithId = imageObjectRepository.save(imageObject1);
+
+        Image image2 = new Image();
+        image2.setUrl("second");
+        image2 = imageRepository.save(image2);
+
+        ImageObject imageObject2 = new ImageObject();
+        imageObject2.setImage(image2);
+        imageObject2.setProfile(artistProfile);
+        imageObject2.setType(ImageObjectType.PROFILE_IMAGE);
+
+        ImageObject imageObject2WithId = imageObjectRepository.save(imageObject2);
+
+        // get token
+
+        String tokenResponse = getToken("artist1");
+
+        // get profile images
+
+        ExtractableResponse<Response> response1 =
+                given()
+                        .header("Authorization", "Bearer " + tokenResponse)
+                        .header("Content-type", "application/json")
+                        .when()
+                        .get("/api/app/profile/single/" + artistProfile.getId() + "/images/0")
+                        .then()
+                        .extract();
+
+        Assertions.assertAll(
+                () -> Assertions.assertEquals(HttpStatus.OK.value(), response1.statusCode()),
+                () -> Assertions.assertEquals("1", response1.header("app-total-page-num")),
+                () -> Assertions.assertEquals("2", response1.header("app-total-items-num")),
+                () -> Assertions.assertEquals("0", response1.header("app-current-page-num")),
+                () -> Assertions.assertEquals("2", response1.header("app-current-items-num"))
+        );
+
+        List<ImageDto> imageDtos = response1.body().jsonPath().getList(".", ImageDto.class);
+
+        Assertions.assertAll(
+                () -> Assertions.assertEquals(2, imageDtos.size()),
+                () -> Assertions.assertEquals("first", imageDtos.get(0).getUrl()),
+                () -> Assertions.assertEquals("second", imageDtos.get(1).getUrl())
+        );
+
     }
 
 }
