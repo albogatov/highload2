@@ -7,6 +7,7 @@ import com.example.highload.model.inner.UserRequest;
 import com.example.highload.model.network.JwtRequest;
 import com.example.highload.model.network.JwtResponse;
 import com.example.highload.model.network.UserDto;
+import com.example.highload.model.network.UserRequestDto;
 import com.example.highload.repos.RoleRepository;
 import com.example.highload.repos.UserRepository;
 import com.example.highload.repos.UserRequestRepository;
@@ -30,6 +31,8 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 import static io.restassured.RestAssured.given;
@@ -273,13 +276,103 @@ public class AdminAPITests {
     }
 
     @Test
-    public void getAllUserRequests() {
-        /*TODO: implement, RUN*/
+    public void getAllUserRequests() { /*TODO: RUN*/
+
+        // create user request1 using repo
+
+        Role clientRole = roleRepository.findByName(RoleType.CLIENT).orElseThrow();
+
+        UserRequest userRequest1 = new UserRequest();
+        userRequest1.setLogin("admin_test_client4");
+        userRequest1.setHashPassword(bCryptPasswordEncoder.encode("admin_test_client4"));
+        userRequest1.setRole(clientRole);
+
+        UserRequest userRequest1WithId = userRequestRepository.save(userRequest1);
+
+        // create user request2 using repo
+
+        UserRequest userRequest2 = new UserRequest();
+        userRequest2.setLogin("admin_test_client5");
+        userRequest2.setHashPassword(bCryptPasswordEncoder.encode("admin_test_client5"));
+        userRequest2.setRole(clientRole);
+
+        UserRequest userRequest2WithId = userRequestRepository.save(userRequest2);
+
+        // get token
+
+        String tokenResponse = getToken("admin1");
+
+        // get all user requests
+
+        ExtractableResponse<Response> response1 =
+                given()
+                        .header("Authorization", "Bearer " + tokenResponse)
+                        .header("Content-type", "application/json")
+                        .when()
+                        .get("/api/app/admin/user-request/all/0")
+                        .then()
+                        .extract();
+
+        Assertions.assertAll(
+                () -> Assertions.assertEquals(HttpStatus.OK.value(), response1.statusCode()),
+                () -> Assertions.assertEquals("1",response1.header("app-total-page-num")),
+                () -> Assertions.assertEquals("2",response1.header("app-total-items-num")),
+                () -> Assertions.assertEquals("0",response1.header("app-current-page-num")),
+                () -> Assertions.assertEquals("2",response1.header("app-current-items-num"))
+        );
+
+        List<UserRequestDto> userRequestDtos = response1.body().jsonPath().getList(".", UserRequestDto.class);
+
+        Assertions.assertAll(
+                () -> Assertions.assertEquals(2, userRequestDtos.size()),
+                () -> Assertions.assertEquals("admin_test_client4", userRequestDtos.get(0).getLogin()),
+                () -> Assertions.assertEquals("admin_test_client5", userRequestDtos.get(1).getLogin())
+        );
+
+        // delete by id using repo
+
+        userRequestRepository.deleteById(userRequest1WithId.getId());
+        userRequestRepository.deleteById(userRequest2WithId.getId());
+
     }
 
     @Test
-    public void deleteAllExpiredUserDeletedAccounts() {
-        /*TODO: implement, RUN*/
+    public void deleteAllExpiredUserDeletedAccounts() { /*TODO: RUN*/
+
+        Role clientRole = roleRepository.findByName(RoleType.CLIENT).orElseThrow();
+
+        // create logically deleted account using repo
+
+        User user = new User();
+        user.setLogin("admin_test_client6");
+        user.setHashPassword(bCryptPasswordEncoder.encode("admin_test_client6"));
+        user.setRole(clientRole);
+        user.setIsActual(false);
+        user.setWhenDeletedTime(LocalDateTime.now());
+
+        userRepository.save(user);
+
+        // get token
+
+        String tokenResponse = getToken("admin1");
+
+        // delete with 0 days param
+
+        ExtractableResponse<Response> response1 =
+                given()
+                        .header("Authorization", "Bearer " + tokenResponse)
+                        .header("Content-type", "application/json")
+                        .when()
+                        .post("/api/app/admin/user/all/delete-expired/0")
+                        .then()
+                        .extract();
+
+        Assertions.assertAll(
+                () -> Assertions.assertEquals("Users deleted", response1.body().asString()),
+                () -> Assertions.assertEquals(HttpStatus.OK.value(), response1.statusCode()),
+                () -> Assertions.assertThrows(NoSuchElementException.class, () -> userRepository.findByLogin("admin_test_client6"))
+        );
+
     }
 }
 

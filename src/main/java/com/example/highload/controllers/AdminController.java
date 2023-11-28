@@ -49,12 +49,12 @@ public class AdminController {
         return ResponseEntity.ok("User deleted");
     }
 
-    @PostMapping("/user/all/delete-expired")
+    @PostMapping("/user/all/delete-expired/{days}")
     @CrossOrigin
 //    @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity deleteLogicallyDeletedAccountsExpired(@RequestBody int days) {
+    public ResponseEntity deleteLogicallyDeletedAccountsExpired(@PathVariable int days) {
         adminService.deleteLogicallyDeletedUsers(days);
-        return ResponseEntity.ok("User deleted");
+        return ResponseEntity.ok("Users deleted");
     }
 
     @PostMapping("/user/add")
