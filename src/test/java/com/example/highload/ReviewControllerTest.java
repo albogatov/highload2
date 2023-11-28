@@ -4,7 +4,9 @@ import com.example.highload.model.inner.Profile;
 import com.example.highload.model.inner.Review;
 import com.example.highload.model.inner.User;
 import com.example.highload.model.network.*;
-import com.example.highload.repos.*;
+import com.example.highload.repos.ProfileRepository;
+import com.example.highload.repos.ReviewRepository;
+import com.example.highload.repos.UserRepository;
 import io.restassured.RestAssured;
 import io.restassured.parsing.Parser;
 import io.restassured.response.ExtractableResponse;
@@ -17,12 +19,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+
+import java.util.List;
 
 import static io.restassured.RestAssured.given;
 
@@ -40,17 +43,9 @@ public class ReviewControllerTest {
     @Autowired
     ReviewRepository reviewRepository;
 
-    private static final String adminLogin = "admin1";
-    private static final String adminPassword = "admin1";
-    private static final String adminRole = "ADMIN";
-    private static final String artistLogin = "artist1";
-    private static final String artistPassword = "artist1";
-    private static final String artistRole = "ARTIST";
     private static final String clientLogin = "client1";
     private static final String clientPassword = "client1";
     private static final String clientRole = "CLIENT";
-    private static final String newClientLogin = "client2";
-    private static final String newClientPassword = "client2";
 
     @Container
     private static final PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>("postgres:latest")
@@ -92,17 +87,6 @@ public class ReviewControllerTest {
                 .then()
                 .extract().body().as(JwtResponse.class).getToken();
     }
-
-    // /api/app/review
-    // /save
-    // /all/{profileId}/{page}
-    // /single/{id}
-
-
-    //    int profileId;
-    //    String userName;
-    //    @NotBlank
-    //    String text;
 
     @Test
     @Order(1)
@@ -152,7 +136,7 @@ public class ReviewControllerTest {
                         .then()
                         .extract();
         Assertions.assertAll(
-                () -> Assertions.assertEquals(HttpStatus.OK.value(), response.response().getStatusCode()),
+                () -> Assertions.assertEquals(HttpStatus.OK.value(), response2.response().getStatusCode()),
                 () -> {
                     Page<Review> review = reviewRepository.findAllByProfile_Id(profile.getId(), pageable);
                     Assertions.assertEquals(1, review.getSize());
@@ -160,7 +144,83 @@ public class ReviewControllerTest {
         );
     }
 
+    @Test
+    @Order(2)
+    void getAllByProfileAPICorrect() {
+        User user = userRepository.findByLogin(clientLogin).orElseThrow();
+        String tokenResponse = getToken(clientLogin, clientPassword, clientRole);
+        Integer userId = user.getId();
 
+        Profile profile = profileRepository.findByUser_Id(userId).orElseThrow();
 
+        ExtractableResponse<Response> response =
+                given()
+                        .header("Content-type", "application/json")
+                        .header("Authorization", "Bearer " + tokenResponse)
+                        .when()
+                        .post("/api/app/review/all/" + profile.getId() + "/" + 1)
+                        .then()
+                        .extract();
 
+        Assertions.assertAll(
+                () -> Assertions.assertEquals(HttpStatus.OK.value(), response.response().getStatusCode()),
+                () -> {
+                    int size = response.body().as(List.class).size();
+                    Assertions.assertEquals(1, size);
+                }
+        );
+    }
+
+    @Test
+    @Order(3)
+    void getAllByProfileAPIWrongPath() {
+        User user = userRepository.findByLogin(clientLogin).orElseThrow();
+        String tokenResponse = getToken(clientLogin, clientPassword, clientRole);
+        Integer userId = user.getId();
+
+        Profile profile = profileRepository.findByUser_Id(userId).orElseThrow();
+
+        ExtractableResponse<Response> response =
+                given()
+                        .header("Content-type", "application/json")
+                        .header("Authorization", "Bearer " + tokenResponse)
+                        .when()
+                        .post("/api/app/review/all/" + profile.getId() + 10 + "/" + 1)
+                        .then()
+                        .extract();
+
+        Assertions.assertAll(
+                () -> Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), response.response().getStatusCode()),
+                () -> Assertions.assertEquals("Wrong ids in path!", response.body().toString())
+        );
+    }
+
+    @Test
+    @Order(4)
+    void getByIdAPICorrect() {
+        User user = userRepository.findByLogin(clientLogin).orElseThrow();
+        String tokenResponse = getToken(clientLogin, clientPassword, clientRole);
+        Integer userId = user.getId();
+
+        Pageable pageable = PageRequest.of(1, 50);
+        Profile profile = profileRepository.findByUser_Id(userId).orElseThrow();
+        Review review = reviewRepository.findAllByProfile_Id(profile.getId(), pageable).stream().findFirst().orElseThrow();
+
+        ExtractableResponse<Response> response =
+                given()
+                        .header("Content-type", "application/json")
+                        .header("Authorization", "Bearer " + tokenResponse)
+                        .when()
+                        .post("/api/app/review/single/" + review.getId())
+                        .then()
+                        .extract();
+
+        Assertions.assertAll(
+                () -> Assertions.assertEquals(HttpStatus.OK.value(), response.response().getStatusCode()),
+                () -> {
+                    ReviewDto reviewDto = response.body().as(ReviewDto.class);
+                    Assertions.assertEquals(review.getText(), reviewDto.getText());
+                }
+        );
+    }
 }

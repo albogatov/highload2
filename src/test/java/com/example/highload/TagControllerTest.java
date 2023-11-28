@@ -1,10 +1,14 @@
 package com.example.highload;
 
+import com.example.highload.model.inner.Tag;
+import com.example.highload.model.inner.User;
 import com.example.highload.model.network.JwtRequest;
 import com.example.highload.model.network.JwtResponse;
+import com.example.highload.model.network.OrderDto;
 import com.example.highload.model.network.TagDto;
-import com.example.highload.model.inner.Tag;
+import com.example.highload.repos.OrderRepository;
 import com.example.highload.repos.TagRepository;
+import com.example.highload.repos.UserRepository;
 import io.restassured.RestAssured;
 import io.restassured.parsing.Parser;
 import io.restassured.response.ExtractableResponse;
@@ -13,6 +17,8 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -33,18 +39,17 @@ public class TagControllerTest {
 
     @Autowired
     public TagRepository tagRepository;
+    @Autowired
+    UserRepository userRepository;
+    @Autowired
+    OrderRepository orderRepository;
 
     private static final String adminLogin = "admin1";
     private static final String adminPassword = "admin1";
     private static final String adminRole = "ADMIN";
-    private static final String artistLogin = "artist1";
-    private static final String artistPassword = "artist1";
-    private static final String artistRole = "ARTIST";
     private static final String clientLogin = "client1";
     private static final String clientPassword = "client1";
     private static final String clientRole = "CLIENT";
-    private static final String newClientLogin = "client2";
-    private static final String newClientPassword = "client2";
 
     @Container
     private static final PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>("postgres:latest")
@@ -92,11 +97,11 @@ public class TagControllerTest {
     @Test
     @Order(1)
     void saveAPICorrect() {
+        String tokenResponse = getToken(adminLogin, adminPassword, adminRole);
+
         String tagName = "Programmer";
         TagDto tagDto = new TagDto();
         tagDto.setName(tagName);
-
-        String tokenResponse = getToken(adminLogin, adminPassword, adminRole);
 
         ExtractableResponse<Response> response =
                 given()
@@ -120,11 +125,11 @@ public class TagControllerTest {
     @Test
     @Order(2)
     void saveAPIAlreadyExist() {
+        String tokenResponse = getToken(adminLogin, adminPassword, adminRole);
+
         String tagName = "Programmer";
         TagDto tagDto = new TagDto();
         tagDto.setName(tagName);
-
-        String tokenResponse = getToken(adminLogin, adminPassword, adminRole);
 
         ExtractableResponse<Response> response =
                 given()
@@ -208,22 +213,97 @@ public class TagControllerTest {
     @Test
     @Order(6)
     void removeTagFromOrderAPICorrect() {
-        String tokenResponse = getToken(adminLogin, adminPassword, adminRole);
+        User user = userRepository.findByLogin(clientLogin).orElseThrow();
+        String tokenResponse = getToken(clientLogin, clientPassword, clientRole);
+        Integer userId = user.getId();
+
+        String tagName = "Programmer";
+        TagDto tagDto = new TagDto();
+        tagDto.setName(tagName);
+
+        OrderDto orderDto = new OrderDto();
+        orderDto.setUserId(userId);
+        orderDto.setDescription("Description");
+        orderDto.setPrice(100);
+        orderDto.setUserName(user.getUsername());
+        orderDto.setTags(List.of(tagDto));
+
+        ExtractableResponse<Response> response0 =
+                given()
+                        .header("Content-type", "application/json")
+                        .header("Authorization", "Bearer " + tokenResponse)
+                        .and()
+                        .body(orderDto)
+                        .when()
+                        .post("/api/app/order/save")
+                        .then()
+                        .extract();
+
+        int tagId = tagRepository.findByName(tagName).orElseThrow().getId();
+        Pageable pageable = PageRequest.of(1, 50);
+        int orderId = orderRepository.findAllByTags_Id(tagId, pageable).get().findFirst().orElseThrow().getId();
 
         ExtractableResponse<Response> response =
                 given()
                         .header("Content-type", "application/json")
                         .header("Authorization", "Bearer " + tokenResponse)
                         .when()
-                        .post("/api/app/tag/all/1")
+                        .post("/api/app/tag/remove/" + orderId + "/" + tagId)
                         .then()
                         .extract();
         Assertions.assertAll(
                 () -> Assertions.assertEquals(HttpStatus.OK.value(), response.response().getStatusCode()),
                 () -> {
-                    int size = response.body().as(List.class).size();
-                    Assertions.assertEquals(1, size);
+                    com.example.highload.model.inner.Order order = orderRepository.findAllByTags_Name(tagName, pageable).stream().findFirst().orElseThrow();
+                    Assertions.assertEquals(0, order.getTags().size());
                 }
+        );
+    }
+
+    @Test
+    @Order(7)
+    void removeTagFromOrderAPIWrongPath() {
+        User user = userRepository.findByLogin(clientLogin).orElseThrow();
+        String tokenResponse = getToken(clientLogin, clientPassword, clientRole);
+        Integer userId = user.getId();
+
+        String tagName = "Programmer";
+        TagDto tagDto = new TagDto();
+        tagDto.setName(tagName);
+
+        OrderDto orderDto = new OrderDto();
+        orderDto.setUserId(userId);
+        orderDto.setDescription("Description");
+        orderDto.setPrice(100);
+        orderDto.setUserName(user.getUsername());
+        orderDto.setTags(List.of(tagDto));
+
+        ExtractableResponse<Response> response0 =
+                given()
+                        .header("Content-type", "application/json")
+                        .header("Authorization", "Bearer " + tokenResponse)
+                        .and()
+                        .body(orderDto)
+                        .when()
+                        .post("/api/app/order/save")
+                        .then()
+                        .extract();
+
+        int tagId = tagRepository.findByName(tagName).orElseThrow().getId();
+        Pageable pageable = PageRequest.of(1, 50);
+        int orderId = orderRepository.findAllByTags_Id(tagId, pageable).get().findFirst().orElseThrow().getId();
+
+        ExtractableResponse<Response> response =
+                given()
+                        .header("Content-type", "application/json")
+                        .header("Authorization", "Bearer " + tokenResponse)
+                        .when()
+                        .post("/api/app/tag/remove/" + orderId + "/" + tagId + 1)
+                        .then()
+                        .extract();
+        Assertions.assertAll(
+                () -> Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), response.response().getStatusCode()),
+                () -> Assertions.assertEquals("Wrong ids in path!", response.body().toString())
         );
     }
 
