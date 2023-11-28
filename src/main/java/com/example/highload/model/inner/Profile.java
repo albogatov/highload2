@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.Data;
+import lombok.ToString;
 
 import java.util.List;
 
@@ -47,4 +48,9 @@ public class Profile {
 
     @OneToMany(mappedBy = "senderProfile")
     List<Notification> sentNotifications;
+
+    @Override
+    public String toString() {
+        return "";
+    }
 }

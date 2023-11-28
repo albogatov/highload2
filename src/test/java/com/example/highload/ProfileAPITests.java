@@ -31,6 +31,7 @@ import java.util.List;
 import static io.restassured.RestAssured.given;
 
 @Testcontainers
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class ProfileAPITests {
 
@@ -150,13 +151,13 @@ public class ProfileAPITests {
                         .and()
                         .body(artistProfileDto)
                         .when()
-                        .get("/api/app/profile/edit/" + artistProfileWithId.getId())
+                        .post("/api/app/profile/edit/" + artistProfileWithId.getId())
                         .then()
                         .extract();
 
         Assertions.assertAll(
-                () -> Assertions.assertEquals("Request body validation failed!", response1.body().asString()),
-                () -> Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), response1.statusCode())
+                () -> Assertions.assertEquals("Request body validation failed!", response2.body().asString()),
+                () -> Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), response2.statusCode())
         );
 
     }
@@ -191,7 +192,7 @@ public class ProfileAPITests {
                         .then()
                         .extract();
 
-        Profile result = response1.body().as(Profile.class);
+        ProfileDto result = response1.body().as(ProfileDto.class);
 
         Assertions.assertAll(
                 () -> Assertions.assertEquals(HttpStatus.OK.value(), response1.statusCode()),
@@ -322,7 +323,7 @@ public class ProfileAPITests {
                         .header("Authorization", "Bearer " + tokenResponse)
                         .header("Content-type", "application/json")
                         .when()
-                        .get("/api/app/profile/single/" + (artistProfile.getId() + 1) + "/images/0")
+                        .get("/api/app/profile/single/" + (artistProfile.getId() + 2) + "/images/0")
                         .then()
                         .extract();
 

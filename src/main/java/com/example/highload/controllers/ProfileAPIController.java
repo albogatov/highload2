@@ -57,7 +57,7 @@ public class ProfileAPIController {
     @CrossOrigin
     @GetMapping("/single/{id}/images/{page}")
     public ResponseEntity getProfileImagesByIdAndPageNumber(@PathVariable int id, @PathVariable int page){
-
+        Profile entity = profileService.findById(id);
         Pageable pageable = PageRequest.of(page, 50);
         Page<Image> images = imageService.findAllProfileImages(id, pageable);
         // TODO вынести 50 в константы из хардкода
