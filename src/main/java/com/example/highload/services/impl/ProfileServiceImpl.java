@@ -21,7 +21,8 @@ public class ProfileServiceImpl implements ProfileService {
     private final DataTransformer dataTransformer;
 
     @Override
-    public Profile saveProfileForUser(ProfileDto profileDto) {
+    public Profile saveProfileForUser(ProfileDto profileDto, int userId) {
+        profileDto.setUserId(userId);
         return profileRepository.save(dataTransformer.profileFromDto(profileDto));
     }
 

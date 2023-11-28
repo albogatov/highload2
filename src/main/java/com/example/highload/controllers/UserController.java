@@ -55,7 +55,7 @@ public class UserController {
     public ResponseEntity addProfile(@Valid @RequestBody ProfileDto profile, @PathVariable int userId) {
 
         if (profileService.findByUserId(userId) == null) {
-            profileService.saveProfileForUser(profile);
+            profileService.saveProfileForUser(profile, userId);
             return new ResponseEntity<>("Profile successfully added", HttpStatus.OK);
         }
         return new ResponseEntity<>("Profile already added", HttpStatus.BAD_REQUEST);

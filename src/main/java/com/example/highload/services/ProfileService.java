@@ -11,7 +11,7 @@ import java.util.List;
 
 public interface ProfileService {
 
-    Profile saveProfileForUser(ProfileDto profileDto);
+    Profile saveProfileForUser(ProfileDto profileDto, int userId);
     Profile editProfile(ProfileDto profileDto, int id);
 
     Profile findById(int id);
