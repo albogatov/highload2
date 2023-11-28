@@ -153,6 +153,40 @@ public class AuthTests {
         );
     }
 
+    @Test
+    void registerAPICorrect() {
+        ExtractableResponse<Response> response =
+                given()
+                        .header("Content-type", "application/json")
+                        .and()
+                        .body(new JwtRequest("client2", "client2", "CLIENT"))
+                        .when()
+                        .post("/api/app/user/register")
+                        .then()
+                        .extract();
+        Assertions.assertEquals(response.response().getStatusCode(), HttpStatus.OK.value());
+
+        authRESTCorrect("client2", "client2", "CLIENT");
+
+//        ExtractableResponse<Response> response2 =
+//                given()
+//                        .header("Content-type", "application/json")
+//                        .and()
+//                        .body(new JwtRequest("client2", "client2", "CLIENT"))
+//                        .when()
+//                        .post("/api/app/user/login")
+//                        .then()
+//                        .extract();
+//        User user = userService.findByLogin("client2");
+//        String tokenResponse = response2.body().as(JwtResponse.class).getToken();
+//        Assertions.assertAll(
+//                () -> Assertions.assertDoesNotThrow(() -> jwtUtil.getLoginFromJwtToken(tokenResponse)),
+//                () -> Assertions.assertEquals(jwtUtil.getLoginFromJwtToken(tokenResponse), user.getLogin()),
+//                () -> Assertions.assertTrue(jwtUtil.getRoleFromJwtToken(tokenResponse).contains(user.getRole().getName().toString())),
+//                () -> Assertions.assertEquals(response2.response().getStatusCode(), HttpStatus.OK.value())
+//        );
+    }
+
     @ParameterizedTest
     @MethodSource("userProvider")
     void authRESTBad(String login, String password, String role) {
