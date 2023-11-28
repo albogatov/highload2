@@ -252,7 +252,6 @@ public class TagControllerTest {
                         .then()
                         .extract();
 
-        String responseBody = response0.body().asString();
         int tagId = tagRepository.findByName(tagName).orElseThrow().getId();
         Pageable pageable = PageRequest.of(0, 50);
         int orderId = orderRepository.findAllByTags_Id(tagId, pageable).get().findFirst().orElseThrow().getId();

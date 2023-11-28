@@ -241,6 +241,10 @@ public class DataTransformer {
         return entities.stream().map(this::notificationToDto).toList();
     }
 
+    public List<Notification> notificationListFromDto(List<NotificationDto> entities) {
+        return entities.stream().map(this::notificationFromDto).toList();
+    }
+
     /* images */
 
     public ImageDto imageToDto(Image image) {
