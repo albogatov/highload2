@@ -25,7 +25,6 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import javax.xml.crypto.Data;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -141,11 +140,7 @@ public class NotificationControllerTests {
     @Test
     @Order(2)
     void saveAPIBadData() {
-        User sender = userRepository.findByLogin(clientLogin).orElseThrow();
-        User receiver = userRepository.findByLogin(artistLogin).orElseThrow();
         String tokenResponse = getToken(clientLogin, clientPassword, clientRole);
-
-        Pageable pageable = PageRequest.of(0, 50);
 
         ExtractableResponse<Response> response =
                 given()
@@ -278,14 +273,9 @@ public class NotificationControllerTests {
     @Test
     @Order(7)
     void getNewQueriesAPICorrect() {
-        User sender1 = userRepository.findByLogin(clientLogin).orElseThrow();
         User sender2 = userRepository.findByLogin(adminLogin).orElseThrow();
         User receiver = userRepository.findByLogin(artistLogin).orElseThrow();
-        Pageable pageable = PageRequest.of(0, 50);
         String tokenResponse = getToken(artistLogin, artistPassword, artistRole);
-
-        Notification notification = notificationRepository.findAllBySenderProfile_Id(sender1.getId(), pageable)
-                .stream().findFirst().orElseThrow();
 
         String senderEmail = "admin@mail.ru";
         NotificationDto notificationDto = new NotificationDto();
