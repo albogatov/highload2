@@ -143,7 +143,7 @@ public class TagControllerTest {
                         .extract();
         Assertions.assertAll(
                 () -> Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), response.response().getStatusCode()),
-                () -> Assertions.assertEquals("Request body validation failed!", response.body().toString())
+                () -> Assertions.assertEquals("Request body validation failed!", response.body().asString())
         );
     }
 
@@ -206,7 +206,7 @@ public class TagControllerTest {
                         .extract();
         Assertions.assertAll(
                 () -> Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), response.response().getStatusCode()),
-                () -> Assertions.assertEquals("Wrong ids in path!", response.body().toString())
+                () -> Assertions.assertEquals("Wrong ids in path!", response.body().asString())
         );
     }
 
@@ -303,7 +303,7 @@ public class TagControllerTest {
                         .extract();
         Assertions.assertAll(
                 () -> Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), response.response().getStatusCode()),
-                () -> Assertions.assertEquals("Wrong ids in path!", response.body().toString())
+                () -> Assertions.assertEquals("Wrong ids in path!", response.body().asString())
         );
     }
 

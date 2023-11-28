@@ -1,7 +1,9 @@
 package com.example.highload.controllers;
 
+import com.example.highload.model.inner.Profile;
 import com.example.highload.model.inner.Review;
 import com.example.highload.model.network.ReviewDto;
+import com.example.highload.services.ProfileService;
 import com.example.highload.services.ReviewService;
 import com.example.highload.utils.DataTransformer;
 import com.example.highload.utils.PaginationHeadersCreator;
@@ -25,6 +27,8 @@ import java.util.NoSuchElementException;
 public class ReviewController {
 
     private final ReviewService reviewService;
+
+    private final ProfileService profileService;
     private final PaginationHeadersCreator paginationHeadersCreator;
     private final DataTransformer dataTransformer;
 
@@ -42,6 +46,7 @@ public class ReviewController {
     @PreAuthorize("hasAnyAuthority('CLIENT', 'ARTIST')")
     public ResponseEntity getAllByProfile(@PathVariable int profileId, @PathVariable int page) {
         Pageable pageable = PageRequest.of(page, 50);
+        Profile entity = profileService.findById(profileId);
         Page<Review> entityList = reviewService.findAllProfileReviews(profileId, pageable);
         List<ReviewDto> dtoList = dataTransformer.reviewListToDto(entityList.getContent());
         HttpHeaders responseHeaders = paginationHeadersCreator.pageWithTotalElementsHeadersCreate(entityList);

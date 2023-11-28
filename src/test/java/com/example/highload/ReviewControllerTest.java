@@ -30,6 +30,7 @@ import java.util.List;
 import static io.restassured.RestAssured.given;
 
 @Testcontainers
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class ReviewControllerTest {
 
@@ -97,14 +98,14 @@ public class ReviewControllerTest {
         Integer userId = user.getId();
 
         ProfileDto profileDto = new ProfileDto();
-        ImageDto imageDto = new ImageDto();
-        imageDto.setUrl("http");
+//        ImageDto imageDto = new ImageDto();
+//        imageDto.setUrl("http");
         profileDto.setUserId(user.getId());
         profileDto.setMail("client@gmail.com");
         profileDto.setName(clientLogin + "Profile");
         profileDto.setEducation("ITMO");
         profileDto.setExperience("ITMO logo");
-        profileDto.setImage(imageDto);
+//        profileDto.setImage(imageDto);
 
         ExtractableResponse<Response> response =
                 given()
@@ -117,9 +118,10 @@ public class ReviewControllerTest {
                         .then()
                         .extract();
 
+        String responseBody =  response.body().asString();
         String text = "Cat is not a Dog!";
         Profile profile = profileRepository.findByUser_Id(userId).orElseThrow();
-        Pageable pageable = PageRequest.of(1, 50);
+        Pageable pageable = PageRequest.of(0, 50);
         ReviewDto reviewDto = new ReviewDto();
         reviewDto.setProfileId(profile.getId());
         reviewDto.setText(text);
@@ -139,7 +141,7 @@ public class ReviewControllerTest {
                 () -> Assertions.assertEquals(HttpStatus.OK.value(), response2.response().getStatusCode()),
                 () -> {
                     Page<Review> review = reviewRepository.findAllByProfile_Id(profile.getId(), pageable);
-                    Assertions.assertEquals(1, review.getSize());
+                    Assertions.assertEquals(1, review.getNumberOfElements());
                 }
         );
     }
@@ -158,7 +160,7 @@ public class ReviewControllerTest {
                         .header("Content-type", "application/json")
                         .header("Authorization", "Bearer " + tokenResponse)
                         .when()
-                        .post("/api/app/review/all/" + profile.getId() + "/" + 1)
+                        .get("/api/app/review/all/" + profile.getId() + "/" + 0)
                         .then()
                         .extract();
 
@@ -185,13 +187,13 @@ public class ReviewControllerTest {
                         .header("Content-type", "application/json")
                         .header("Authorization", "Bearer " + tokenResponse)
                         .when()
-                        .post("/api/app/review/all/" + profile.getId() + 10 + "/" + 1)
+                        .get("/api/app/review/all/" + profile.getId() + 10 + "/" + 0)
                         .then()
                         .extract();
 
         Assertions.assertAll(
                 () -> Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), response.response().getStatusCode()),
-                () -> Assertions.assertEquals("Wrong ids in path!", response.body().toString())
+                () -> Assertions.assertEquals("Wrong ids in path!", response.body().asString())
         );
     }
 
@@ -202,7 +204,7 @@ public class ReviewControllerTest {
         String tokenResponse = getToken(clientLogin, clientPassword, clientRole);
         Integer userId = user.getId();
 
-        Pageable pageable = PageRequest.of(1, 50);
+        Pageable pageable = PageRequest.of(0, 50);
         Profile profile = profileRepository.findByUser_Id(userId).orElseThrow();
         Review review = reviewRepository.findAllByProfile_Id(profile.getId(), pageable).stream().findFirst().orElseThrow();
 
@@ -211,7 +213,7 @@ public class ReviewControllerTest {
                         .header("Content-type", "application/json")
                         .header("Authorization", "Bearer " + tokenResponse)
                         .when()
-                        .post("/api/app/review/single/" + review.getId())
+                        .get("/api/app/review/single/" + review.getId())
                         .then()
                         .extract();
 

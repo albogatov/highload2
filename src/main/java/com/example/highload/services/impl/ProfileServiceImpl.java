@@ -44,7 +44,7 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Override
     public Profile findByUserId(int userId) {
-        return profileRepository.findByUser_Id(userId).orElseThrow();
+        return profileRepository.findByUser_Id(userId).orElse(null);
     }
 
     @Override
