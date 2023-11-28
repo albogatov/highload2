@@ -1,6 +1,7 @@
 package com.example.highload;
 
 import com.example.highload.model.inner.User;
+import com.example.highload.model.network.ImageDto;
 import com.example.highload.model.network.JwtRequest;
 import com.example.highload.model.network.JwtResponse;
 import com.example.highload.model.network.ProfileDto;
@@ -9,7 +10,6 @@ import com.example.highload.repos.UserRepository;
 import com.example.highload.security.jwt.JwtUtil;
 import com.example.highload.services.AuthenticationService;
 import com.example.highload.services.ProfileService;
-import com.example.highload.services.UserService;
 import com.example.highload.utils.DataTransformer;
 import io.restassured.RestAssured;
 import io.restassured.parsing.Parser;
@@ -20,7 +20,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
@@ -59,22 +58,17 @@ public class UserControllerTests {
     @Autowired
     public DataTransformer dataTransformer;
 
-    private static String adminLogin = "admin1";
-
-    private static String adminPassword = "admin1";
-    private static String adminRole = "ADMIN";
-
-    private static String artistLogin = "artist1";
-
-    private static String artistPassword = "artist1";
-
-    private static String artistRole = "ARTIST";
-
-    private static String clientLogin = "client1";
-
-    private static String clientPassword = "client1";
-
-    private static String clientRole = "CLIENT";
+    private static final String adminLogin = "admin1";
+    private static final String adminPassword = "admin1";
+    private static final String adminRole = "ADMIN";
+    private static final String artistLogin = "artist1";
+    private static final String artistPassword = "artist1";
+    private static final String artistRole = "ARTIST";
+    private static final String clientLogin = "client1";
+    private static final String clientPassword = "client1";
+    private static final String clientRole = "CLIENT";
+    private static final String newClientLogin = "client2";
+    private static final String newClientPassword = "client2";
 
 
     @Container
@@ -109,7 +103,6 @@ public class UserControllerTests {
     }
 
     private String getToken(String login, String password, String role) {
-        User user = userRepository.findByLogin(login).orElseThrow();
         return given()
                 .header("Content-type", "application/json")
                 .and()
@@ -165,15 +158,6 @@ public class UserControllerTests {
     @MethodSource("userProvider")
     @Order(4)
     void authRESTCorrect(String login, String password, String role) {
-//        ExtractableResponse<Response> response =
-//                given()
-//                        .header("Content-type", "application/json")
-//                        .and()
-//                        .body(new JwtRequest(login, password, role))
-//                        .when()
-//                        .post("/api/app/user/login")
-//                        .then()
-//                        .extract();
         ExtractableResponse<Response> response = getResponse("/api/app/user/login", login, password, role);
         User user = userRepository.findByLogin(login).orElseThrow();
         String tokenResponse = response.body().as(JwtResponse.class).getToken();
@@ -188,15 +172,6 @@ public class UserControllerTests {
     @MethodSource("userProvider")
     @Order(5)
     void authRESTBad(String login, String password, String role) {
-//        ExtractableResponse<Response> response =
-//                given()
-//                        .header("Content-type", "application/json")
-//                        .and()
-//                        .body(new JwtRequest(login + "1", password, role))
-//                        .when()
-//                        .post("/api/app/user/login")
-//                        .then()
-//                        .extract();
         ExtractableResponse<Response> response = getResponse("/api/app/user/login", login + "1", password, role);
         Assertions.assertEquals(response.response().getStatusCode(), HttpStatus.UNAUTHORIZED.value());
     }
@@ -204,55 +179,17 @@ public class UserControllerTests {
     @Test
     @Order(6)
     void registerAPICorrect() {
-//        ExtractableResponse<Response> response =
-//                given()
-//                        .header("Content-type", "application/json")
-//                        .and()
-//                        .body(new JwtRequest("client2", "client2", "CLIENT"))
-//                        .when()
-//                        .post("/api/app/user/register")
-//                        .then()
-//                        .extract();
-        ExtractableResponse<Response> response = getResponse("/api/app/user/register", "client2", "client2", "CLIENT");
+        ExtractableResponse<Response> response = getResponse("/api/app/user/register", newClientLogin, newClientPassword, clientRole);
         Assertions.assertEquals(response.response().getStatusCode(), HttpStatus.OK.value());
 
-        ExtractableResponse<Response> response2 = getResponse("/api/app/user/login", "client2", "client2", "CLIENT");
-        Assertions.assertEquals(response.response().getStatusCode(), HttpStatus.OK.value());
-
-//        authRESTCorrect("client2", "client2", "CLIENT");
-
-//        ExtractableResponse<Response> response2 =
-//                given()
-//                        .header("Content-type", "application/json")
-//                        .and()
-//                        .body(new JwtRequest("client2", "client2", "CLIENT"))
-//                        .when()
-//                        .post("/api/app/user/login")
-//                        .then()
-//                        .extract();
-//        User user = userService.findByLogin("client2");
-//        String tokenResponse = response2.body().as(JwtResponse.class).getToken();
-//        Assertions.assertAll(
-//                () -> Assertions.assertDoesNotThrow(() -> jwtUtil.getLoginFromJwtToken(tokenResponse)),
-//                () -> Assertions.assertEquals(jwtUtil.getLoginFromJwtToken(tokenResponse), user.getLogin()),
-//                () -> Assertions.assertTrue(jwtUtil.getRoleFromJwtToken(tokenResponse).contains(user.getRole().getName().toString())),
-//                () -> Assertions.assertEquals(response2.response().getStatusCode(), HttpStatus.OK.value())
-//        );
+        ExtractableResponse<Response> response2 = getResponse("/api/app/user/login", newClientLogin, newClientPassword, clientRole);
+        Assertions.assertEquals(response2.response().getStatusCode(), HttpStatus.OK.value());
     }
 
     @Test
     @Order(7)
     void registerAPIBad() {
-//        ExtractableResponse<Response> response =
-//                given()
-//                        .header("Content-type", "application/json")
-//                        .and()
-//                        .body(new JwtRequest("client2", "client2", "CLIENT"))
-//                        .when()
-//                        .post("/api/app/user/register")
-//                        .then()
-//                        .extract();
-        ExtractableResponse<Response> response = getResponse("/api/app/user/register", "client2", "client2", "CLIENT");
+        ExtractableResponse<Response> response = getResponse("/api/app/user/register", newClientLogin, newClientPassword, clientRole);
         Assertions.assertEquals(response.response().getStatusCode(), HttpStatus.CONFLICT.value());
     }
 
@@ -260,12 +197,18 @@ public class UserControllerTests {
     @Order(8)
     void addProfileAPICorrect() {
         User user = userRepository.findByLogin(clientLogin).orElseThrow();
-        String tokenResponse = getToken(user.getLogin(), "client1", user.getRole().getName().toString());
+        String tokenResponse = getToken(clientLogin, clientPassword, clientRole);
         Integer userId = user.getId();
+
         ProfileDto profileDto = new ProfileDto();
-        profileDto.setUserId( user.getId());
+        ImageDto imageDto = new ImageDto();
+        imageDto.setUrl("http");
+        profileDto.setUserId(user.getId());
         profileDto.setMail("client@gmail.com");
         profileDto.setName(clientLogin + "Profile");
+        profileDto.setEducation("ITMO");
+        profileDto.setExperience("ITMO logo");
+        profileDto.setImage(imageDto);
 
         ExtractableResponse<Response> response =
                 given()
@@ -290,12 +233,18 @@ public class UserControllerTests {
     void addProfileAPIAlreadyExist() {
 
         User user = userRepository.findByLogin(clientLogin).orElseThrow();
-        String tokenResponse = getToken(user.getLogin(), "client1", user.getRole().getName().toString());
+        String tokenResponse = getToken(clientLogin, clientPassword, clientRole);
         Integer userId = user.getId();
+
         ProfileDto profileDto = new ProfileDto();
-        profileDto.setUserId( user.getId());
+        ImageDto imageDto = new ImageDto();
+        imageDto.setUrl("http");
+        profileDto.setUserId(user.getId());
         profileDto.setMail("client@gmail.com");
         profileDto.setName(clientLogin + "Profile");
+        profileDto.setEducation("ITMO");
+        profileDto.setExperience("ITMO logo");
+        profileDto.setImage(imageDto);
 
         ExtractableResponse<Response> response =
                 given()
@@ -314,14 +263,19 @@ public class UserControllerTests {
     @Test
     @Order(10)
     void addProfileAPIBad() {
-
-        User user = userRepository.findByLogin(artistLogin).orElseThrow();
-        String tokenResponse = getToken(user.getLogin(), "artist1", user.getRole().getName().toString());
+        User user = userRepository.findByLogin(clientLogin).orElseThrow();
+        String tokenResponse = getToken(clientLogin, clientPassword, clientRole);
         Integer userId = user.getId();
+
         ProfileDto profileDto = new ProfileDto();
+        ImageDto imageDto = new ImageDto();
+        imageDto.setUrl("http");
         profileDto.setUserId(user.getId());
-        profileDto.setMail(artistLogin);
-        profileDto.setName(artistLogin + "Profile");
+        profileDto.setMail("BADEMAIL");
+        profileDto.setName(clientLogin + "Profile");
+        profileDto.setEducation("ITMO");
+        profileDto.setExperience("ITMO logo");
+        profileDto.setImage(imageDto);
 
         ExtractableResponse<Response> response =
                 given()
@@ -334,46 +288,38 @@ public class UserControllerTests {
                         .then()
                         .extract();
 
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(),response.response().getStatusCode());
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), response.response().getStatusCode());
     }
 
+    @Test
+    @Order(11)
+    void deactivateIdAPICorrect() {
+        User user = userRepository.findByLogin(clientLogin).orElseThrow();
+        String tokenResponse = getToken(clientLogin, clientPassword, clientRole);
+        Integer userId = user.getId();
 
-
-
-
-
-
-//    @Test
-//    void deactivateAPICorrect() {
-//        ExtractableResponse<Response> response =
-//                given()
-//                        .header("Content-type", "application/json")
-//                        .and()
-//                        .body(new JwtRequest("client1", "client2", "CLIENT"))
-//                        .when()
-//                        .post("/api/app/user/register")
-//                        .then()
-//                        .extract();
-//    }
-//
-//    @Test
-//    void deactivateAPIBad() {
-//        ExtractableResponse<Response> response =
-//                given()
-//                        .header("Content-type", "application/json")
-//                        .and()
-//                        .body(new JwtRequest("client1", "client2", "CLIENT"))
-//                        .when()
-//                        .post("/api/app/user/register")
-//                        .then()
-//                        .extract();
-//    }
+        ExtractableResponse<Response> response =
+                given()
+                        .header("Content-type", "application/json")
+                        .header("Authorization", "Bearer " + tokenResponse)
+                        .when()
+                        .post("/api/app/user/deactivate/" + userId)
+                        .then()
+                        .extract();
+        Assertions.assertAll(
+                () -> Assertions.assertEquals(HttpStatus.OK.value(), response.response().getStatusCode()),
+                () -> {
+                    User user2 = userRepository.findByLogin(clientLogin).orElseThrow();
+                    Assertions.assertFalse(user2.getIsActual());
+                }
+        );
+    }
 
     private static Stream<String> loginProvider() {
         return Stream.of(
                 clientLogin,
                 artistLogin,
-                "ANDREY_EREKHINSKY_SLAVE",
+                "Bogatov",
                 "client2",
                 adminLogin + "1"
         );
@@ -396,6 +342,5 @@ public class UserControllerTests {
                 Arguments.of(clientLogin, clientPassword, clientRole)
         );
     }
-
 
 }
