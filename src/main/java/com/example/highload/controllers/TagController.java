@@ -7,7 +7,6 @@ import com.example.highload.utils.DataTransformer;
 import com.example.highload.utils.PaginationHeadersCreator;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -32,8 +31,8 @@ public class TagController {
     @CrossOrigin
     @PostMapping("/save")
     @PreAuthorize("hasAnyAuthority('ADMIN')")
-    public ResponseEntity save(@Valid @RequestBody TagDto data){
-        if(tagService.saveTag(data) != null)
+    public ResponseEntity save(@Valid @RequestBody TagDto data) {
+        if (tagService.saveTag(data) != null)
             return ResponseEntity.ok("");
         else return ResponseEntity.badRequest().body("Couldn't save tag, check data");
     }
@@ -56,12 +55,12 @@ public class TagController {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity handleValidationExceptions(){
+    public ResponseEntity handleValidationExceptions() {
         return ResponseEntity.badRequest().body("Request body validation failed!");
     }
 
     @ExceptionHandler(NoSuchElementException.class)
-    public ResponseEntity handleServiceExceptions(){
+    public ResponseEntity handleServiceExceptions() {
         return ResponseEntity.badRequest().body("Wrong ids in path!");
     }
 
