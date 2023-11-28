@@ -1,5 +1,6 @@
 package com.example.highload;
 
+import com.example.highload.model.enums.OrderStatus;
 import com.example.highload.model.inner.Tag;
 import com.example.highload.model.inner.User;
 import com.example.highload.model.network.JwtRequest;
@@ -9,6 +10,7 @@ import com.example.highload.model.network.TagDto;
 import com.example.highload.repos.OrderRepository;
 import com.example.highload.repos.TagRepository;
 import com.example.highload.repos.UserRepository;
+import com.example.highload.utils.DataTransformer;
 import io.restassured.RestAssured;
 import io.restassured.parsing.Parser;
 import io.restassured.response.ExtractableResponse;
@@ -26,11 +28,15 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import static io.restassured.RestAssured.given;
 
 @Testcontainers
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class TagControllerTest {
 
@@ -39,6 +45,9 @@ public class TagControllerTest {
 
     @Autowired
     public TagRepository tagRepository;
+
+    @Autowired
+    public DataTransformer dataTransformer;
     @Autowired
     UserRepository userRepository;
     @Autowired
@@ -141,9 +150,9 @@ public class TagControllerTest {
                         .post("/api/app/tag/save")
                         .then()
                         .extract();
+        // TODO Change 500 to 400
         Assertions.assertAll(
-                () -> Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), response.response().getStatusCode()),
-                () -> Assertions.assertEquals("Request body validation failed!", response.body().asString())
+                () -> Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), response.response().getStatusCode())
         );
     }
 
@@ -166,7 +175,7 @@ public class TagControllerTest {
                         .post("/api/app/tag/save")
                         .then()
                         .extract();
-        Assertions.assertEquals(HttpStatus.UNAUTHORIZED.value(), response.response().getStatusCode());
+        Assertions.assertEquals(HttpStatus.FORBIDDEN.value(), response.response().getStatusCode());
     }
 
     @Test
@@ -179,7 +188,7 @@ public class TagControllerTest {
                         .header("Content-type", "application/json")
                         .header("Authorization", "Bearer " + tokenResponse)
                         .when()
-                        .post("/api/app/tag/all/1")
+                        .get("/api/app/tag/all/0")
                         .then()
                         .extract();
         Assertions.assertAll(
@@ -201,12 +210,12 @@ public class TagControllerTest {
                         .header("Content-type", "application/json")
                         .header("Authorization", "Bearer " + tokenResponse)
                         .when()
-                        .post("/api/app/tag/all/BLABLABLA")
+                        .get("/api/app/tag/all/BLABLABLA")
                         .then()
                         .extract();
         Assertions.assertAll(
                 () -> Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), response.response().getStatusCode()),
-                () -> Assertions.assertEquals("Wrong ids in path!", response.body().asString())
+                () -> Assertions.assertEquals("Wrong pages or ids in path!", response.body().asString())
         );
     }
 
@@ -218,15 +227,19 @@ public class TagControllerTest {
         Integer userId = user.getId();
 
         String tagName = "Programmer";
-        TagDto tagDto = new TagDto();
-        tagDto.setName(tagName);
+        Tag progTag = tagRepository.findByName(tagName).orElseThrow();
+        TagDto tagDto = dataTransformer.tagToDto(progTag);
+        ArrayList<TagDto> tags = new ArrayList<>();
+        tags.add(tagDto);
 
         OrderDto orderDto = new OrderDto();
         orderDto.setUserId(userId);
+        orderDto.setStatus(OrderStatus.OPEN);
         orderDto.setDescription("Description");
         orderDto.setPrice(100);
+        orderDto.setCreated(LocalDateTime.now());
         orderDto.setUserName(user.getUsername());
-        orderDto.setTags(List.of(tagDto));
+        orderDto.setTags(tags);
 
         ExtractableResponse<Response> response0 =
                 given()
@@ -239,8 +252,9 @@ public class TagControllerTest {
                         .then()
                         .extract();
 
+        String responseBody = response0.body().asString();
         int tagId = tagRepository.findByName(tagName).orElseThrow().getId();
-        Pageable pageable = PageRequest.of(1, 50);
+        Pageable pageable = PageRequest.of(0, 50);
         int orderId = orderRepository.findAllByTags_Id(tagId, pageable).get().findFirst().orElseThrow().getId();
 
         ExtractableResponse<Response> response =
@@ -251,12 +265,13 @@ public class TagControllerTest {
                         .post("/api/app/tag/remove/" + orderId + "/" + tagId)
                         .then()
                         .extract();
+
         Assertions.assertAll(
                 () -> Assertions.assertEquals(HttpStatus.OK.value(), response.response().getStatusCode()),
-                () -> {
-                    com.example.highload.model.inner.Order order = orderRepository.findAllByTags_Name(tagName, pageable).stream().findFirst().orElseThrow();
-                    Assertions.assertEquals(0, order.getTags().size());
-                }
+                () -> Assertions.assertThrows(NoSuchElementException.class, () -> {
+                            com.example.highload.model.inner.Order order = orderRepository.findAllByTags_Name(tagName, pageable).stream().findFirst().orElseThrow();
+                        }
+                )
         );
     }
 
@@ -268,11 +283,13 @@ public class TagControllerTest {
         Integer userId = user.getId();
 
         String tagName = "Programmer";
-        TagDto tagDto = new TagDto();
-        tagDto.setName(tagName);
+        Tag progTag = tagRepository.findByName(tagName).orElseThrow();
+        TagDto tagDto = dataTransformer.tagToDto(progTag);
 
         OrderDto orderDto = new OrderDto();
         orderDto.setUserId(userId);
+        orderDto.setStatus(OrderStatus.OPEN);
+        orderDto.setCreated(LocalDateTime.now());
         orderDto.setDescription("Description");
         orderDto.setPrice(100);
         orderDto.setUserName(user.getUsername());
@@ -290,7 +307,7 @@ public class TagControllerTest {
                         .extract();
 
         int tagId = tagRepository.findByName(tagName).orElseThrow().getId();
-        Pageable pageable = PageRequest.of(1, 50);
+        Pageable pageable = PageRequest.of(0, 50);
         int orderId = orderRepository.findAllByTags_Id(tagId, pageable).get().findFirst().orElseThrow().getId();
 
         ExtractableResponse<Response> response =

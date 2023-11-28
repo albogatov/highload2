@@ -64,4 +64,10 @@ public class TagController {
         return ResponseEntity.badRequest().body("Wrong ids in path!");
     }
 
+    @ExceptionHandler(NumberFormatException.class)
+    public ResponseEntity handlePathExceptions() {
+        return ResponseEntity.badRequest().body("Wrong pages or ids in path!");
+    }
+
+
 }

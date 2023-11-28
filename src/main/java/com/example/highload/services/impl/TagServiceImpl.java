@@ -12,6 +12,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+
 @Service
 @RequiredArgsConstructor
 public class TagServiceImpl implements TagService {
@@ -32,8 +34,9 @@ public class TagServiceImpl implements TagService {
 
     @Override
     public void removeTagFromOrder(int tagId, int orderId) {
+        Tag tagToRemove = tagRepository.findById(tagId).orElseThrow();
         Order order = orderRepository.findById(orderId).orElseThrow();
-        order.setTags(order.getTags().stream().filter(tag -> tag.getId()!=tagId).toList());
+        order.setTags(new ArrayList<Tag>(order.getTags().stream().filter(tag -> tag.getId()!=tagId).toList()));
         orderRepository.save(order);
     }
 }
