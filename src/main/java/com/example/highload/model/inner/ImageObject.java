@@ -10,7 +10,7 @@ import lombok.Data;
 public class ImageObject {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     Integer id;
 
     @Enumerated(EnumType.STRING)

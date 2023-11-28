@@ -11,7 +11,7 @@ import lombok.Data;
 public class UserRequest {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     Integer id;
 
     @NotBlank

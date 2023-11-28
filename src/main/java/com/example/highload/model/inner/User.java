@@ -20,7 +20,7 @@ import java.util.List;
 public class User implements UserDetails {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     Integer id;
 
     @NotBlank
@@ -36,7 +36,7 @@ public class User implements UserDetails {
     String hashPassword;
 
     @ManyToOne
-    @JoinColumn(name = "role_id", referencedColumnName = "id", insertable = false, updatable = false)
+    @JoinColumn(name = "role_id", referencedColumnName = "id", updatable = false)
     Role role;
 
     @Column(name = "is_actual", nullable = false)

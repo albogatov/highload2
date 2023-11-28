@@ -15,6 +15,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
@@ -57,6 +59,7 @@ public class UserServiceImpl implements UserService {
     public void deactivateById(int userId) {
         User user = userRepository.findById(userId).orElseThrow();
         user.setIsActual(false);
+        user.setWhenDeletedTime(LocalDateTime.now());
         userRepository.save(user);
     }
 

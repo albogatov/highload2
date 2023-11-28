@@ -1,6 +1,9 @@
 package com.example.highload.model.network;
 
 import com.example.highload.model.enums.OrderStatus;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -13,8 +16,11 @@ public class OrderDto implements Serializable {
     int userId;
     String userName;
     LocalDateTime created;
+    @Min(0)
     int price;
+    @NotBlank
     String description;
+    @Size(max=10)
     List<TagDto> tags; // should be displayed all
     OrderStatus status;
 }

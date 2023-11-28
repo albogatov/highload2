@@ -5,6 +5,7 @@ import com.example.highload.model.network.ResponseDto;
 import com.example.highload.services.ResponseService;
 import com.example.highload.utils.DataTransformer;
 import com.example.highload.utils.PaginationHeadersCreator;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -12,9 +13,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @RestController
 @RequestMapping(value = "/api/app/response")
@@ -27,7 +30,7 @@ public class ResponseController {
 
     @CrossOrigin
     @PostMapping("/save")
-    public ResponseEntity save(@RequestBody ResponseDto data){
+    public ResponseEntity save(@Valid @RequestBody ResponseDto data){
         if(responseService.saveResponse(data) != null)
             return ResponseEntity.ok("");
         else return ResponseEntity.badRequest().body("Couldn't save response, check data");
@@ -63,5 +66,14 @@ public class ResponseController {
         return ResponseEntity.ok(dataTransformer.responseToDto(entity));
     }
 
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity handleValidationExceptions(){
+        return ResponseEntity.badRequest().body("Request body validation failed!");
+    }
+
+    @ExceptionHandler(NoSuchElementException.class)
+    public ResponseEntity handleServiceExceptions(){
+        return ResponseEntity.badRequest().body("Wrong ids in path!");
+    }
 
 }

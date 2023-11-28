@@ -5,6 +5,7 @@ import com.example.highload.model.network.NotificationDto;
 import com.example.highload.services.NotificationService;
 import com.example.highload.utils.DataTransformer;
 import com.example.highload.utils.PaginationHeadersCreator;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -12,9 +13,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @RestController
 @RequestMapping(value = "/api/app/notification")
@@ -27,7 +30,7 @@ public class NotificationController {
 
     @CrossOrigin
     @PostMapping("/save")
-    public ResponseEntity save(@RequestBody NotificationDto data){
+    public ResponseEntity save(@Valid @RequestBody NotificationDto data){
         if(notificationService.saveNotification(data) != null)
             return ResponseEntity.ok("");
         else return ResponseEntity.badRequest().body("Couldn't save notification, check data");
@@ -63,5 +66,15 @@ public class NotificationController {
         List<NotificationDto> dtoList = dataTransformer.notificationListToDto(entityList.getContent());
         HttpHeaders responseHeaders = paginationHeadersCreator.pageWithTotalElementsHeadersCreate(entityList);
         return ResponseEntity.ok().headers(responseHeaders).body(dtoList);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity handleValidationExceptions(){
+        return ResponseEntity.badRequest().body("Request body validation failed!");
+    }
+
+    @ExceptionHandler(NoSuchElementException.class)
+    public ResponseEntity handleServiceExceptions(){
+        return ResponseEntity.badRequest().body("Wrong ids in path!");
     }
 }

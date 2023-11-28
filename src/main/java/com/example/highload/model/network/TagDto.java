@@ -1,5 +1,6 @@
 package com.example.highload.model.network;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -8,5 +9,6 @@ import java.io.Serializable;
 public class TagDto implements Serializable {
 
     int id;
+    @NotBlank
     String name;
 }

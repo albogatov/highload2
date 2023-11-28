@@ -1,5 +1,7 @@
 package com.example.highload.model.network;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -13,4 +15,5 @@ public class NotificationDto implements Serializable {
     int senderId;
     boolean isRead;
     LocalDateTime time;
+    String senderMail;
 }

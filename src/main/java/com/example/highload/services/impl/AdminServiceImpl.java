@@ -71,7 +71,8 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public User addUser(UserDto userDto) {
-        return userRepository.save(dataTransformer.userFromDto(userDto));
+        User user = dataTransformer.userFromDto(userDto);
+        return userRepository.save(user);
     }
 
     @Override

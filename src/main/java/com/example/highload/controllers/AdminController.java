@@ -7,6 +7,7 @@ import com.example.highload.services.AdminService;
 import com.example.highload.services.UserService;
 import com.example.highload.utils.DataTransformer;
 import com.example.highload.utils.PaginationHeadersCreator;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -14,9 +15,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @RestController
 @PreAuthorize("hasAuthority('ADMIN')")
@@ -45,18 +49,18 @@ public class AdminController {
         return ResponseEntity.ok("User deleted");
     }
 
-    @PostMapping("/user/all/delete-expired")
+    @PostMapping("/user/all/delete-expired/{days}")
     @CrossOrigin
 //    @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity deleteLogicallyDeletedAccountsExpired(@RequestBody int days) {
+    public ResponseEntity deleteLogicallyDeletedAccountsExpired(@PathVariable int days) {
         adminService.deleteLogicallyDeletedUsers(days);
-        return ResponseEntity.ok("User deleted");
+        return ResponseEntity.ok("Users deleted");
     }
 
-    @PostMapping("/user/add/")
+    @PostMapping("/user/add")
     @CrossOrigin
 //    @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity addUser(@RequestBody UserDto user) {
+    public ResponseEntity addUser(@Valid @RequestBody UserDto user) {
         if (userService.findByLogin(user.getLogin()) == null) {
             adminService.addUser(user);
             return ResponseEntity.ok("User added");
@@ -74,6 +78,16 @@ public class AdminController {
         List<UserRequestDto> dtoList = dataTransformer.userRequestListToDto(entityList.getContent());
         HttpHeaders responseHeaders = paginationHeadersCreator.pageWithTotalElementsHeadersCreate(entityList);
         return ResponseEntity.ok().headers(responseHeaders).body(dtoList);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity handleValidationExceptions(){
+        return ResponseEntity.badRequest().body("Request body validation failed!");
+    }
+
+    @ExceptionHandler(NoSuchElementException.class)
+    public ResponseEntity handleServiceExceptions(){
+        return ResponseEntity.badRequest().body("Wrong ids in path!");
     }
 
 }
