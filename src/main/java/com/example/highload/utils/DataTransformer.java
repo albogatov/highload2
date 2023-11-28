@@ -9,6 +9,7 @@ import lombok.Data;
 //import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Component("dataTransformer")
@@ -54,6 +55,10 @@ public class DataTransformer {
 
     public List<TagDto> tagListToDto(List<Tag> entities) {
         return entities.stream().map(this::tagToDto).toList();
+    }
+
+    public List<Tag> tagDtoListToTag(List<TagDto> entities) {
+        return entities.stream().map(this::tagFromDto).toList();
     }
 
 
@@ -197,6 +202,7 @@ public class DataTransformer {
         order.setCreated(orderDto.getCreated());
         order.setPrice(orderDto.getPrice());
         order.setStatus(orderDto.getStatus());
+        order.setTags(tagDtoListToTag(orderDto.getTags()));
         User user = userRepository.findById(orderDto.getUserId()).orElseThrow();
         order.setUser(user);
         return order;
