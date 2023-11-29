@@ -10,6 +10,8 @@ import com.example.highload.repos.NotificationRepository;
 import com.example.highload.repos.ProfileRepository;
 import com.example.highload.repos.UserRepository;
 import com.example.highload.utils.DataTransformer;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.restassured.RestAssured;
 import io.restassured.parsing.Parser;
 import io.restassured.response.ExtractableResponse;
@@ -26,9 +28,12 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.shaded.com.fasterxml.jackson.core.type.TypeReference;
+
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static io.restassured.RestAssured.given;
@@ -270,6 +275,8 @@ public class NotificationControllerTests {
     @Test
     @Order(6)
     void getAllQueriesAPICorrect() {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
         User sender = userRepository.findByLogin(clientLogin).orElseThrow();
         User receiver = userRepository.findByLogin(artistLogin).orElseThrow();
         Integer profileId = profileRepository.findByUser_Id(sender.getId()).orElseThrow().getId();
@@ -289,8 +296,8 @@ public class NotificationControllerTests {
                         .then()
                         .extract();
 
-        List<NotificationDto> notificationDtoList = response.body().as(List.class);
-        //List<Notification> notificationList = dataTransformer.notificationListFromDto(notificationDtoList);
+        List<NotificationDto> notificationDtoList = Arrays.stream(response.body().as(NotificationDto[].class)).toList();
+        //mapper.convertValue(dataTransformer.notificationListFromDto(notificationDtoList),  new TypeReference<List<Notification>>() { };
 
         Assertions.assertAll(
                 () -> Assertions.assertEquals(HttpStatus.OK.value(), response.response().getStatusCode()),
@@ -305,24 +312,19 @@ public class NotificationControllerTests {
         User sender2 = userRepository.findByLogin(adminLogin).orElseThrow();
         User receiver = userRepository.findByLogin(artistLogin).orElseThrow();
         String tokenResponse = getToken(artistLogin, artistPassword, artistRole);
-        Profile artistProfile = new Profile();
-        artistProfile.setUser(sender2);
-        artistProfile.setName("Admin1");
-        artistProfile.setMail("sender@gmail.com");
-
-        Profile artistProfileWithId = profileRepository.save(artistProfile);
-
-        Profile clientProfile = new Profile();
-        clientProfile.setUser(receiver);
-        clientProfile.setName("Client1");
-        clientProfile.setMail("receiver@mail.ru");
-
-        Profile clientProfileWithId = profileRepository.save(clientProfile);
-
+        Profile adminProfile = new Profile();
+        adminProfile.setUser(sender2);
+        adminProfile.setName("Admin1");
         String senderEmail = "admin@mail.ru";
+        adminProfile.setMail(senderEmail);
+
+        Profile artistProfileWithId = profileRepository.save(adminProfile);
+
+        Integer receiverProfileId = profileRepository.findByUser_Id(receiver.getId()).orElseThrow().getId();
+
         NotificationDto notificationDto = new NotificationDto();
         notificationDto.setRead(false);
-        notificationDto.setReceiverId(clientProfileWithId.getId());
+        notificationDto.setReceiverId(receiverProfileId);
         notificationDto.setSenderId(artistProfileWithId.getId());
         notificationDto.setSenderMail(senderEmail);
         notificationDto.setTime(LocalDateTime.now());
@@ -334,11 +336,12 @@ public class NotificationControllerTests {
                         .header("Content-type", "application/json")
                         .header("Authorization", "Bearer " + tokenResponse)
                         .when()
-                        .get("/api/app/notification/new/" + receiver.getId() + "/" + 0)
+                        .get("/api/app/notification/new/" + receiverProfileId + "/" + 0)
                         .then()
                         .extract();
 
-        List<NotificationDto> notificationDtoList = response.body().as(ArrayList.class);
+        String responseBody = response.body().asString();
+        List<NotificationDto> notificationDtoList = Arrays.stream(response.body().as(NotificationDto[].class)).toList();
         List<Notification> notificationList = dataTransformer.notificationListFromDto(notificationDtoList);
 
         Assertions.assertAll(
