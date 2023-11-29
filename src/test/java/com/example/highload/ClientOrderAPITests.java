@@ -222,7 +222,7 @@ public class ClientOrderAPITests {
         // update valid
 
         OrderDto orderDto = dataTransformer.orderToDto(clientOrder1WithId);
-        orderDto.setUserName("2o_upd");
+        orderDto.setDescription("2o_upd");
 
         ExtractableResponse<Response> response1 =
                 given()
@@ -346,7 +346,7 @@ public class ClientOrderAPITests {
                         .header("Authorization", "Bearer " + clientTokenResponse)
                         .header("Content-type", "application/json")
                         .and()
-                        .body(List.of(tagDtoExisting))
+                        .body(List.of(tagDtoExisting.getId()))
                         .when()
                         .get("/api/app/order/single/" + clientOrder1WithId.getId() + "/tags/add")
                         .then()
@@ -368,7 +368,7 @@ public class ClientOrderAPITests {
                         .and()
                         .body(List.of(tagDtoNotExisting))
                         .when()
-                        .post("/api/app/order/single/" + clientOrder1WithId.getId() + "/tags/add")
+                        .get("/api/app/order/single/" + clientOrder1WithId.getId() + "/tags/add")
                         .then()
                         .extract();
 
