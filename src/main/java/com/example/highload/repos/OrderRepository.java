@@ -37,7 +37,7 @@ public interface OrderRepository extends JpaRepository<ClientOrder, Integer> {
             "(select order_id from order_tags " +
             "where tag_id in :tagIds " +
             "group by order_tags.order_id " +
-            "having count(order_id) = :tagNum);", nativeQuery = true)
+            "having count(order_id) = :tagNum)", nativeQuery = true)
     Page<ClientOrder> findAllByMultipleTagsIds(@Param("tagIds") List<Integer> tagIds,
                                                @Param("tagNum") int tagNum,
                                                Pageable pageable);
@@ -47,7 +47,7 @@ public interface OrderRepository extends JpaRepository<ClientOrder, Integer> {
             "where tag_id in :tagIds " +
             "group by order_tags.order_id " +
             "having count(order_id) = :tagNum) " +
-            "and public.order.status = :orderStatus;", nativeQuery = true)
+            "and public.order.status = :orderStatus", nativeQuery = true)
     Page<ClientOrder> findAllByMultipleTagsIdsAndStatus(@Param("tagIds") List<Integer> tagIds,
                                                         @Param("tagNum") int tagNum,
                                                         @Param("orderStatus") String status,
