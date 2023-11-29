@@ -38,7 +38,7 @@ public class NotificationController {
 
     @CrossOrigin
     @PostMapping("/update/{id}")
-    @PreAuthorize("hasAnyAuthority('CLIENT', 'ARTIST') and notificationConsistencyChecker.mayReadNotification(authentication.principal, #id)")
+    @PreAuthorize("hasAnyAuthority('CLIENT', 'ARTIST')")
     public ResponseEntity setRead(@PathVariable int id){
         if(notificationService.readNotification(id) != null)
             return ResponseEntity.ok("");
