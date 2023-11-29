@@ -412,8 +412,8 @@ public class ClientOrderAPITests {
 
         Assertions.assertAll(
                 () -> Assertions.assertEquals(2, orderDtos.size()),
-                () -> Assertions.assertEquals("1o", orderDtos.get(0).getDescription()),
-                () -> Assertions.assertEquals("3o", orderDtos.get(1).getDescription())
+                () -> Assertions.assertEquals("1o", orderDtos.get(1).getDescription()),
+                () -> Assertions.assertEquals("3o", orderDtos.get(0).getDescription())
         );
     }
 
