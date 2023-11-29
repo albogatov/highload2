@@ -58,12 +58,12 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Page<ClientOrder> getOrdersByTags(List<Integer> tagIds, Pageable pageable) {
-        return orderRepository.findAllByMultipleTagsIds(tagIds, pageable);
+        return orderRepository.findAllByMultipleTagsIds(tagIds, tagIds.size(), pageable);
     }
 
     @Override
     public Page<ClientOrder> getOpenOrdersByTags(List<Integer> tagIds, Pageable pageable) {
-        return orderRepository.findAllByMultipleTagsIdsAndStatus(tagIds, OrderStatus.OPEN.toString(), pageable);
+        return orderRepository.findAllByMultipleTagsIdsAndStatus(tagIds, tagIds.size(), OrderStatus.OPEN.toString(), pageable);
     }
 
     @Override

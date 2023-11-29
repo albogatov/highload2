@@ -20,16 +20,39 @@ public interface OrderRepository extends JpaRepository<ClientOrder, Integer> {
     Page<ClientOrder> findAllByTags_Name(String name, Pageable pageable);
     Page<ClientOrder> findAllByTags_Id(Integer id, Pageable pageable);
 
-    @Query(value = "select * from order where id in (select order.id from order " +
-            "join order_tags on order.id = order_tags.order_id " +
-            "where order_tags.tag_id in :tagIds)" , nativeQuery = true)
-    Page<ClientOrder> findAllByMultipleTagsIds(@Param("tagIds") List<Integer> tagIds, Pageable pageable);
+//    @Query(value = "select * from order where id in (select order.id from order " +
+//            "join order_tags on order.id = order_tags.order_id " +
+//            "where order_tags.tag_id in :tagIds)" , nativeQuery = true)
+//    Page<ClientOrder> findAllByMultipleTagsIds(@Param("tagIds") List<Integer> tagIds, Pageable pageable);
+//
+//    @Query(value = "select * from order where id in (select order.id from order " +
+//            "join order_tags on order.id = order_tags.order_id " +
+//            "where order_tags.tag_id in :tagIds and order.status = :orderStatus)" , nativeQuery = true)
+//    Page<ClientOrder> findAllByMultipleTagsIdsAndStatus(@Param("tagIds") List<Integer> tagIds,
+//                                                        @Param("orderStatus")String status,
+//                                                        Pageable pageable);
 
-    @Query(value = "select * from order where id in (select order.id from order " +
-            "join order_tags on order.id = order_tags.order_id " +
-            "where order_tags.tag_id in :tagIds and order.status = :orderStatus)" , nativeQuery = true)
+
+    @Query(value = "select * from public.order where id in " +
+            "(select order_id from order_tags " +
+            "where tag_id in :tagIds " +
+            "group by order_tags.order_id " +
+            "having count(order_id) = :tagNum);", nativeQuery = true)
+    Page<ClientOrder> findAllByMultipleTagsIds(@Param("tagIds") List<Integer> tagIds,
+                                               @Param("tagNum") int tagNum,
+                                               Pageable pageable);
+
+    @Query(value = "select * from public.order where id in " +
+            "(select order_id from order_tags " +
+            "where tag_id in :tagIds " +
+            "group by order_tags.order_id " +
+            "having count(order_id) = :tagNum) " +
+            "and public.order.status = :orderStatus;", nativeQuery = true)
     Page<ClientOrder> findAllByMultipleTagsIdsAndStatus(@Param("tagIds") List<Integer> tagIds,
-                                                        @Param("orderStatus")String status,
+                                                        @Param("tagNum") int tagNum,
+                                                        @Param("orderStatus") String status,
                                                         Pageable pageable);
+
+
 
 }
