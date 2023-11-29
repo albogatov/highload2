@@ -23,7 +23,7 @@ public class ImageObject {
 
     @ManyToOne
     @JoinColumn(name = "order_id", referencedColumnName = "id")
-    Order order;
+    ClientOrder clientOrder;
 
     @OneToOne
     @JoinColumn(name = "image_id", referencedColumnName = "id", nullable = false)

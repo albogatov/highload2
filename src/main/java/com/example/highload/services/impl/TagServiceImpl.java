@@ -1,6 +1,6 @@
 package com.example.highload.services.impl;
 
-import com.example.highload.model.inner.Order;
+import com.example.highload.model.inner.ClientOrder;
 import com.example.highload.model.inner.Tag;
 import com.example.highload.model.network.TagDto;
 import com.example.highload.repos.OrderRepository;
@@ -35,8 +35,8 @@ public class TagServiceImpl implements TagService {
     @Override
     public void removeTagFromOrder(int tagId, int orderId) {
         Tag tagToRemove = tagRepository.findById(tagId).orElseThrow();
-        Order order = orderRepository.findById(orderId).orElseThrow();
-        order.setTags(new ArrayList<Tag>(order.getTags().stream().filter(tag -> tag.getId()!=tagId).toList()));
-        orderRepository.save(order);
+        ClientOrder clientOrder = orderRepository.findById(orderId).orElseThrow();
+        clientOrder.setTags(new ArrayList<Tag>(clientOrder.getTags().stream().filter(tag -> tag.getId()!=tagId).toList()));
+        orderRepository.save(clientOrder);
     }
 }

@@ -1,6 +1,6 @@
 package com.example.highload.services.impl;
 
-import com.example.highload.model.inner.Order;
+import com.example.highload.model.inner.ClientOrder;
 import com.example.highload.model.inner.Profile;
 import com.example.highload.model.inner.User;
 import com.example.highload.model.inner.UserRequest;
@@ -50,9 +50,9 @@ public class AdminServiceImpl implements AdminService {
                     imageRepository.deleteById(profile.getImage().getId());
                 }
 
-                List<Order> orders = user.getOrders();
-                if (orders.size() > 0)
-                    orders.forEach(imageRepository::deleteAllByImageObject_Order);
+                List<ClientOrder> clientOrders = user.getClientOrders();
+                if (clientOrders.size() > 0)
+                    clientOrders.forEach(imageRepository::deleteAllByImageObject_Order);
             }
             i++;
         } while (usersToDelete.getContent().size() == 50);

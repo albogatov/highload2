@@ -1,6 +1,7 @@
 package com.example.highload;
 
 import com.example.highload.model.enums.OrderStatus;
+import com.example.highload.model.inner.ClientOrder;
 import com.example.highload.model.inner.Tag;
 import com.example.highload.model.inner.User;
 import com.example.highload.model.network.JwtRequest;
@@ -269,7 +270,7 @@ public class TagControllerTest {
         Assertions.assertAll(
                 () -> Assertions.assertEquals(HttpStatus.OK.value(), response.response().getStatusCode()),
                 () -> Assertions.assertThrows(NoSuchElementException.class, () -> {
-                            com.example.highload.model.inner.Order order = orderRepository.findAllByTags_Name(tagName, pageable).stream().findFirst().orElseThrow();
+                            ClientOrder clientOrder = orderRepository.findAllByTags_Name(tagName, pageable).stream().findFirst().orElseThrow();
                         }
                 )
         );

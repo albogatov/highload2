@@ -1,8 +1,6 @@
 package com.example.highload.services;
 
-import com.example.highload.model.inner.Image;
-import com.example.highload.model.inner.Order;
-import com.example.highload.model.network.ImageDto;
+import com.example.highload.model.inner.ClientOrder;
 import com.example.highload.model.network.OrderDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -11,23 +9,23 @@ import java.util.List;
 
 public interface OrderService {
 
-    Order saveOrder(OrderDto orderDto);
+    ClientOrder saveOrder(OrderDto orderDto);
 
-    Order updateOrder(OrderDto orderDto, int id);
+    ClientOrder updateOrder(OrderDto orderDto, int id);
 
-    Order getOrderById(int id);
+    ClientOrder getOrderById(int id);
 
-    Page<Order> getUserOrders(int userId, Pageable pageable);
+    Page<ClientOrder> getUserOrders(int userId, Pageable pageable);
 
-    Page<Order> getUserOpenOrders(int userId, Pageable pageable);
+    Page<ClientOrder> getUserOpenOrders(int userId, Pageable pageable);
 
-    Page<Order> getOrdersByTags(List<Integer> tagIds, Pageable pageable);
+    Page<ClientOrder> getOrdersByTags(List<Integer> tagIds, Pageable pageable);
 
-    Page<Order> getOpenOrdersByTags(List<Integer> tagIds, Pageable pageable);
+    Page<ClientOrder> getOpenOrdersByTags(List<Integer> tagIds, Pageable pageable);
 
-    Page<Order> getAllOrders(Pageable pageable);
+    Page<ClientOrder> getAllOrders(Pageable pageable);
 
-    Order addTagsToOrder(List<Integer> tagIds, int orderId);
+    ClientOrder addTagsToOrder(List<Integer> tagIds, int orderId);
 
-    Order deleteTagsFromOrder(List<Integer> tagIds, int orderId);
+    ClientOrder deleteTagsFromOrder(List<Integer> tagIds, int orderId);
 }
