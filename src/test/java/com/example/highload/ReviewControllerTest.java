@@ -98,14 +98,12 @@ public class ReviewControllerTest {
         Integer userId = user.getId();
 
         ProfileDto profileDto = new ProfileDto();
-//        ImageDto imageDto = new ImageDto();
-//        imageDto.setUrl("http");
+
         profileDto.setUserId(user.getId());
         profileDto.setMail("client@gmail.com");
         profileDto.setName(clientLogin + "Profile");
         profileDto.setEducation("ITMO");
         profileDto.setExperience("ITMO logo");
-//        profileDto.setImage(imageDto);
 
         ExtractableResponse<Response> response =
                 given()
@@ -118,7 +116,6 @@ public class ReviewControllerTest {
                         .then()
                         .extract();
 
-        String responseBody =  response.body().asString();
         String text = "Cat is not a Dog!";
         Profile profile = profileRepository.findByUser_Id(userId).orElseThrow();
         Pageable pageable = PageRequest.of(0, 50);
