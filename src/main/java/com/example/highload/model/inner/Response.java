@@ -17,7 +17,7 @@ public class Response {
     User user;
     @ManyToOne
     @JoinColumn(name = "order_id", referencedColumnName = "id")
-    ClientOrder clientOrder;
+    ClientOrder order;
 
     @Column(name = "text")
     String text;

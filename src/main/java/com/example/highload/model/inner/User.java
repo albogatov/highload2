@@ -49,7 +49,7 @@ public class User implements UserDetails {
     List<Response> responses;
 
     @OneToMany(mappedBy = "user")
-    List<ClientOrder> clientOrders;
+    List<ClientOrder> orders;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

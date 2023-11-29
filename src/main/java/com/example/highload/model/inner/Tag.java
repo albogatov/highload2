@@ -20,5 +20,5 @@ public class Tag {
     String name;
 
     @ManyToMany(mappedBy = "tags")
-    List<ClientOrder> clientOrders;
+    List<ClientOrder> orders;
 }

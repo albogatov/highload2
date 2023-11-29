@@ -49,13 +49,13 @@ public class ImageServiceImpl implements ImageService {
     @Override
     @Transactional(value = Transactional.TxType.REQUIRES_NEW, rollbackOn = {NoSuchElementException.class, Exception.class})
     public List<Image> saveImagesForOrder(List<ImageDto> imageDtos, int orderId) {
-        ClientOrder clientOrder = orderRepository.findById(orderId).orElseThrow();
+        ClientOrder order = orderRepository.findById(orderId).orElseThrow();
         List<Image> images = imageRepository.saveAll(imageDtos.stream().map(dataTransformer::imageFromDto).toList());
         List<ImageObject> imageObjects = images.stream().map(image ->
                 {
                     ImageObject imageObject = new ImageObject();
                     imageObject.setImage(image);
-                    imageObject.setClientOrder(clientOrder);
+                    imageObject.setOrder(order);
                     imageObject.setProfile(null);
                     imageObject.setType(ImageObjectType.ORDER_IMAGE);
                     return imageObject;
@@ -74,7 +74,7 @@ public class ImageServiceImpl implements ImageService {
                 {
                     ImageObject imageObject = new ImageObject();
                     imageObject.setImage(image);
-                    imageObject.setClientOrder(null);
+                    imageObject.setOrder(null);
                     imageObject.setProfile(profile);
                     imageObject.setType(ImageObjectType.PROFILE_IMAGE);
                     return imageObject;

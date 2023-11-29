@@ -95,7 +95,7 @@ public class DataTransformer {
         responseDto.setUserId(response.getUser().getId());
         responseDto.setApproved(response.getIsApproved());
         responseDto.setUserName(response.getUser().getLogin());
-        responseDto.setOrderId(response.getClientOrder().getId());
+        responseDto.setOrderId(response.getOrder().getId());
         return responseDto;
     }
 
@@ -106,8 +106,8 @@ public class DataTransformer {
         response.setIsApproved(responseDto.isApproved());
         User user = userRepository.findById(responseDto.getUserId()).orElseThrow();
         response.setUser(user);
-        ClientOrder clientOrder = orderRepository.findById(responseDto.getOrderId()).orElseThrow();
-        response.setClientOrder(clientOrder);
+        ClientOrder order = orderRepository.findById(responseDto.getOrderId()).orElseThrow();
+        response.setOrder(order);
         return response;
     }
 
@@ -181,30 +181,30 @@ public class DataTransformer {
 
     /* orders */
 
-    public OrderDto orderToDto(ClientOrder clientOrder) {
+    public OrderDto orderToDto(ClientOrder order) {
         OrderDto orderDto = new OrderDto();
-        orderDto.setId(clientOrder.getId());
-        orderDto.setDescription(clientOrder.getDescription());
-        orderDto.setCreated(clientOrder.getCreated());
-        orderDto.setPrice(clientOrder.getPrice());
-        orderDto.setStatus(clientOrder.getStatus());
-        orderDto.setUserName(clientOrder.getUser().getLogin());
-        orderDto.setUserId(clientOrder.getUser().getId());
-        orderDto.setTags(tagListToDto(clientOrder.getTags()));
+        orderDto.setId(order.getId());
+        orderDto.setDescription(order.getDescription());
+        orderDto.setCreated(order.getCreated());
+        orderDto.setPrice(order.getPrice());
+        orderDto.setStatus(order.getStatus());
+        orderDto.setUserName(order.getUser().getLogin());
+        orderDto.setUserId(order.getUser().getId());
+        orderDto.setTags(tagListToDto(order.getTags()));
         return orderDto;
     }
 
     public ClientOrder orderFromDto(OrderDto orderDto) {
-        ClientOrder clientOrder = new ClientOrder();
-        clientOrder.setId(orderDto.getId());
-        clientOrder.setDescription(orderDto.getDescription());
-        clientOrder.setCreated(orderDto.getCreated());
-        clientOrder.setPrice(orderDto.getPrice());
-        clientOrder.setStatus(orderDto.getStatus());
-        clientOrder.setTags(tagDtoListToTag(orderDto.getTags()));
+        ClientOrder order = new ClientOrder();
+        order.setId(orderDto.getId());
+        order.setDescription(orderDto.getDescription());
+        order.setCreated(orderDto.getCreated());
+        order.setPrice(orderDto.getPrice());
+        order.setStatus(orderDto.getStatus());
+        order.setTags(tagDtoListToTag(orderDto.getTags()));
         User user = userRepository.findById(orderDto.getUserId()).orElseThrow();
-        clientOrder.setUser(user);
-        return clientOrder;
+        order.setUser(user);
+        return order;
     }
 
     public List<OrderDto> orderListToDto(List<ClientOrder> entities) {

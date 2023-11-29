@@ -50,9 +50,9 @@ public class AdminServiceImpl implements AdminService {
                     imageRepository.deleteById(profile.getImage().getId());
                 }
 
-                List<ClientOrder> clientOrders = user.getClientOrders();
-                if (clientOrders.size() > 0)
-                    clientOrders.forEach(imageRepository::deleteAllByImageObject_Order);
+                List<ClientOrder> orders = user.getOrders();
+                if (orders.size() > 0)
+                    orders.forEach(imageRepository::deleteAllByImageObject_Order);
             }
             i++;
         } while (usersToDelete.getContent().size() == 50);

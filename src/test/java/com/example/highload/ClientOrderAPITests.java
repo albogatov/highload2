@@ -146,7 +146,7 @@ public class ClientOrderAPITests {
         Page<ClientOrder> result = orderRepository.findAllByUser_Id(client1.getId(), pageable);
 
         Assertions.assertAll(
-                () -> Assertions.assertEquals("Order added", response1.body().asString()),
+                () -> Assertions.assertEquals("Order saved", response1.body().asString()),
                 () -> Assertions.assertEquals(HttpStatus.OK.value(), response1.statusCode()),
                 () -> Assertions.assertEquals(1, result.getTotalElements()),
                 () -> Assertions.assertEquals(1, result.getTotalPages()),
@@ -348,7 +348,7 @@ public class ClientOrderAPITests {
                         .and()
                         .body(List.of(tagDtoExisting))
                         .when()
-                        .post("/api/app/order/single/" + clientOrder1WithId.getId() + "/tags/add")
+                        .get("/api/app/order/single/" + clientOrder1WithId.getId() + "/tags/add")
                         .then()
                         .extract();
 

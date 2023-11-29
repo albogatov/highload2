@@ -89,9 +89,9 @@ public class OrderController {
     @GetMapping("/single/{orderId}/tags/add")
     @PreAuthorize("hasAnyAuthority('CLIENT')")
     public ResponseEntity addTagsToOrder(@Valid @RequestBody List<Integer> tagIds, @PathVariable int orderId){
-        ClientOrder clientOrder = orderService.addTagsToOrder( tagIds, orderId);
-        if (clientOrder != null) {
-            return ResponseEntity.ok(dataTransformer.orderToDto(clientOrder));
+        ClientOrder order = orderService.addTagsToOrder( tagIds, orderId);
+        if (order != null) {
+            return ResponseEntity.ok(dataTransformer.orderToDto(order));
         }
         return ResponseEntity.badRequest().body("Invalid total tag number (should be not more than 10)!");
     }
@@ -100,9 +100,9 @@ public class OrderController {
     @GetMapping("/single/{orderId}/tags/delete")
     @PreAuthorize("hasAnyAuthority('CLIENT')")
     public ResponseEntity deleteTagsFromOrder(@Valid @RequestBody List<Integer> tagIds, @PathVariable int orderId){
-        ClientOrder clientOrder = orderService.deleteTagsFromOrder( tagIds, orderId);
-        if (clientOrder != null) {
-            return ResponseEntity.ok(dataTransformer.orderToDto(clientOrder));
+        ClientOrder order = orderService.deleteTagsFromOrder( tagIds, orderId);
+        if (order != null) {
+            return ResponseEntity.ok(dataTransformer.orderToDto(order));
         }
         return ResponseEntity.badRequest().body("Invalid tag ids!");
     }

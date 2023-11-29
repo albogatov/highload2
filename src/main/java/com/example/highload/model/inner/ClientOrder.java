@@ -42,7 +42,7 @@ public class ClientOrder {
     @Size(max=10)
     List<Tag> tags;
 
-    @OneToMany(mappedBy = "clientOrder")
+    @OneToMany(mappedBy = "order")
     List<ImageObject> images;
 
     @Enumerated(EnumType.STRING)

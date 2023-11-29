@@ -32,13 +32,13 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public ClientOrder updateOrder(OrderDto orderDto, int id) {
-        ClientOrder clientOrder = orderRepository.findById(id).orElseThrow();
-        clientOrder.setPrice(orderDto.getPrice());
-        clientOrder.setDescription(orderDto.getDescription());
-        clientOrder.setStatus(orderDto.getStatus());
+        ClientOrder order = orderRepository.findById(id).orElseThrow();
+        order.setPrice(orderDto.getPrice());
+        order.setDescription(orderDto.getDescription());
+        order.setStatus(orderDto.getStatus());
         // TODO TAGS ADD/DELETE
-        orderRepository.save(clientOrder);
-        return clientOrder;
+        orderRepository.save(order);
+        return order;
     }
 
     @Override
@@ -74,8 +74,8 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional(value = Transactional.TxType.REQUIRES_NEW, rollbackOn = {NoSuchElementException.class, Exception.class})
     public ClientOrder addTagsToOrder(List<Integer> tagIds, int orderId) {
-        ClientOrder clientOrder = orderRepository.findById(orderId).orElseThrow();
-        List<Integer> oldTagIds = clientOrder.getTags().stream().map(Tag::getId).toList();
+        ClientOrder order = orderRepository.findById(orderId).orElseThrow();
+        List<Integer> oldTagIds = order.getTags().stream().map(Tag::getId).toList();
         List<Integer> tagIdsToAdd = tagIds.stream().filter(i -> !oldTagIds.contains(i)).toList();
         if (tagIdsToAdd.size() + oldTagIds.size() <= 10) {
             List<Tag> tagsToAdd = new ArrayList<>();
@@ -83,9 +83,9 @@ public class OrderServiceImpl implements OrderService {
                 Tag tag = tagRepository.findById(tagIdToAdd).orElseThrow();
                 tagsToAdd.add(tag);
             }
-            clientOrder.getTags().addAll(tagsToAdd);
-            orderRepository.save(clientOrder);
-            return clientOrder;
+            order.getTags().addAll(tagsToAdd);
+            orderRepository.save(order);
+            return order;
         }
         return null;
     }
@@ -93,17 +93,17 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional(value = Transactional.TxType.REQUIRES_NEW, rollbackOn = {NoSuchElementException.class, Exception.class})
     public ClientOrder deleteTagsFromOrder(List<Integer> tagIds, int orderId) {
-        ClientOrder clientOrder = orderRepository.findById(orderId).orElseThrow();
-        List<Integer> oldTagIds = clientOrder.getTags().stream().map(Tag::getId).toList();
+        ClientOrder order = orderRepository.findById(orderId).orElseThrow();
+        List<Integer> oldTagIds = order.getTags().stream().map(Tag::getId).toList();
         for (Integer tagIdToDelete : tagIds) {
             if (!oldTagIds.contains(tagIdToDelete)) {
                 return null;
             }
         }
-        List<Tag> newTagList = clientOrder.getTags().stream().filter(tag -> !tagIds.contains(tag.getId())).toList();
-        clientOrder.setTags(newTagList);
-        orderRepository.save(clientOrder);
-        return clientOrder;
+        List<Tag> newTagList = order.getTags().stream().filter(tag -> !tagIds.contains(tag.getId())).toList();
+        order.setTags(newTagList);
+        orderRepository.save(order);
+        return order;
 
     }
 }
