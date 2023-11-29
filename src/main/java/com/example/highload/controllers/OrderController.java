@@ -86,7 +86,7 @@ public class OrderController {
 
 
     @CrossOrigin
-    @GetMapping("/single/{orderId}/tags/add")
+    @PostMapping("/single/{orderId}/tags/add")
     @PreAuthorize("hasAnyAuthority('CLIENT')")
     public ResponseEntity addTagsToOrder(@Valid @RequestBody List<Integer> tagIds, @PathVariable int orderId){
         ClientOrder order = orderService.addTagsToOrder( tagIds, orderId);
@@ -97,7 +97,7 @@ public class OrderController {
     }
 
     @CrossOrigin
-    @GetMapping("/single/{orderId}/tags/delete")
+    @PostMapping("/single/{orderId}/tags/delete")
     @PreAuthorize("hasAnyAuthority('CLIENT')")
     public ResponseEntity deleteTagsFromOrder(@Valid @RequestBody List<Integer> tagIds, @PathVariable int orderId){
         ClientOrder order = orderService.deleteTagsFromOrder( tagIds, orderId);
