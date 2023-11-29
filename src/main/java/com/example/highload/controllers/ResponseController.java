@@ -32,13 +32,13 @@ public class ResponseController {
     @PostMapping("/save")
     public ResponseEntity save(@Valid @RequestBody ResponseDto data){
         if(responseService.saveResponse(data) != null)
-            return ResponseEntity.ok("");
+            return ResponseEntity.ok("Response added");
         else return ResponseEntity.badRequest().body("Couldn't save response, check data");
     }
 
     @CrossOrigin
-    @GetMapping("/all/{orderId}/{page}")
-    @PreAuthorize("hasAnyAuthority('CLIENT')")
+    @GetMapping("/all/order/{orderId}/{page}")
+    @PreAuthorize("hasAnyAuthority('ARTIST', 'CLIENT')")
     public ResponseEntity getAllByOrder(@PathVariable int orderId, @PathVariable int page){
         Pageable pageable = PageRequest.of(page, 50);
         Page<Response> entityList = responseService.findAllForOrder(orderId, pageable);
@@ -48,9 +48,9 @@ public class ResponseController {
     }
 
     @CrossOrigin
-    @GetMapping("/all/{userId}/{page}")
+    @GetMapping("/all/user/{userId}/{page}")
     @PreAuthorize("hasAnyAuthority('ARTIST')")
-    public ResponseEntity getAllByProfile(@PathVariable int userId, @PathVariable int page){
+    public ResponseEntity getAllByUser(@PathVariable int userId, @PathVariable int page){
         Pageable pageable = PageRequest.of(page, 50);
         Page<Response> entityList = responseService.findAllForUser(userId, pageable);
         List<ResponseDto> dtoList = dataTransformer.responseListToDto(entityList.getContent());
