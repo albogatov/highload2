@@ -380,7 +380,6 @@ public class ClientOrderAPITests {
     @Test
     @Order(5)
     public void getAllOrdersByTags() {
-        /* TODO: implement, RUN */
 
         Tag tag1 = tagRepository.findByName("1t").orElseThrow();
         Tag tag3 = tagRepository.findByName("3t").orElseThrow();
@@ -420,7 +419,6 @@ public class ClientOrderAPITests {
     @Test
     @Order(6)
     public void getAllOpenOrdersByTags() {
-        /* TODO: implement, RUN */
         User client1 = userRepository.findByLogin("client1").orElseThrow();
 
         Tag tag1 = tagRepository.findByName("1t").orElseThrow();
