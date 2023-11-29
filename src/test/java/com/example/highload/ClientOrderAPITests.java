@@ -348,7 +348,7 @@ public class ClientOrderAPITests {
                         .and()
                         .body(List.of(tagDtoExisting.getId()))
                         .when()
-                        .get("/api/app/order/single/" + clientOrder1WithId.getId() + "/tags/add")
+                        .post("/api/app/order/single/" + clientOrder1WithId.getId() + "/tags/add")
                         .then()
                         .extract();
 
@@ -368,7 +368,7 @@ public class ClientOrderAPITests {
                         .and()
                         .body(List.of(tagDtoNotExisting))
                         .when()
-                        .get("/api/app/order/single/" + clientOrder1WithId.getId() + "/tags/add")
+                        .post("/api/app/order/single/" + clientOrder1WithId.getId() + "/tags/add")
                         .then()
                         .extract();
 
@@ -381,6 +381,86 @@ public class ClientOrderAPITests {
     @Order(5)
     public void getAllOrdersByTags() {
         /* TODO: implement, RUN */
+
+        Tag tag1 = tagRepository.findByName("1t").orElseThrow();
+        Tag tag3 = tagRepository.findByName("3t").orElseThrow();
+
+        // get token
+
+        String clientTokenResponse = getToken("client1");
+
+        // orders 1o & 3o will fit
+
+        ExtractableResponse<Response> response1 =
+                given()
+                        .header("Authorization", "Bearer " + clientTokenResponse)
+                        .header("Content-type", "application/json")
+                        .and()
+                        .body(List.of(tag1.getId(), tag3.getId()))
+                        .when()
+                        .get("/api/app/order/all/tag/0")
+                        .then()
+                        .extract();
+
+        Assertions.assertAll(
+                () -> Assertions.assertEquals(HttpStatus.OK.value(), response1.statusCode()),
+                () -> Assertions.assertEquals("false", response1.header("app-page-has-next")),
+                () -> Assertions.assertEquals("0", response1.header("app-current-page-num"))
+        );
+
+        List<OrderDto> orderDtos = response1.body().jsonPath().getList(".", OrderDto.class);
+
+        Assertions.assertAll(
+                () -> Assertions.assertEquals(2, orderDtos.size()),
+                () -> Assertions.assertEquals("1o", orderDtos.get(0).getDescription()),
+                () -> Assertions.assertEquals("3o", orderDtos.get(1).getDescription())
+        );
+    }
+
+    @Test
+    @Order(6)
+    public void getAllOpenOrdersByTags() {
+        /* TODO: implement, RUN */
+        User client1 = userRepository.findByLogin("client1").orElseThrow();
+
+        Tag tag1 = tagRepository.findByName("1t").orElseThrow();
+        Tag tag3 = tagRepository.findByName("3t").orElseThrow();
+
+        Pageable pageable = PageRequest.of(0, 50);
+        Page<ClientOrder> result = orderRepository.findAllByUser_Id(client1.getId(), pageable);
+        ClientOrder order1 = result.getContent().get(0);
+        order1.setStatus(OrderStatus.CLOSED);
+        orderRepository.save(order1);
+
+        // get token
+
+        String clientTokenResponse = getToken("client1");
+
+        // orders 1o & 3o will fit
+
+        ExtractableResponse<Response> response1 =
+                given()
+                        .header("Authorization", "Bearer " + clientTokenResponse)
+                        .header("Content-type", "application/json")
+                        .and()
+                        .body(List.of(tag1.getId(), tag3.getId()))
+                        .when()
+                        .get("/api/app/order/open/tag/0")
+                        .then()
+                        .extract();
+
+        Assertions.assertAll(
+                () -> Assertions.assertEquals(HttpStatus.OK.value(), response1.statusCode()),
+                () -> Assertions.assertEquals("false", response1.header("app-page-has-next")),
+                () -> Assertions.assertEquals("0", response1.header("app-current-page-num"))
+        );
+
+        List<OrderDto> orderDtos = response1.body().jsonPath().getList(".", OrderDto.class);
+
+        Assertions.assertAll(
+                () -> Assertions.assertEquals(1, orderDtos.size()),
+                () -> Assertions.assertEquals("3o", orderDtos.get(0).getDescription())
+        );
     }
 
 
