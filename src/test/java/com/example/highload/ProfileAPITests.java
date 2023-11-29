@@ -164,7 +164,7 @@ public class ProfileAPITests {
 
     @Test
     @Order(2)
-    public void getProfile() { /* TODO: RUN */
+    public void getProfile() {  
 
         // create profile using repo
 
@@ -221,7 +221,7 @@ public class ProfileAPITests {
 
     @Test
     @Order(3)
-    public void getAllProfiles() { /* TODO: RUN */
+    public void getAllProfiles() {  
 
         // get token
 
@@ -257,7 +257,7 @@ public class ProfileAPITests {
 
     @Test
     @Order(4)
-    public void getProfileImages() { /* TODO: RUN */
+    public void getProfileImages() {  
 
         Profile artistProfile = userRepository.findByLogin("artist1").orElseThrow().getProfile();
 

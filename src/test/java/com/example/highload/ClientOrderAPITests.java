@@ -96,7 +96,7 @@ public class ClientOrderAPITests {
     @Test
     @Order(1)
     public void addOrder() {
-        /* TODO: RUN */
+         
 
         User client1 = userRepository.findByLogin("client1").orElseThrow();
         // create order
@@ -200,7 +200,7 @@ public class ClientOrderAPITests {
     @Test
     @Order(2)
     public void updateOrder() {
-        /* TODO: RUN */
+         
         User client1 = userRepository.findByLogin("client1").orElseThrow();
 
         Tag tag1 = tagRepository.findByName("1t").orElseThrow();
@@ -270,7 +270,7 @@ public class ClientOrderAPITests {
     @Test
     @Order(3)
     public void getAllUserOpenOrders() {
-        /* TODO: RUN */
+         
 
         User client1 = userRepository.findByLogin("client1").orElseThrow();
 
@@ -313,7 +313,7 @@ public class ClientOrderAPITests {
     @Test
     @Order(4)
     public void addTagsToOrder() {
-        /* TODO: RUN */
+         
         User client1 = userRepository.findByLogin("client1").orElseThrow();
 
         Tag tag1 = tagRepository.findByName("1t").orElseThrow();

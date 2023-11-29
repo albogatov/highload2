@@ -100,7 +100,7 @@ public class ResponseAPITests {
     @Test
     @Order(2)
     public void addResponse() {
-        /* TODO: RUN */
+         
         User client1 = userRepository.findByLogin("client1").orElseThrow();
         User artist1 = userRepository.findByLogin("artist1").orElseThrow();
 
@@ -151,7 +151,7 @@ public class ResponseAPITests {
     @Test
     @Order(2)
     public void getAllByOrder() {
-        /* TODO: RUN */
+         
 
 //        User client1 = userRepository.findByLogin("client1").orElseThrow();
         ClientOrder clientOrder = orderRepository.findById(1).orElseThrow();
@@ -192,7 +192,7 @@ public class ResponseAPITests {
     @Test
     @Order(3)
     public void getAllByUser() {
-        /* TODO: RUN */
+         
 
         User artist1 = userRepository.findByLogin("artist1").orElseThrow();
         ClientOrder clientOrder = orderRepository.findById(1).orElseThrow();

@@ -89,7 +89,7 @@ public class ImageObjectAPITests {
     @Test
     @Order(1)
     public void addImagesToProfile() {
-        /* TODO: RUN */
+         
 
         User artist1 = userRepository.findByLogin("artist1").orElseThrow();
         User client1 = userRepository.findByLogin("client1").orElseThrow();
@@ -178,7 +178,7 @@ public class ImageObjectAPITests {
     @Test
     @Order(2)
     public void changeMainImageOfProfile() {
-        /* TODO: RUN */
+         
 
         Profile artistProfile = userRepository.findByLogin("artist1").orElseThrow().getProfile();
 
@@ -216,7 +216,7 @@ public class ImageObjectAPITests {
     @Test
     @Order(3)
     public void removeImageForProfile() {
-        /* TODO: RUN */
+         
 
         Profile artistProfile = userRepository.findByLogin("artist1").orElseThrow().getProfile();
         Profile clientProfile = userRepository.findByLogin("client1").orElseThrow().getProfile();
