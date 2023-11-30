@@ -11,8 +11,6 @@ public interface NotificationService {
 
     Notification saveNotification(NotificationDto notificationDto);
 
-//    NotificationDto updateNotification(NotificationDto notificationDto, int id);
-
     Notification readNotification(int id);
 
     Page<Notification> getAllUserNotifications(int userId, Pageable pageable);

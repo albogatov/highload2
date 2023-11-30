@@ -168,7 +168,6 @@ public class AdminAPITests {
 
     @Test
     public void approveUser() {
-        // create user request using repo
 
         Role clientRole = roleRepository.findByName(RoleType.CLIENT).orElseThrow();
 
@@ -179,11 +178,7 @@ public class AdminAPITests {
 
         UserRequest userRequestWithId = userRequestRepository.save(userRequest);
 
-        // get token
-
         String tokenResponse = getToken("admin1");
-
-        // approve existing
 
         String id = userRequestWithId.getId().toString();
 
@@ -201,8 +196,6 @@ public class AdminAPITests {
                 () -> Assertions.assertThrows(NoSuchElementException.class, () -> userRequestRepository.findByLogin("admin_test_client2").orElseThrow()),
                 () -> Assertions.assertDoesNotThrow(() -> userRepository.findByLogin("admin_test_client2").orElseThrow())
         );
-
-        // approve not existing (on prev step user request was deleted when accepted)
 
         ExtractableResponse<Response> response2 =
                 given()

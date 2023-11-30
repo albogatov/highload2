@@ -6,7 +6,6 @@ import com.example.highload.model.network.*;
 import com.example.highload.repos.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-//import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -67,7 +66,6 @@ public class DataTransformer {
         ReviewDto reviewDto = new ReviewDto();
         reviewDto.setId(review.getId());
         reviewDto.setText(review.getText());
-//        reviewDto.setUserName(review.getProfile().getName());
         reviewDto.setUserName(review.getProfile().getUser().getLogin());
         reviewDto.setProfileId(review.getProfile().getId());
         return reviewDto;
@@ -121,7 +119,6 @@ public class DataTransformer {
         UserRequestDto userRequestDto = new UserRequestDto();
         userRequestDto.setId(userRequest.getId());
         userRequestDto.setLogin(userRequest.getLogin());
-//        userRequestDto.setPassword(userRequest.getHashPassword());
         userRequestDto.setRole(userRequest.getRole().getName());
         return userRequestDto;
     }

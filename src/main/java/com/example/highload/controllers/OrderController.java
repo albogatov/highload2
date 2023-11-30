@@ -59,7 +59,7 @@ public class OrderController {
         Page<ClientOrder> entityList = orderService.getUserOrders(userId, pageable);
 
         HttpHeaders responseHeaders = paginationHeadersCreator.endlessSwipeHeadersCreate(entityList);
-        // "findAll в виде бесконечной прокрутки без указания общего количества записей"
+          
 
         return ResponseEntity.ok().headers(responseHeaders).body(dataTransformer.orderListToDto(entityList.getContent()));
 
@@ -129,7 +129,6 @@ public class OrderController {
         Page<ClientOrder> entityList = orderService.getOrdersByTags(tags, pageable);
 
         HttpHeaders responseHeaders = paginationHeadersCreator.endlessSwipeHeadersCreate(entityList);
-        //"findAll в виде бесконечной прокрутки без указания общего количества записей"
 
         return ResponseEntity.ok().headers(responseHeaders).body(dataTransformer.orderListToDto(entityList.getContent()));
     }
@@ -144,7 +143,6 @@ public class OrderController {
         Page<ClientOrder> entityList = orderService.getOpenOrdersByTags(tags, pageable);
 
         HttpHeaders responseHeaders = paginationHeadersCreator.endlessSwipeHeadersCreate(entityList);
-        //"findAll в виде бесконечной прокрутки без указания общего количества записей"
 
         return ResponseEntity.ok().headers(responseHeaders).body(dataTransformer.orderListToDto(entityList.getContent()));
     }

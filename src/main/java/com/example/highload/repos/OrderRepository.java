@@ -20,18 +20,6 @@ public interface OrderRepository extends JpaRepository<ClientOrder, Integer> {
     Page<ClientOrder> findAllByTags_Name(String name, Pageable pageable);
     Page<ClientOrder> findAllByTags_Id(Integer id, Pageable pageable);
 
-//    @Query(value = "select * from order where id in (select order.id from order " +
-//            "join order_tags on order.id = order_tags.order_id " +
-//            "where order_tags.tag_id in :tagIds)" , nativeQuery = true)
-//    Page<ClientOrder> findAllByMultipleTagsIds(@Param("tagIds") List<Integer> tagIds, Pageable pageable);
-//
-//    @Query(value = "select * from order where id in (select order.id from order " +
-//            "join order_tags on order.id = order_tags.order_id " +
-//            "where order_tags.tag_id in :tagIds and order.status = :orderStatus)" , nativeQuery = true)
-//    Page<ClientOrder> findAllByMultipleTagsIdsAndStatus(@Param("tagIds") List<Integer> tagIds,
-//                                                        @Param("orderStatus")String status,
-//                                                        Pageable pageable);
-
 
     @Query(value = "select * from public.order where id in " +
             "(select order_id from order_tags " +

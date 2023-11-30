@@ -101,7 +101,6 @@ public class ProfileAPITests {
 
         User artist1 = userRepository.findByLogin("artist1").orElseThrow();
 
-        // create profile using repo
 
         Profile artistProfile = new Profile();
         artistProfile.setUser(artist1);

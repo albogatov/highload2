@@ -23,29 +23,23 @@ public class ImageObjectController {
     @PreAuthorize("hasAuthority('CLIENT')")
     @PostMapping("/add/order/{orderId}")
     public ResponseEntity addImagesToOrder(@Valid @RequestBody List<ImageDto> imageDtos, @PathVariable int orderId) {
-//        if (imageService.saveImagesForOrder(imageDtos, orderId) != null)
         imageService.saveImagesForOrder(imageDtos, orderId);
         return ResponseEntity.ok("Images added");
-//        else return ResponseEntity.badRequest().body("Couldn't save image to the order, check data");
     }
 
     @CrossOrigin
     @PreAuthorize("hasAuthority('ARTIST')")
     @PostMapping("/add/profile/{profileId}")
     public ResponseEntity addImagesToProfile(@Valid @RequestBody List<ImageDto> imageDtos, @PathVariable int profileId) {
-//        if (imageService.saveImageForProfile(imageDtos, profileId) != null)
         imageService.saveImageForProfile(imageDtos, profileId);
         return ResponseEntity.ok("Images added");
-//        else return ResponseEntity.badRequest().body("Couldn't save image to the profile, check data");
     }
 
     @CrossOrigin
     @PostMapping("/change/profile/{profileId}")
     public ResponseEntity changeMainImageOfProfile(@Valid @RequestBody ImageDto imageDto, @PathVariable int profileId) {
-//        if (imageService.changeMainImageOfProfile(imageDto, profileId) != null)
         imageService.changeMainImageOfProfile(imageDto, profileId);
         return ResponseEntity.ok("Main image changed");
-//        else return ResponseEntity.badRequest().body("Couldn't save image to the profile, check data");
     }
 
     @CrossOrigin

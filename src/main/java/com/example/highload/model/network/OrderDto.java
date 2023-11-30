@@ -22,6 +22,6 @@ public class OrderDto implements Serializable {
     @NotBlank
     String description;
     @Size(max=10)
-    List<TagDto> tags; // should be displayed all
+    List<TagDto> tags;
     OrderStatus status;
 }

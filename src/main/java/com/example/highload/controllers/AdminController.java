@@ -35,7 +35,6 @@ public class AdminController {
 
     @PostMapping("/user-request/approve/{userRequestId}")
     @CrossOrigin
-//    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity approveUserRequest(@PathVariable int userRequestId) {
         adminService.approveUser(userRequestId);
         return ResponseEntity.ok("User approved");
@@ -43,7 +42,6 @@ public class AdminController {
 
     @PostMapping("/user/delete/{id}")
     @CrossOrigin
-//    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity deleteUser(@PathVariable int id) {
         adminService.deleteUser(id);
         return ResponseEntity.ok("User deleted");
@@ -51,7 +49,6 @@ public class AdminController {
 
     @PostMapping("/user/all/delete-expired/{days}")
     @CrossOrigin
-//    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity deleteLogicallyDeletedAccountsExpired(@PathVariable int days) {
         adminService.deleteLogicallyDeletedUsers(days);
         return ResponseEntity.ok("Users deleted");
