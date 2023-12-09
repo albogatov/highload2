@@ -1,0 +1,89 @@
+package com.example.user.controllers;
+
+import com.example.user.model.inner.UserRequest;
+import com.example.user.model.network.UserDto;
+import com.example.user.model.network.UserRequestDto;
+import com.example.user.services.AdminService;
+import com.example.user.services.UserService;
+import com.example.user.utils.DataTransformer;
+import com.example.user.utils.PaginationHeadersCreator;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.NoSuchElementException;
+
+@RestController
+@PreAuthorize("hasAuthority('ADMIN')")
+@RequestMapping(value = "/api/app/admin")
+@RequiredArgsConstructor
+public class AdminController {
+
+    private final UserService userService;
+    private final AdminService adminService;
+    private final DataTransformer dataTransformer;
+    private final PaginationHeadersCreator paginationHeadersCreator;
+
+    @PostMapping("/user-request/approve/{userRequestId}")
+    @CrossOrigin
+    public ResponseEntity approveUserRequest(@PathVariable int userRequestId) {
+        adminService.approveUser(userRequestId);
+        return ResponseEntity.ok("User approved");
+    }
+
+    @PostMapping("/user/delete/{id}")
+    @CrossOrigin
+    public ResponseEntity deleteUser(@PathVariable int id) {
+        adminService.deleteUser(id);
+        return ResponseEntity.ok("User deleted");
+    }
+
+    @PostMapping("/user/all/delete-expired/{days}")
+    @CrossOrigin
+    public ResponseEntity deleteLogicallyDeletedAccountsExpired(@PathVariable int days) {
+        adminService.deleteLogicallyDeletedUsers(days);
+        return ResponseEntity.ok("Users deleted");
+    }
+
+    @PostMapping("/user/add")
+    @CrossOrigin
+//    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity addUser(@Valid @RequestBody UserDto user) {
+        if (userService.findByLogin(user.getLogin()) == null) {
+            adminService.addUser(user);
+            return ResponseEntity.ok("User added");
+        }
+        return ResponseEntity.badRequest().body("User already exists!");
+
+    }
+
+    @GetMapping("/user-request/all/{page}")
+    @CrossOrigin
+//    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity getAllUserRequests(@PathVariable int page) {
+        Pageable pageable = PageRequest.of(page, 50);
+        Page<UserRequest> entityList = userService.getAllUserRequests(pageable);
+        List<UserRequestDto> dtoList = dataTransformer.userRequestListToDto(entityList.getContent());
+        HttpHeaders responseHeaders = paginationHeadersCreator.pageWithTotalElementsHeadersCreate(entityList);
+        return ResponseEntity.ok().headers(responseHeaders).body(dtoList);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity handleValidationExceptions(){
+        return ResponseEntity.badRequest().body("Request body validation failed!");
+    }
+
+    @ExceptionHandler(NoSuchElementException.class)
+    public ResponseEntity handleServiceExceptions(){
+        return ResponseEntity.badRequest().body("Wrong ids in path!");
+    }
+
+}
