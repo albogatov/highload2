@@ -1,5 +1,7 @@
 package com.example.user.services.impl;
 
+import com.example.user.consumer.ImageRestConsumer;
+import com.example.user.consumer.OrderRestConsumer;
 import com.example.user.model.inner.Profile;
 import com.example.user.model.inner.User;
 import com.example.user.model.inner.UserRequest;
@@ -10,6 +12,7 @@ import com.example.user.services.AdminService;
 import com.example.user.utils.DataTransformer;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -27,7 +30,12 @@ public class AdminServiceImpl implements AdminService {
     // TODO: Separate admin and image processing or think about microservice structure a bit more
     private final UserRepository userRepository;
     private final UserRequestRepository userRequestRepository;
-//    private final ImageRepository imageRepository;
+
+    @Autowired
+    private ImageRestConsumer imageRestConsumer;
+
+    @Autowired
+    private OrderRestConsumer orderRestConsumer;
     private final DataTransformer dataTransformer;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
@@ -45,6 +53,8 @@ public class AdminServiceImpl implements AdminService {
 
                 Profile profile = user.getProfile();
                 // TODO: Deletion of images and orders to be done by image and order services
+                imageRestConsumer.deleteImages(profile.getId());
+                orderRestConsumer.deleteOrders(profile.getId());
 //                if (profile != null) {
 //                    imageRepository.deleteAllByImageObject_Profile(profile);
 //                    imageRepository.deleteById(profile.getImage().getId());
