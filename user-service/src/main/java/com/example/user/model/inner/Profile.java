@@ -40,15 +40,6 @@ public class Profile {
     @Column(name = "mail", nullable = false)
     String mail;
 
-    @OneToMany(mappedBy = "profile", fetch = FetchType.EAGER)
-    List<Integer> imagesIds;
-
-    @OneToMany(mappedBy = "receiverProfile")
-    List<Integer> receivedNotificationsIds;
-
-    @OneToMany(mappedBy = "senderProfile")
-    List<Integer> sentNotificationsIds;
-
     @Override
     public String toString() {
         return "";
