@@ -45,12 +45,6 @@ public class User implements UserDetails {
     @Column(name = "when_deleted_time", columnDefinition = "TIMESTAMP")
     private LocalDateTime whenDeletedTime;
 
-    @OneToMany(mappedBy = "user")
-    List<Integer> responsesIds;
-
-    @OneToMany(mappedBy = "user")
-    List<Integer> ordersIds;
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<SimpleGrantedAuthority> authorities = new ArrayList<>();

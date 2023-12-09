@@ -1,11 +1,9 @@
 package com.example.user.utils;
 
 import com.example.user.model.enums.RoleType;
-import com.example.user.model.inner.Profile;
-import com.example.user.model.inner.Role;
-import com.example.user.model.inner.User;
-import com.example.user.model.inner.UserRequest;
+import com.example.user.model.inner.*;
 import com.example.user.model.network.ProfileDto;
+import com.example.user.model.network.ReviewDto;
 import com.example.user.model.network.UserDto;
 import com.example.user.model.network.UserRequestDto;
 import com.example.user.repos.ProfileRepository;
@@ -39,6 +37,30 @@ public class DataTransformer {
         user.setRole(role);
         user.setIsActual(true);
         return user;
+    }
+
+    /* reviews */
+
+    public ReviewDto reviewToDto(Review review) {
+        ReviewDto reviewDto = new ReviewDto();
+        reviewDto.setId(review.getId());
+        reviewDto.setText(review.getText());
+        reviewDto.setUserName(review.getProfile().getUser().getLogin());
+        reviewDto.setProfileId(review.getProfile().getId());
+        return reviewDto;
+    }
+
+    public Review reviewFromDto(ReviewDto reviewDto) {
+        Review review = new Review();
+        review.setId(reviewDto.getId());
+        review.setText(reviewDto.getText());
+        Profile profile = profileRepository.findById(reviewDto.getProfileId()).orElseThrow();
+        review.setProfile(profile);
+        return review;
+    }
+
+    public List<ReviewDto> reviewListToDto(List<Review> entities) {
+        return entities.stream().map(this::reviewToDto).toList();
     }
 
 
