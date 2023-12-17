@@ -84,7 +84,7 @@ public class ReviewControllerTest {
                 .and()
                 .body(new JwtRequest(login, password, role))
                 .when()
-                .post("/api/app/user/login")
+                .post("/api/user/login")
                 .then()
                 .extract().body().as(JwtResponse.class).getToken();
     }
@@ -112,7 +112,7 @@ public class ReviewControllerTest {
                         .and()
                         .body(profileDto)
                         .when()
-                        .post("/api/app/user/profile/add/" + userId)
+                        .post("/api/user/profile/add/" + userId)
                         .then()
                         .extract();
 
@@ -131,13 +131,13 @@ public class ReviewControllerTest {
                         .and()
                         .body(reviewDto)
                         .when()
-                        .post("/api/app/review/save")
+                        .post("/api/review/save")
                         .then()
                         .extract();
         Assertions.assertAll(
                 () -> Assertions.assertEquals(HttpStatus.OK.value(), response2.response().getStatusCode()),
                 () -> {
-                    Page<Review> review = reviewRepository.findAllByProfile_Id(profile.getId(), pageable);
+                    Page<Review> review = reviewRepository.findAllByProfile_Id(profile.getId(), pageable).orElse(Page.empty());
                     Assertions.assertEquals(1, review.getNumberOfElements());
                 }
         );
@@ -157,7 +157,7 @@ public class ReviewControllerTest {
                         .header("Content-type", "application/json")
                         .header("Authorization", "Bearer " + tokenResponse)
                         .when()
-                        .get("/api/app/review/all/" + profile.getId() + "/" + 0)
+                        .get("/api/review/all/" + profile.getId() + "/" + 0)
                         .then()
                         .extract();
 
@@ -184,7 +184,7 @@ public class ReviewControllerTest {
                         .header("Content-type", "application/json")
                         .header("Authorization", "Bearer " + tokenResponse)
                         .when()
-                        .get("/api/app/review/all/" + profile.getId() + 10 + "/" + 0)
+                        .get("/api/review/all/" + profile.getId() + 10 + "/" + 0)
                         .then()
                         .extract();
 
@@ -203,14 +203,17 @@ public class ReviewControllerTest {
 
         Pageable pageable = PageRequest.of(0, 50);
         Profile profile = profileRepository.findByUser_Id(userId).orElseThrow();
-        Review review = reviewRepository.findAllByProfile_Id(profile.getId(), pageable).stream().findFirst().orElseThrow();
+        Review review = reviewRepository
+                .findAllByProfile_Id(profile.getId(), pageable)
+                .orElse(Page.empty())
+                .stream().findFirst().orElseThrow();
 
         ExtractableResponse<Response> response =
                 given()
                         .header("Content-type", "application/json")
                         .header("Authorization", "Bearer " + tokenResponse)
                         .when()
-                        .get("/api/app/review/single/" + review.getId())
+                        .get("/api/review/single/" + review.getId())
                         .then()
                         .extract();
 

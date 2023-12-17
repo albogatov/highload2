@@ -7,7 +7,7 @@ import java.io.Serializable;
 @Data
 public class CredentialsDto implements Serializable {
 
-    String login;
-    String token;
+    private String login;
+    private String token;
 
 }

@@ -16,7 +16,9 @@ public interface ProfileService {
 
     Profile findById(int id);
 
-    Profile findByUserId(int userId);
+    Profile findByUserIdElseNull(int userId);
 
     Page<Profile> findAllProfiles(Pageable pageable);
+
+    Image setNewMainImage(int profileId, Image newImage);
 }

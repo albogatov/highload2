@@ -1,6 +1,8 @@
 package com.example.highload.services;
 
+import com.example.highload.model.inner.ClientOrder;
 import com.example.highload.model.inner.Image;
+import com.example.highload.model.inner.Profile;
 import com.example.highload.model.network.ImageDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,6 +22,12 @@ public interface ImageService {
     List<Image> saveImageForProfile(List<ImageDto> imageDtos, int profileId);
 
     void removeImageForOrder(int imageId, int orderId);
+
+    void removeImageById(int imageId);
+
+    void removeAllImagesForProfile(Profile profile);
+
+    void removeAllImagesForOrder(ClientOrder order);
 
     void removeImageForProfile(int imageId, int profileId);
 

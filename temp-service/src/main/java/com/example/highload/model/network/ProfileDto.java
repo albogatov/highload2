@@ -9,15 +9,15 @@ import java.io.Serializable;
 @Data
 public class ProfileDto implements Serializable {
 
-    int id;
-    int userId;
-    ImageDto image;
+    private int id;
+    private int userId;
+    private ImageDto image;
     @NotBlank
-    String name;
-    String experience;
-    String education;
-    String about;
+    private String name;
+    private String experience;
+    private String education;
+    private String about;
     @NotBlank
     @Pattern(regexp = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{1,4}$")
-    String mail;
+    private String mail;
 }

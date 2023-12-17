@@ -87,7 +87,7 @@ public class ClientOrderAPITests {
                 .and()
                 .body(new JwtRequest(userName, userName, user.getRole().getName().toString()))
                 .when()
-                .post("/api/app/user/login")
+                .post("/api/user/login")
                 .then()
                 .extract().body().as(JwtResponse.class).getToken();
     }
@@ -138,12 +138,12 @@ public class ClientOrderAPITests {
                         .and()
                         .body(orderDto)
                         .when()
-                        .post("/api/app/order/save")
+                        .post("/api/order/save")
                         .then()
                         .extract();
 
         Pageable pageable = PageRequest.of(0, 50);
-        Page<ClientOrder> result = orderRepository.findAllByUser_Id(client1.getId(), pageable);
+        Page<ClientOrder> result = orderRepository.findAllByUser_Id(client1.getId(), pageable).orElse(Page.empty());
 
         Assertions.assertAll(
                 () -> Assertions.assertEquals("Order saved", response1.body().asString()),
@@ -165,7 +165,7 @@ public class ClientOrderAPITests {
                         .and()
                         .body(orderDto)
                         .when()
-                        .post("/api/app/order/save")
+                        .post("/api/order/save")
                         .then()
                         .extract();
 
@@ -189,7 +189,7 @@ public class ClientOrderAPITests {
                         .and()
                         .body(orderDto)
                         .when()
-                        .post("/api/app/order/save")
+                        .post("/api/order/save")
                         .then()
                         .extract();
         Assertions.assertAll(
@@ -231,11 +231,11 @@ public class ClientOrderAPITests {
                         .and()
                         .body(orderDto)
                         .when()
-                        .post("/api/app/order/update/" + clientOrder1WithId.getId())
+                        .post("/api/order/update/" + clientOrder1WithId.getId())
                         .then()
                         .extract();
         Pageable pageable = PageRequest.of(0, 50);
-        Page<ClientOrder> result = orderRepository.findAllByUser_Id(client1.getId(), pageable);
+        Page<ClientOrder> result = orderRepository.findAllByUser_Id(client1.getId(), pageable).orElse(Page.empty());
 
         Assertions.assertAll(
                 () -> Assertions.assertEquals("Order updated", response1.body().asString()),
@@ -257,7 +257,7 @@ public class ClientOrderAPITests {
                         .and()
                         .body(orderDto)
                         .when()
-                        .post("/api/app/order/update/" + clientOrder1WithId.getId())
+                        .post("/api/order/update/" + clientOrder1WithId.getId())
                         .then()
                         .extract();
 
@@ -285,7 +285,7 @@ public class ClientOrderAPITests {
                         .header("Authorization", "Bearer " + tokenResponse)
                         .header("Content-type", "application/json")
                         .when()
-                        .get("/api/app/order/open/user/" + client1.getId() + "/0")
+                        .get("/api/order/open/user/" + client1.getId() + "/0")
                         .then()
                         .extract();
 
@@ -348,7 +348,7 @@ public class ClientOrderAPITests {
                         .and()
                         .body(List.of(tagDtoExisting.getId()))
                         .when()
-                        .post("/api/app/order/single/" + clientOrder1WithId.getId() + "/tags/add")
+                        .post("/api/order/single/" + clientOrder1WithId.getId() + "/tags/add")
                         .then()
                         .extract();
 
@@ -368,7 +368,7 @@ public class ClientOrderAPITests {
                         .and()
                         .body(List.of(tagDtoNotExisting))
                         .when()
-                        .post("/api/app/order/single/" + clientOrder1WithId.getId() + "/tags/add")
+                        .post("/api/order/single/" + clientOrder1WithId.getId() + "/tags/add")
                         .then()
                         .extract();
 
@@ -397,7 +397,7 @@ public class ClientOrderAPITests {
                         .and()
                         .body(List.of(tag1.getId(), tag3.getId()))
                         .when()
-                        .get("/api/app/order/all/tag/0")
+                        .get("/api/order/all/tag/0")
                         .then()
                         .extract();
 
@@ -425,7 +425,7 @@ public class ClientOrderAPITests {
         Tag tag3 = tagRepository.findByName("3t").orElseThrow();
 
         Pageable pageable = PageRequest.of(0, 50);
-        Page<ClientOrder> result = orderRepository.findAllByUser_Id(client1.getId(), pageable);
+        Page<ClientOrder> result = orderRepository.findAllByUser_Id(client1.getId(), pageable).orElse(Page.empty());
         ClientOrder order1 = result.getContent().get(0);
         order1.setStatus(OrderStatus.CLOSED);
         orderRepository.save(order1);
@@ -443,7 +443,7 @@ public class ClientOrderAPITests {
                         .and()
                         .body(List.of(tag1.getId(), tag3.getId()))
                         .when()
-                        .get("/api/app/order/open/tag/0")
+                        .get("/api/order/open/tag/0")
                         .then()
                         .extract();
 

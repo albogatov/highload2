@@ -11,4 +11,5 @@ import java.io.Serializable;
 @Getter
 public class JwtResponse implements Serializable {
     private String token;
+    private Integer userId;
 }
