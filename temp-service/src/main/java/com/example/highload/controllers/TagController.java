@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 @RestController
-@RequestMapping(value = "/api/app/tag")
+@RequestMapping(value = "/api/tag")
 @RequiredArgsConstructor
 public class TagController {
 
@@ -28,16 +28,14 @@ public class TagController {
     private final PaginationHeadersCreator paginationHeadersCreator;
     private final DataTransformer dataTransformer;
 
-    @CrossOrigin
     @PostMapping("/save")
     @PreAuthorize("hasAnyAuthority('ADMIN')")
     public ResponseEntity save(@Valid @RequestBody TagDto data) {
         if (tagService.saveTag(data) != null)
-            return ResponseEntity.ok("");
+            return ResponseEntity.ok("Tag successfully created");
         else return ResponseEntity.badRequest().body("Couldn't save tag, check data");
     }
 
-    @CrossOrigin
     @GetMapping("/all/{page}")
     public ResponseEntity getAll(@PathVariable int page) {
         Pageable pageable = PageRequest.of(page, 50);
@@ -47,11 +45,10 @@ public class TagController {
         return ResponseEntity.ok().headers(responseHeaders).body(dtoList);
     }
 
-    @CrossOrigin
     @PostMapping("/remove/{orderId}/{tagId}")
     public ResponseEntity removeTagFromOrder(@PathVariable int orderId, @PathVariable int tagId) {
         tagService.removeTagFromOrder(tagId, orderId);
-        return ResponseEntity.ok("");
+        return ResponseEntity.ok("Tag successfully removed from order");
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

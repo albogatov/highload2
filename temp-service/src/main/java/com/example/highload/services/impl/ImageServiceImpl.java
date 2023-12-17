@@ -11,6 +11,8 @@ import com.example.highload.repos.ImageRepository;
 import com.example.highload.repos.OrderRepository;
 import com.example.highload.repos.ProfileRepository;
 import com.example.highload.services.ImageService;
+import com.example.highload.services.OrderService;
+import com.example.highload.services.ProfileService;
 import com.example.highload.utils.DataTransformer;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -25,20 +27,22 @@ import java.util.NoSuchElementException;
 @RequiredArgsConstructor
 public class ImageServiceImpl implements ImageService {
 
-    private final OrderRepository orderRepository;
-    private final ProfileRepository profileRepository;
+    private final OrderService orderService;
+    private final ProfileService profileService;
+
     private final ImageRepository imageRepository;
     private final ImageObjectRepository imageObjectRepository;
+
     private final DataTransformer dataTransformer;
 
     @Override
     public Page<Image> findAllProfileImages(int profileId, Pageable pageable) {
-        return imageRepository.findAllByImageObject_Profile_Id(profileId, pageable);
+        return imageRepository.findAllByImageObject_Profile_Id(profileId, pageable).orElse(Page.empty());
     }
 
     @Override
     public Page<Image> findAllOrderImages(int orderId, Pageable pageable) {
-        return imageRepository.findAllByImageObject_Order_Id(orderId, pageable);
+        return imageRepository.findAllByImageObject_Order_Id(orderId, pageable).orElse(Page.empty());
     }
 
     @Override
@@ -49,7 +53,7 @@ public class ImageServiceImpl implements ImageService {
     @Override
     @Transactional(value = Transactional.TxType.REQUIRES_NEW, rollbackOn = {NoSuchElementException.class, Exception.class})
     public List<Image> saveImagesForOrder(List<ImageDto> imageDtos, int orderId) {
-        ClientOrder order = orderRepository.findById(orderId).orElseThrow();
+        ClientOrder order = orderService.getOrderById(orderId);
         List<Image> images = imageRepository.saveAll(imageDtos.stream().map(dataTransformer::imageFromDto).toList());
         List<ImageObject> imageObjects = images.stream().map(image ->
                 {
@@ -68,7 +72,7 @@ public class ImageServiceImpl implements ImageService {
     @Override
     @Transactional(value = Transactional.TxType.REQUIRES_NEW, rollbackOn = {NoSuchElementException.class, Exception.class})
     public List<Image> saveImageForProfile(List<ImageDto> imageDtos, int profileId) {
-        Profile profile = profileRepository.findById(profileId).orElseThrow();
+        Profile profile = profileService.findById(profileId);
         List<Image> images = imageRepository.saveAll(imageDtos.stream().map(dataTransformer::imageFromDto).toList());
         List<ImageObject> imageObjects = images.stream().map(image ->
                 {
@@ -92,6 +96,21 @@ public class ImageServiceImpl implements ImageService {
     }
 
     @Override
+    public void removeImageById(int imageId) {
+        imageRepository.deleteById(imageId);
+    }
+
+    @Override
+    public void removeAllImagesForProfile(Profile profile) {
+        imageRepository.deleteAllByImageObject_Profile(profile);
+    }
+
+    @Override
+    public void removeAllImagesForOrder(ClientOrder order) {
+        imageRepository.deleteAllByImageObject_Order(order);
+    }
+
+    @Override
     @Transactional(value = Transactional.TxType.REQUIRES_NEW, rollbackOn = {Exception.class})
     public void removeImageForProfile(int imageId, int profileId) {
         imageObjectRepository.deleteByImage_IdAndProfile_Id(imageId, profileId);
@@ -101,11 +120,8 @@ public class ImageServiceImpl implements ImageService {
     @Override
     @Transactional(value = Transactional.TxType.REQUIRES_NEW, rollbackOn = {NoSuchElementException.class, Exception.class})
     public Image changeMainImageOfProfile(ImageDto imageDto, int profileId) {
-        Profile profile = profileRepository.findById(profileId).orElseThrow();
-        Image oldImage = profile.getImage();
         Image newImage = imageRepository.save(dataTransformer.imageFromDto(imageDto));
-        profile.setImage(newImage);
-        profileRepository.save(profile);
+        Image oldImage = profileService.setNewMainImage(profileId, newImage);
         if (oldImage != null) {
             imageRepository.deleteById(oldImage.getId());
         }

@@ -10,18 +10,18 @@ public class Response {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Integer id;
+    private Integer id;
 
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
-    User user;
+    private User user;
     @ManyToOne
     @JoinColumn(name = "order_id", referencedColumnName = "id")
-    ClientOrder order;
+    private ClientOrder order;
 
     @Column(name = "text")
-    String text;
+    private String text;
 
     @Column(name = "is_approved", nullable = false)
-    Boolean isApproved;
+    private Boolean isApproved;
 }
