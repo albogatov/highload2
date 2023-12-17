@@ -1,6 +1,6 @@
 package com.example.highload;
 
-import com.example.highload.utils.DataTransformer;
+import com.example.image.utils.DataTransformer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.restassured.RestAssured;
@@ -19,7 +19,6 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.shaded.com.fasterxml.jackson.core.type.TypeReference;
 
 
 import java.time.LocalDateTime;

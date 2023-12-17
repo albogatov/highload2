@@ -1,12 +1,8 @@
 package com.example.highload;
 
-import com.example.highload.model.enums.ImageObjectType;
-import com.example.highload.model.inner.Image;
-import com.example.highload.model.inner.ImageObject;
 import com.example.highload.model.network.*;
-import com.example.highload.repos.ImageObjectRepository;
-import com.example.highload.repos.ImageRepository;
-import com.example.highload.utils.DataTransformer;
+import com.example.image.model.network.ImageDto;
+import com.example.image.utils.DataTransformer;
 import io.restassured.RestAssured;
 import io.restassured.parsing.Parser;
 import io.restassured.response.ExtractableResponse;

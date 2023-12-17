@@ -1,9 +1,7 @@
 package com.example.highload;
 
-import com.example.highload.model.network.ImageDto;
-import com.example.highload.security.jwt.JwtUtil;
-import com.example.highload.services.ProfileService;
-import com.example.highload.utils.DataTransformer;
+import com.example.image.model.network.ImageDto;
+import com.example.image.utils.DataTransformer;
 import io.restassured.RestAssured;
 import io.restassured.parsing.Parser;
 import io.restassured.response.ExtractableResponse;

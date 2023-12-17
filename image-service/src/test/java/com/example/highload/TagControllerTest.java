@@ -1,7 +1,6 @@
 package com.example.highload;
 
-import com.example.highload.repos.OrderRepository;
-import com.example.highload.utils.DataTransformer;
+import com.example.image.utils.DataTransformer;
 import io.restassured.RestAssured;
 import io.restassured.parsing.Parser;
 import io.restassured.response.ExtractableResponse;
