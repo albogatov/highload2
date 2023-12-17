@@ -15,39 +15,39 @@ public class Profile {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Integer id;
+    private Integer id;
 
     @OneToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id", updatable = false)
-    User user;
+    private User user;
 
     @OneToOne
     @JoinColumn(name = "image_id", referencedColumnName = "id")
-    Image image;
+    private Image image;
 
     @NotBlank
     @Column(name = "name", nullable = false)
-    String name;
+    private String name;
     @Column(name = "experience")
-    String experience;
+    private String experience;
     @Column(name = "education")
-    String education;
+    private String education;
     @Column(name = "about")
-    String about;
+    private String about;
 
     @NotBlank
     @Pattern(regexp = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{1,4}$")
     @Column(name = "mail", nullable = false)
-    String mail;
+    private String mail;
 
     @OneToMany(mappedBy = "profile", fetch = FetchType.EAGER)
-    List<ImageObject> images;
+    private List<ImageObject> images;
 
     @OneToMany(mappedBy = "receiverProfile")
-    List<Notification> receivedNotifications;
+    private List<Notification> receivedNotifications;
 
     @OneToMany(mappedBy = "senderProfile")
-    List<Notification> sentNotifications;
+    private List<Notification> sentNotifications;
 
     @Override
     public String toString() {

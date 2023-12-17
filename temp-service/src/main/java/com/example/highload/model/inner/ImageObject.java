@@ -11,21 +11,21 @@ public class ImageObject {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Integer id;
+    private Integer id;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "type", nullable = false)
-    ImageObjectType type;
+    private ImageObjectType type;
 
     @ManyToOne
     @JoinColumn(name = "profile_id", referencedColumnName = "id")
-    Profile profile;
+    private Profile profile;
 
     @ManyToOne
     @JoinColumn(name = "order_id", referencedColumnName = "id")
-    ClientOrder order;
+    private ClientOrder order;
 
     @OneToOne
     @JoinColumn(name = "image_id", referencedColumnName = "id", nullable = false)
-    Image image;
+    private Image image;
 }

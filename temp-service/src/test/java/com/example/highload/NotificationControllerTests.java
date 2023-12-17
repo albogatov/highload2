@@ -20,6 +20,7 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -102,14 +103,10 @@ public class NotificationControllerTests {
                 .and()
                 .body(new JwtRequest(login, password, role))
                 .when()
-                .post("/api/app/user/login")
+                .post("/api/user/login")
                 .then()
                 .extract().body().as(JwtResponse.class).getToken();
     }
-
-    // post setRead /update/{id}
-    // get getAllQueries /all/{userId}/{page}
-    // get getNewQueries /new/{userId}/{page}
 
     @Test
     @Order(1)
@@ -151,7 +148,7 @@ public class NotificationControllerTests {
                         .and()
                         .body(notificationDto)
                         .when()
-                        .post("/api/app/notification/save")
+                        .post("/api/notification/save")
                         .then()
                         .extract();
 
@@ -159,8 +156,12 @@ public class NotificationControllerTests {
         Assertions.assertAll(
                 () -> Assertions.assertEquals(HttpStatus.OK.value(), response.response().getStatusCode()),
                 () -> {
-                    Notification notification = notificationRepository.findAllBySenderProfile_Id(clientProfileWithId.getId(), pageable)
-                            .stream().findFirst().orElseThrow();
+                    Notification notification = notificationRepository
+                            .findAllBySenderProfile_Id(clientProfileWithId.getId(), pageable)
+                            .orElse(Page.empty())
+                            .stream()
+                            .findFirst()
+                            .orElseThrow();
                     Assertions.assertEquals(senderEmail, notification.getSenderProfile().getMail());
                 }
         );
@@ -178,7 +179,7 @@ public class NotificationControllerTests {
                         .and()
                         .body(new NotificationDto())
                         .when()
-                        .post("/api/app/notification/save")
+                        .post("/api/notification/save")
                         .then()
                         .extract();
         Assertions.assertAll(
@@ -195,7 +196,9 @@ public class NotificationControllerTests {
         Pageable pageable = PageRequest.of(0, 50);
         String tokenResponse = getToken(artistLogin, artistPassword, artistRole);
 
-        Notification notification = notificationRepository.findAllBySenderProfile_Id(profileId, pageable)
+        Notification notification = notificationRepository
+                .findAllBySenderProfile_Id(profileId, pageable)
+                .orElse(Page.empty())
                 .stream().findFirst().orElseThrow();
 
         ExtractableResponse<Response> response =
@@ -203,14 +206,16 @@ public class NotificationControllerTests {
                         .header("Content-type", "application/json")
                         .header("Authorization", "Bearer " + tokenResponse)
                         .when()
-                        .post("/api/app/notification/update/" + notification.getId())
+                        .post("/api/notification/update/" + notification.getId())
                         .then()
                         .extract();
 
         Assertions.assertAll(
                 () -> Assertions.assertEquals(HttpStatus.OK.value(), response.response().getStatusCode()),
                 () -> {
-                    Notification notification1 = notificationRepository.findAllBySenderProfile_Id(profileId, pageable)
+                    Notification notification1 = notificationRepository
+                            .findAllBySenderProfile_Id(profileId, pageable)
+                            .orElse(Page.empty())
                             .stream().findFirst().orElseThrow();
                     Assertions.assertTrue(notification1.getIsRead());
                 }
@@ -225,7 +230,9 @@ public class NotificationControllerTests {
         Pageable pageable = PageRequest.of(0, 50);
         String tokenResponse = getToken(artistLogin, artistPassword, artistRole);
 
-        Notification notification = notificationRepository.findAllBySenderProfile_Id(profileId, pageable)
+        Notification notification = notificationRepository
+                .findAllBySenderProfile_Id(profileId, pageable)
+                .orElseThrow()
                 .stream().findFirst().orElseThrow();
         notification.setIsRead(false);
         notificationRepository.save(notification);
@@ -235,7 +242,7 @@ public class NotificationControllerTests {
                         .header("Content-type", "application/json")
                         .header("Authorization", "Bearer " + tokenResponse)
                         .when()
-                        .post("/api/app/notification/update/" + notification.getId() + 3)
+                        .post("/api/notification/update/" + notification.getId() + 3)
                         .then()
                         .extract();
 
@@ -244,33 +251,6 @@ public class NotificationControllerTests {
                 () -> Assertions.assertEquals("Wrong ids in path!", response.body().asString())
         );
     }
-
-//    @Test
-//    @Order(5)
-//    void setReadAPISenderRead() {
-//        User sender = userRepository.findByLogin(clientLogin).orElseThrow();
-//        Integer profileId = profileRepository.findByUser_Id(sender.getId()).orElseThrow().getId();
-//        Pageable pageable = PageRequest.of(0, 50);
-//        String tokenResponse = getToken(clientLogin, clientPassword, "CLIENT");
-//
-//        Notification notification = notificationRepository.findAllBySenderProfile_Id(profileId, pageable)
-//                .stream().findFirst().orElseThrow();
-//        notification.setIsRead(false);
-//        notificationRepository.save(notification);
-//
-//        ExtractableResponse<Response> response =
-//                given()
-//                        .header("Content-type", "application/json")
-//                        .header("Authorization", "Bearer " + tokenResponse)
-//                        .when()
-//                        .post("/api/app/notification/update/" + notification.getId())
-//                        .then()
-//                        .extract();
-//
-//        Assertions.assertAll(
-//                () -> Assertions.assertEquals(HttpStatus.FORBIDDEN.value(), response.response().getStatusCode())
-//        );
-//    }
 
     @Test
     @Order(6)
@@ -284,7 +264,9 @@ public class NotificationControllerTests {
         Pageable pageable = PageRequest.of(0, 50);
         String tokenResponse = getToken(artistLogin, artistPassword, artistRole);
 
-        Notification notification = notificationRepository.findAllBySenderProfile_Id(profileId, pageable)
+        Notification notification = notificationRepository
+                .findAllBySenderProfile_Id(profileId, pageable)
+                .orElse(Page.empty())
                 .stream().findFirst().orElseThrow();
 
         ExtractableResponse<Response> response =
@@ -292,7 +274,7 @@ public class NotificationControllerTests {
                         .header("Content-type", "application/json")
                         .header("Authorization", "Bearer " + tokenResponse)
                         .when()
-                        .get("/api/app/notification/all/" + receiverProfileId + "/" + 0)
+                        .get("/api/notification/all/" + receiverProfileId + "/" + 0)
                         .then()
                         .extract();
 
@@ -336,7 +318,7 @@ public class NotificationControllerTests {
                         .header("Content-type", "application/json")
                         .header("Authorization", "Bearer " + tokenResponse)
                         .when()
-                        .get("/api/app/notification/new/" + receiverProfileId + "/" + 0)
+                        .get("/api/notification/new/" + receiverProfileId + "/" + 0)
                         .then()
                         .extract();
 

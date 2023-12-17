@@ -15,4 +15,5 @@ public interface TagService {
 
     void removeTagFromOrder(int tagId, int orderId);
 
+    Tag findById(Integer tagIdToAdd);
 }

@@ -11,11 +11,11 @@ import java.time.LocalDateTime;
 @Data
 public class NotificationDto implements Serializable {
 
-    int id;
-    int receiverId;
-    int senderId;
-    boolean isRead;
-    LocalDateTime time;
+    private int id;
+    private int receiverId;
+    private int senderId;
+    private boolean isRead;
+    private LocalDateTime time;
     @NotBlank
-    String senderMail;
+    private String senderMail;
 }

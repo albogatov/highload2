@@ -12,19 +12,19 @@ public class UserRequest {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Integer id;
+    private Integer id;
 
     @NotBlank
     @Size(min = 1, max = 50)
     @Column(name = "login", nullable = false, unique = true)
-    String login;
+    private String login;
 
     @NotBlank
     @Column(name = "hash_password", nullable = false)
-    String hashPassword;
+    private String hashPassword;
 
     @ManyToOne
     @JoinColumn(name = "role_id", referencedColumnName = "id")
-    Role role;
+    private Role role;
 
 }

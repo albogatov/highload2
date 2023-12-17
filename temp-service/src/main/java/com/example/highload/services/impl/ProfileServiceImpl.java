@@ -43,12 +43,20 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
-    public Profile findByUserId(int userId) {
+    public Profile findByUserIdElseNull(int userId) {
         return profileRepository.findByUser_Id(userId).orElse(null);
     }
 
     @Override
     public Page<Profile> findAllProfiles(Pageable pageable) {
         return profileRepository.findAll(pageable);
+    }
+
+    @Override
+    public Image setNewMainImage(int profileId, Image newImage) {
+        Profile profile = profileRepository.findById(profileId).orElseThrow();
+        Image oldImage = profile.getImage();
+        profile.setImage(newImage);
+        return oldImage;
     }
 }

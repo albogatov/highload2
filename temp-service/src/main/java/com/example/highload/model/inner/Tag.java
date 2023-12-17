@@ -13,12 +13,12 @@ public class Tag {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Integer id;
+    private Integer id;
 
     @NotBlank
     @Column(name = "name", nullable = false, unique = true)
-    String name;
+    private String name;
 
     @ManyToMany(mappedBy = "tags")
-    List<ClientOrder> orders;
+    private List<ClientOrder> orders;
 }

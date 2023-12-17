@@ -5,10 +5,9 @@ import com.example.highload.model.inner.Profile;
 import com.example.highload.model.inner.User;
 import com.example.highload.model.inner.UserRequest;
 import com.example.highload.model.network.UserDto;
-import com.example.highload.repos.ImageRepository;
-import com.example.highload.repos.UserRepository;
-import com.example.highload.repos.UserRequestRepository;
 import com.example.highload.services.AdminService;
+import com.example.highload.services.ImageService;
+import com.example.highload.services.UserService;
 import com.example.highload.utils.DataTransformer;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -26,9 +25,8 @@ import java.util.NoSuchElementException;
 @RequiredArgsConstructor
 public class AdminServiceImpl implements AdminService {
 
-    private final UserRepository userRepository;
-    private final UserRequestRepository userRequestRepository;
-    private final ImageRepository imageRepository;
+    private final UserService userService;
+    private final ImageService imageService;
     private final DataTransformer dataTransformer;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
@@ -40,38 +38,41 @@ public class AdminServiceImpl implements AdminService {
         int i = 0;
         do {
             pageable = PageRequest.of(i, 50);
-            usersToDelete = userRepository.findAllByIsActualFalseAndWhenDeletedTimeLessThan(dateTimeLTDelete, pageable);
+            usersToDelete = userService.findAllExpired(dateTimeLTDelete, pageable);
             for (User user :
                     usersToDelete.getContent()) {
 
                 Profile profile = user.getProfile();
                 if (profile != null) {
-                    imageRepository.deleteAllByImageObject_Profile(profile);
-                    imageRepository.deleteById(profile.getImage().getId());
+                    imageService.removeAllImagesForProfile(profile);
+                    if (profile.getImage() != null) {
+                        imageService.removeImageById(profile.getImage().getId());
+                    }
+
                 }
 
                 List<ClientOrder> orders = user.getOrders();
-                if (orders.size() > 0)
-                    orders.forEach(imageRepository::deleteAllByImageObject_Order);
+                if (!orders.isEmpty())
+                    orders.forEach(imageService::removeAllImagesForOrder);
             }
             i++;
         } while (usersToDelete.getContent().size() == 50);
 
-        userRepository.deleteAllByIsActualFalseAndWhenDeletedTimeLessThan(dateTimeLTDelete);
+        userService.deleteAllExpired(dateTimeLTDelete);
 
     }
 
     @Override
     @Transactional(value = Transactional.TxType.REQUIRES_NEW, rollbackOn = {NoSuchElementException.class, Exception.class})
     public User approveUser(int userRequestId) {
-        UserRequest userRequest = userRequestRepository.findById(userRequestId).orElseThrow();
+        UserRequest userRequest = userService.findUserRequestById(userRequestId);
         User user = new User();
         user.setLogin(userRequest.getLogin());
         user.setHashPassword(userRequest.getHashPassword());
         user.setRole(userRequest.getRole());
         user.setIsActual(true);
-        user = userRepository.save(user);
-        userRequestRepository.delete(userRequest);
+        user = userService.save(user);
+        userService.deleteUserRequest(userRequest);
         return user;
     }
 
@@ -79,12 +80,12 @@ public class AdminServiceImpl implements AdminService {
     public User addUser(UserDto userDto) {
         User user = dataTransformer.userFromDto(userDto);
         user.setHashPassword(bCryptPasswordEncoder.encode(userDto.getPassword()));
-        return userRepository.save(user);
+        return userService.save(user);
     }
 
     @Override
     public void deleteUser(int userId) {
-        User user = userRepository.findById(userId).orElseThrow();
-        userRepository.deleteById(user.getId());
+        User user = userService.findById(userId);
+        userService.deleteById(user.getId());
     }
 }

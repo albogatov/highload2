@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 @RestController
-@RequestMapping(value = "/api/app/response")
+@RequestMapping(value = "/api/response")
 @RequiredArgsConstructor
 public class ResponseController {
 
@@ -28,7 +28,6 @@ public class ResponseController {
     private final PaginationHeadersCreator paginationHeadersCreator;
     private final DataTransformer dataTransformer;
 
-    @CrossOrigin
     @PostMapping("/save")
     public ResponseEntity save(@Valid @RequestBody ResponseDto data){
         if(responseService.saveResponse(data) != null)
@@ -36,7 +35,6 @@ public class ResponseController {
         else return ResponseEntity.badRequest().body("Couldn't save response, check data");
     }
 
-    @CrossOrigin
     @GetMapping("/all/order/{orderId}/{page}")
     @PreAuthorize("hasAnyAuthority('ARTIST', 'CLIENT')")
     public ResponseEntity getAllByOrder(@PathVariable int orderId, @PathVariable int page){
@@ -47,7 +45,6 @@ public class ResponseController {
         return ResponseEntity.ok().headers(responseHeaders).body(dtoList);
     }
 
-    @CrossOrigin
     @GetMapping("/all/user/{userId}/{page}")
     @PreAuthorize("hasAnyAuthority('ARTIST')")
     public ResponseEntity getAllByUser(@PathVariable int userId, @PathVariable int page){
@@ -58,7 +55,6 @@ public class ResponseController {
         return ResponseEntity.ok().headers(responseHeaders).body(dtoList);
     }
 
-    @CrossOrigin
     @GetMapping("/single/{id}")
     @PreAuthorize("hasAnyAuthority('CLIENT', 'ARTIST')")
     public ResponseEntity getById(@PathVariable int id){

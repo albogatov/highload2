@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 @RestController
-@RequestMapping(value = "/api/app/order")
+@RequestMapping(value = "/api/order")
 @RequiredArgsConstructor
 public class OrderController {
 
@@ -32,7 +32,6 @@ public class OrderController {
     private final PaginationHeadersCreator paginationHeadersCreator;
     private final DataTransformer dataTransformer;
 
-    @CrossOrigin
     @PostMapping("/save")
     @PreAuthorize("hasAuthority('CLIENT')")
     public ResponseEntity save(@Valid @RequestBody OrderDto data){
@@ -41,7 +40,6 @@ public class OrderController {
         else return ResponseEntity.badRequest().body("Couldn't save order, check data");
     }
 
-    @CrossOrigin
     @PostMapping("/update/{orderId}")
     @PreAuthorize("hasAuthority('CLIENT')")
     public ResponseEntity update(@Valid @RequestBody OrderDto data, @PathVariable int orderId){
@@ -50,7 +48,6 @@ public class OrderController {
         else return ResponseEntity.badRequest().body("Couldn't save order, check data");
     }
 
-    @CrossOrigin
     @GetMapping("/all/user/{userId}/{page}")
     @PreAuthorize("hasAnyAuthority('CLIENT', 'ARTIST')")
     public ResponseEntity getAllUserOrders(@PathVariable int userId, @PathVariable int page){
@@ -65,7 +62,6 @@ public class OrderController {
 
     }
 
-    @CrossOrigin
     @GetMapping("/open/user/{userId}/{page}")
     @PreAuthorize("hasAnyAuthority('CLIENT', 'ARTIST')")
     public ResponseEntity getAllUserOpenOrders(@PathVariable int userId, @PathVariable int page){
@@ -76,7 +72,6 @@ public class OrderController {
         return ResponseEntity.ok().headers(responseHeaders).body(dtoList);
     }
 
-    @CrossOrigin
     @GetMapping("/single/{orderId}")
     @PreAuthorize("hasAnyAuthority('CLIENT', 'ARTIST')")
     public ResponseEntity getById(@PathVariable int orderId){
@@ -85,7 +80,6 @@ public class OrderController {
     }
 
 
-    @CrossOrigin
     @PostMapping("/single/{orderId}/tags/add")
     @PreAuthorize("hasAnyAuthority('CLIENT')")
     public ResponseEntity addTagsToOrder(@Valid @RequestBody List<Integer> tagIds, @PathVariable int orderId){
@@ -96,7 +90,6 @@ public class OrderController {
         return ResponseEntity.badRequest().body("Invalid total tag number (should be not more than 10)!");
     }
 
-    @CrossOrigin
     @PostMapping("/single/{orderId}/tags/delete")
     @PreAuthorize("hasAnyAuthority('CLIENT')")
     public ResponseEntity deleteTagsFromOrder(@Valid @RequestBody List<Integer> tagIds, @PathVariable int orderId){
@@ -108,7 +101,6 @@ public class OrderController {
     }
 
 
-    @CrossOrigin
     @GetMapping("/single/{orderId}/images/{page}")
     @PreAuthorize("hasAnyAuthority('CLIENT', 'ARTIST')")
     public ResponseEntity getOrderImages(@Valid @PathVariable int orderId, @PathVariable int page){
@@ -120,7 +112,6 @@ public class OrderController {
     }
 
 
-    @CrossOrigin
     @GetMapping("/all/tag/{page}")
     @PreAuthorize("hasAnyAuthority('CLIENT', 'ARTIST')")
     public ResponseEntity getAllOrdersByTags(@Valid @RequestBody List<Integer> tags, @PathVariable int page){
@@ -134,7 +125,6 @@ public class OrderController {
     }
 
 
-    @CrossOrigin
     @GetMapping("/open/tag/{page}")
     @PreAuthorize("hasAnyAuthority('CLIENT', 'ARTIST')")
     public ResponseEntity getAllOpenOrdersByTags(@Valid @RequestBody List<Integer> tags, @PathVariable int page){
@@ -148,7 +138,6 @@ public class OrderController {
     }
 
 
-    @CrossOrigin
     @GetMapping("/all/{page}")
     @PreAuthorize("hasAnyAuthority('CLIENT', 'ARTIST')")
     public ResponseEntity getAllOrders(@PathVariable int page){
