@@ -108,7 +108,7 @@ public class UserControllerTests {
                 .and()
                 .body(new JwtRequest(login, password, role))
                 .when()
-                .post("/api/app/user/login")
+                .post("/api/user/login")
                 .then()
                 .extract().body().as(JwtResponse.class).getToken();
     }
@@ -158,7 +158,7 @@ public class UserControllerTests {
     @MethodSource("userProvider")
     @Order(4)
     void authRESTCorrect(String login, String password, String role) {
-        ExtractableResponse<Response> response = getResponse("/api/app/user/login", login, password, role);
+        ExtractableResponse<Response> response = getResponse("/api/user/login", login, password, role);
         User user = userRepository.findByLogin(login).orElseThrow();
         String tokenResponse = response.body().as(JwtResponse.class).getToken();
         Assertions.assertAll(
@@ -172,21 +172,21 @@ public class UserControllerTests {
     @MethodSource("userProvider")
     @Order(5)
     void authRESTBad(String login, String password, String role) {
-        ExtractableResponse<Response> response = getResponse("/api/app/user/login", login + "1", password, role);
+        ExtractableResponse<Response> response = getResponse("/api/user/login", login + "1", password, role);
         Assertions.assertEquals(response.response().getStatusCode(), HttpStatus.UNAUTHORIZED.value());
     }
 
     @Test
     @Order(6)
     void registerAPICorrect() {
-        ExtractableResponse<Response> response = getResponse("/api/app/user/register", newClientLogin, newClientPassword, clientRole);
+        ExtractableResponse<Response> response = getResponse("/api/user/register", newClientLogin, newClientPassword, clientRole);
         Assertions.assertEquals(HttpStatus.OK.value(), response.response().getStatusCode());
     }
 
     @Test
     @Order(7)
     void registerAPIBad() {
-        ExtractableResponse<Response> response = getResponse("/api/app/user/register", newClientLogin, newClientPassword, clientRole);
+        ExtractableResponse<Response> response = getResponse("/api/user/register", newClientLogin, newClientPassword, clientRole);
         Assertions.assertEquals(response.response().getStatusCode(), HttpStatus.CONFLICT.value());
     }
 
@@ -211,13 +211,13 @@ public class UserControllerTests {
                         .and()
                         .body(profileDto)
                         .when()
-                        .post("/api/app/user/profile/add/" + userId)
+                        .post("/api/user/profile/add/" + userId)
                         .then()
                         .extract();
         Assertions.assertAll(
                 () -> Assertions.assertEquals(response.response().getStatusCode(), HttpStatus.OK.value()),
                 () -> Assertions.assertEquals(
-                        profileService.findByUserId(userId).getName(),
+                        profileService.findByUserIdElseNull(userId).getName(),
                         dataTransformer.profileFromDto(profileDto).getName())
         );
     }
@@ -247,7 +247,7 @@ public class UserControllerTests {
                         .and()
                         .body(profileDto)
                         .when()
-                        .post("/api/app/user/profile/add/" + userId)
+                        .post("/api/user/profile/add/" + userId)
                         .then()
                         .extract();
 
@@ -278,7 +278,7 @@ public class UserControllerTests {
                         .and()
                         .body(profileDto)
                         .when()
-                        .post("/api/app/user/profile/add/" + userId)
+                        .post("/api/user/profile/add/" + userId)
                         .then()
                         .extract();
 
@@ -297,7 +297,7 @@ public class UserControllerTests {
                         .header("Content-type", "application/json")
                         .header("Authorization", "Bearer " + tokenResponse)
                         .when()
-                        .post("/api/app/user/deactivate/" + userId)
+                        .post("/api/user/deactivate/" + userId)
                         .then()
                         .extract();
         Assertions.assertAll(

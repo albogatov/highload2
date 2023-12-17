@@ -13,15 +13,15 @@ import java.util.List;
 
 @Data
 public class OrderDto implements Serializable {
-    int id;
-    int userId;
-    String userName;
-    LocalDateTime created;
+    private int id;
+    private int userId;
+    private String userName;
+    private LocalDateTime created;
     @Min(0)
-    int price;
+    private int price;
     @NotBlank
-    String description;
+    private String description;
     @Size(max=10)
-    List<TagDto> tags;
-    OrderStatus status;
+    private List<TagDto> tags;
+    private OrderStatus status;
 }

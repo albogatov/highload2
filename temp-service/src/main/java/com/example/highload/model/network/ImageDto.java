@@ -8,8 +8,8 @@ import java.io.Serializable;
 @Data
 public class ImageDto implements Serializable {
 
-    int id;
+    private int id;
     @NotBlank
-    String url;
+    private String url;
 
 }

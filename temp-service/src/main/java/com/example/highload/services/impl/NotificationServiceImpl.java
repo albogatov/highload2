@@ -7,8 +7,12 @@ import com.example.highload.services.NotificationService;
 import com.example.highload.utils.DataTransformer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.awt.*;
+import java.util.Collections;
 
 @Service
 @RequiredArgsConstructor
@@ -33,11 +37,11 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public Page<Notification> getAllUserNotifications(int userId, Pageable pageable) {
-        return notificationRepository.findAllByReceiverProfile_Id(userId, pageable);
+        return notificationRepository.findAllByReceiverProfile_Id(userId, pageable).orElse(Page.empty());
     }
 
     @Override
     public Page<Notification> getNewUserNotifications(int userId, Pageable pageable) {
-        return notificationRepository.findAllByIsReadFalseAndReceiverProfile_Id(userId, pageable);
+        return notificationRepository.findAllByIsReadFalseAndReceiverProfile_Id(userId, pageable).orElse(Page.empty());
     }
 }

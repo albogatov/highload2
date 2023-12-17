@@ -7,11 +7,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface NotificationRepository extends JpaRepository<Notification, Integer> {
-    Page<Notification> findAllByReceiverProfile_Id(Integer id, Pageable pageable);
-    Page<Notification> findAllBySenderProfile_Id(Integer id, Pageable pageable);
-    Page<Notification> findAllByIsReadFalseAndReceiverProfile_Id(Integer receiverId, Pageable pageable);
+    Optional<Page<Notification>> findAllByReceiverProfile_Id(Integer id, Pageable pageable);
+    Optional<Page<Notification>> findAllBySenderProfile_Id(Integer id, Pageable pageable);
+    Optional<Page<Notification>> findAllByIsReadFalseAndReceiverProfile_Id(Integer receiverId, Pageable pageable);
 
 }

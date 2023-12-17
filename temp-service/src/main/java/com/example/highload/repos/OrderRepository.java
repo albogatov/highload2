@@ -15,10 +15,10 @@ import java.util.Optional;
 @Repository
 public interface OrderRepository extends JpaRepository<ClientOrder, Integer> {
 
-    Page<ClientOrder> findAllByUser_Id(Integer id, Pageable pageable);
-    Page<ClientOrder> findAllByUser_IdAndStatus(Integer id, OrderStatus status, Pageable pageable);
-    Page<ClientOrder> findAllByTags_Name(String name, Pageable pageable);
-    Page<ClientOrder> findAllByTags_Id(Integer id, Pageable pageable);
+    Optional<Page<ClientOrder>> findAllByUser_Id(Integer id, Pageable pageable);
+    Optional<Page<ClientOrder>> findAllByUser_IdAndStatus(Integer id, OrderStatus status, Pageable pageable);
+    Optional<Page<ClientOrder>> findAllByTags_Name(String name, Pageable pageable);
+    Optional<Page<ClientOrder>> findAllByTags_Id(Integer id, Pageable pageable);
 
 
     @Query(value = "select * from public.order where id in " +
@@ -26,7 +26,7 @@ public interface OrderRepository extends JpaRepository<ClientOrder, Integer> {
             "where tag_id in :tagIds " +
             "group by order_tags.order_id " +
             "having count(order_id) = :tagNum)", nativeQuery = true)
-    Page<ClientOrder> findAllByMultipleTagsIds(@Param("tagIds") List<Integer> tagIds,
+    Optional<Page<ClientOrder>> findAllByMultipleTagsIds(@Param("tagIds") List<Integer> tagIds,
                                                @Param("tagNum") int tagNum,
                                                Pageable pageable);
 
@@ -36,7 +36,7 @@ public interface OrderRepository extends JpaRepository<ClientOrder, Integer> {
             "group by order_tags.order_id " +
             "having count(order_id) = :tagNum) " +
             "and public.order.status = :orderStatus", nativeQuery = true)
-    Page<ClientOrder> findAllByMultipleTagsIdsAndStatus(@Param("tagIds") List<Integer> tagIds,
+    Optional<Page<ClientOrder>> findAllByMultipleTagsIdsAndStatus(@Param("tagIds") List<Integer> tagIds,
                                                         @Param("tagNum") int tagNum,
                                                         @Param("orderStatus") String status,
                                                         Pageable pageable);

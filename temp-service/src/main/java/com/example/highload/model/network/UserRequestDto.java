@@ -8,12 +8,12 @@ import lombok.Data;
 @Data
 public class UserRequestDto {
 
-    int id;
+    private int id;
     @NotBlank
     @Size(min = 1, max = 50)
-    String login;
+    private String login;
     @NotBlank
-    String password;
-    RoleType role;
+    private String password;
+    private RoleType role;
 
 }

@@ -8,7 +8,7 @@ import java.io.Serializable;
 @Data
 public class TagDto implements Serializable {
 
-    int id;
+    private int id;
     @NotBlank
-    String name;
+    private String name;
 }

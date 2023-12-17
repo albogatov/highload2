@@ -93,7 +93,7 @@ public class AdminAPITests {
                 .and()
                 .body(new JwtRequest(userName, userName, user.getRole().getName().toString()))
                 .when()
-                .post("/api/app/user/login")
+                .post("/api/user/login")
                 .then()
                 .extract().body().as(JwtResponse.class).getToken();
     }
@@ -117,7 +117,7 @@ public class AdminAPITests {
                         .and()
                         .body(userDto)
                         .when()
-                        .post("/api/app/admin/user/add")
+                        .post("/api/admin/user/add")
                         .then()
                         .extract();
         Assertions.assertAll(
@@ -134,7 +134,7 @@ public class AdminAPITests {
                         .and()
                         .body(userDto)
                         .when()
-                        .post("/api/app/admin/user/add")
+                        .post("/api/admin/user/add")
                         .then()
                         .extract();
         Assertions.assertAll(
@@ -156,7 +156,7 @@ public class AdminAPITests {
                         .and()
                         .body(wrongUserDto)
                         .when()
-                        .post("/api/app/admin/user/add")
+                        .post("/api/admin/user/add")
                         .then()
                         .extract();
         Assertions.assertAll(
@@ -187,7 +187,7 @@ public class AdminAPITests {
                         .header("Authorization", "Bearer " + tokenResponse)
                         .header("Content-type", "application/json")
                         .when()
-                        .post("/api/app/admin/user-request/approve/" + id)
+                        .post("/api/admin/user-request/approve/" + id)
                         .then()
                         .extract();
         Assertions.assertAll(
@@ -202,7 +202,7 @@ public class AdminAPITests {
                         .header("Authorization", "Bearer " + tokenResponse)
                         .header("Content-type", "application/json")
                         .when()
-                        .post("/api/app/admin/user-request/approve/" + id)
+                        .post("/api/admin/user-request/approve/" + id)
                         .then()
                         .extract();
         Assertions.assertAll(
@@ -240,7 +240,7 @@ public class AdminAPITests {
                         .header("Authorization", "Bearer " + tokenResponse)
                         .header("Content-type", "application/json")
                         .when()
-                        .post("/api/app/admin/user/delete/" + id)
+                        .post("/api/admin/user/delete/" + id)
                         .then()
                         .extract();
         Assertions.assertAll(
@@ -256,7 +256,7 @@ public class AdminAPITests {
                         .header("Authorization", "Bearer " + tokenResponse)
                         .header("Content-type", "application/json")
                         .when()
-                        .post("/api/app/admin/user/delete/" + id)
+                        .post("/api/admin/user/delete/" + id)
                         .then()
                         .extract();
         Assertions.assertAll(
@@ -300,7 +300,7 @@ public class AdminAPITests {
                         .header("Authorization", "Bearer " + tokenResponse)
                         .header("Content-type", "application/json")
                         .when()
-                        .get("/api/app/admin/user-request/all/0")
+                        .get("/api/admin/user-request/all/0")
                         .then()
                         .extract();
 
@@ -354,7 +354,7 @@ public class AdminAPITests {
                         .header("Authorization", "Bearer " + tokenResponse)
                         .header("Content-type", "application/json")
                         .when()
-                        .post("/api/app/admin/user/all/delete-expired/0")
+                        .post("/api/admin/user/all/delete-expired/0")
                         .then()
                         .extract();
 

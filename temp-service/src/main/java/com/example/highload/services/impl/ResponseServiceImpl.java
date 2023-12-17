@@ -24,16 +24,16 @@ public class ResponseServiceImpl implements ResponseService {
 
     @Override
     public Page<Response> findAllForOrder(int orderId, Pageable pageable) {
-        return responseRepository.findAllByOrder_Id(orderId, pageable);
+        return responseRepository.findAllByOrder_Id(orderId, pageable).orElse(Page.empty());
     }
 
     @Override
     public Page<Response> findAllForUser(int userId, Pageable pageable) {
-        return responseRepository.findAllByUser_Id(userId, pageable);
+        return responseRepository.findAllByUser_Id(userId, pageable).orElse(Page.empty());
     }
 
     @Override
     public Response findById(int id) {
-        return responseRepository.findById(id).orElse(null);
+        return responseRepository.findById(id).orElseThrow();
     }
 }
