@@ -11,13 +11,13 @@ public class Image {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Integer id;
+    private Integer id;
 
     @NotBlank
     @Column(name = "url", nullable = false)
-    String url;
+    private String url;
 
     @OneToOne(mappedBy = "image")
-    ImageObject imageObject;
+    private ImageObject imageObject;
 
 }

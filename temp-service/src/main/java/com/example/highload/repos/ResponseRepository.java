@@ -7,12 +7,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ResponseRepository extends JpaRepository<Response, Integer> {
 
-    Page<Response> findAllByUser_Id(Integer id, Pageable pageable);
-    Page<Response> findAllByOrder_Id(Integer id, Pageable pageable);
+    Optional<Page<Response>> findAllByUser_Id(Integer id, Pageable pageable);
+    Optional<Page<Response>> findAllByOrder_Id(Integer id, Pageable pageable);
 
 
 }

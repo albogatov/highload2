@@ -17,22 +17,22 @@ public class ClientOrder {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Integer id;
+    private Integer id;
 
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
-    User user;
+    private User user;
 
     @Column(name = "created", columnDefinition = "TIMESTAMP", nullable = false)
-    LocalDateTime created;
+    private LocalDateTime created;
 
     @Min(0)
     @Column(name = "price", nullable = false)
-    Integer price;
+    private Integer price;
 
     @NotBlank
     @Column(name = "description", nullable = false)
-    String description;
+    private String description;
 
     @ManyToMany
     @JoinTable(
@@ -40,12 +40,12 @@ public class ClientOrder {
             joinColumns = @JoinColumn(name = "order_id"),
             inverseJoinColumns = @JoinColumn(name = "tag_id"))
     @Size(max=10)
-    List<Tag> tags;
+    private List<Tag> tags;
 
     @OneToMany(mappedBy = "order")
-    List<ImageObject> images;
+    private List<ImageObject> images;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
-    OrderStatus status;
+    private OrderStatus status;
 }

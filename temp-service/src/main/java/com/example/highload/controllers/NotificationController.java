@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 @RestController
-@RequestMapping(value = "/api/app/notification")
+@RequestMapping(value = "/api/notification")
 @RequiredArgsConstructor
 public class NotificationController {
 
@@ -28,24 +28,21 @@ public class NotificationController {
     private final PaginationHeadersCreator paginationHeadersCreator;
     private final DataTransformer dataTransformer;
 
-    @CrossOrigin
     @PostMapping("/save")
     public ResponseEntity save(@Valid @RequestBody NotificationDto data){
         if(notificationService.saveNotification(data) != null)
-            return ResponseEntity.ok("");
+            return ResponseEntity.ok("Notification successfully created");
         else return ResponseEntity.badRequest().body("Couldn't save notification, check data");
     }
 
-    @CrossOrigin
     @PostMapping("/update/{id}")
     @PreAuthorize("hasAnyAuthority('CLIENT', 'ARTIST')")
     public ResponseEntity setRead(@PathVariable int id){
         if(notificationService.readNotification(id) != null)
-            return ResponseEntity.ok("");
+            return ResponseEntity.ok("Notification status is set");
         else return ResponseEntity.badRequest().body("Couldn't change notification, check data");
     }
 
-    @CrossOrigin
     @GetMapping("/all/{userId}/{page}")
     @PreAuthorize("hasAnyAuthority('CLIENT', 'ARTIST')")
     public ResponseEntity getAllQueries(@PathVariable int userId, @PathVariable int page) {
@@ -57,7 +54,6 @@ public class NotificationController {
     }
 
 
-    @CrossOrigin
     @GetMapping("/new/{userId}/{page}")
     @PreAuthorize("hasAnyAuthority('CLIENT', 'ARTIST')")
     public ResponseEntity getNewQueries(@PathVariable int userId, @PathVariable int page) {

@@ -81,7 +81,7 @@ public class ImageObjectAPITests {
                 .and()
                 .body(new JwtRequest(userName, userName, user.getRole().getName().toString()))
                 .when()
-                .post("/api/app/user/login")
+                .post("/api/user/login")
                 .then()
                 .extract().body().as(JwtResponse.class).getToken();
     }
@@ -136,7 +136,7 @@ public class ImageObjectAPITests {
                         .and()
                         .body(imageDtoList)
                         .when()
-                        .post("/api/app/image/add/profile/" + artistProfileWithId.getId())
+                        .post("/api/image/add/profile")
                         .then()
                         .extract();
 
@@ -165,7 +165,7 @@ public class ImageObjectAPITests {
                         .and()
                         .body(imageDtoList)
                         .when()
-                        .post("/api/app/image/add/profile/" + clientProfileWithId.getId())
+                        .post("/api/image/add/profile")
                         .then()
                         .extract();
 
@@ -198,7 +198,7 @@ public class ImageObjectAPITests {
                         .and()
                         .body(imageDto)
                         .when()
-                        .post("/api/app/image/change/profile/" + artistProfile.getId())
+                        .post("/api/image/change/profile")
                         .then()
                         .extract();
 
@@ -235,7 +235,7 @@ public class ImageObjectAPITests {
                         .header("Authorization", "Bearer " + tokenResponse1)
                         .header("Content-type", "application/json")
                         .when()
-                        .post("/api/app/image/remove/profile/" + artistProfile.getId() + "/" + imageId)
+                        .post("/api/image/remove/profile/" + imageId)
                         .then()
                         .extract();
 
@@ -256,7 +256,7 @@ public class ImageObjectAPITests {
                         .header("Authorization", "Bearer " + tokenResponse2)
                         .header("Content-type", "application/json")
                         .when()
-                        .post("/api/app/image/remove/profile/" + clientProfile.getId() + "/" + imageId)
+                        .post("/api/image/remove/profile/" + imageId)
                         .then()
                         .extract();
 
@@ -264,19 +264,6 @@ public class ImageObjectAPITests {
                 () -> Assertions.assertEquals(HttpStatus.FORBIDDEN.value(), response2.statusCode())
         );
 
-    }
-
-
-    @Test
-    @Order(4)
-    public void addImagesToOrder() {
-        /* TODO: implement, RUN */
-    }
-
-    @Test
-    @Order(5)
-    public void removeImageForOrder() {
-        /* TODO: implement, RUN */
     }
 
 }

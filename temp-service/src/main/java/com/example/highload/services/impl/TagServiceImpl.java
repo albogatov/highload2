@@ -39,4 +39,9 @@ public class TagServiceImpl implements TagService {
         order.setTags(new ArrayList<Tag>(order.getTags().stream().filter(tag -> tag.getId()!=tagId).toList()));
         orderRepository.save(order);
     }
+
+    @Override
+    public Tag findById(Integer tagIdToAdd) {
+        return tagRepository.findById(tagIdToAdd).orElseThrow();
+    }
 }

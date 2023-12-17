@@ -7,10 +7,10 @@ import java.io.Serializable;
 @Data
 public class ResponseDto implements Serializable {
 
-    int id;
-    int userId;
-    String userName;
-    int orderId;
-    String text;
-    boolean isApproved;
+    private int id;
+    private int userId;
+    private String userName;
+    private int orderId;
+    private String text;
+    private boolean isApproved;
 }

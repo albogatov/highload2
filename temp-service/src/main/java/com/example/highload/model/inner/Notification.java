@@ -11,20 +11,20 @@ import java.time.LocalDateTime;
 public class Notification {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Integer id;
+    private Integer id;
 
     @ManyToOne
     @JoinColumn(name = "sender_profile_id", referencedColumnName = "id")
-    Profile senderProfile;
+    private Profile senderProfile;
 
     @ManyToOne
     @JoinColumn(name = "receiver_profile_id", referencedColumnName = "id")
-    Profile receiverProfile;
+    private Profile receiverProfile;
 
     @Column(name = "is_read", nullable = false)
-    Boolean isRead;
+    private Boolean isRead;
 
     @Column(name = "time", columnDefinition = "TIMESTAMP", nullable = false)
-    LocalDateTime time;
+    private LocalDateTime time;
 
 }
