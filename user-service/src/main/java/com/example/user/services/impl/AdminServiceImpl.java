@@ -2,13 +2,11 @@ package com.example.user.services.impl;
 
 import com.example.user.consumer.ImageRestConsumer;
 import com.example.user.consumer.OrderRestConsumer;
-import com.example.user.model.inner.ClientOrder;
 import com.example.user.model.inner.Profile;
 import com.example.user.model.inner.User;
 import com.example.user.model.inner.UserRequest;
 import com.example.user.model.network.UserDto;
 import com.example.user.services.AdminService;
-import com.example.user.services.ImageService;
 import com.example.user.services.UserService;
 import com.example.user.utils.DataTransformer;
 import jakarta.transaction.Transactional;
@@ -29,7 +27,7 @@ import java.util.NoSuchElementException;
 public class AdminServiceImpl implements AdminService {
 
     private final UserService userService;
-    private final ImageService imageService;
+
     private final DataTransformer dataTransformer;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 

@@ -1,9 +1,7 @@
 package com.example.user.controllers;
 
-import com.example.user.model.inner.Image;
 import com.example.user.model.inner.Profile;
 import com.example.user.model.network.ProfileDto;
-import com.example.user.services.ImageService;
 import com.example.user.services.ProfileService;
 import com.example.user.services.UserService;
 import com.example.user.utils.DataTransformer;
@@ -29,7 +27,7 @@ import java.util.NoSuchElementException;
 public class ProfileAPIController {
 
     private final ProfileService profileService;
-    private final ImageService imageService;
+//    private final ImageService imageService;
     private final UserService userService;
     private final PaginationHeadersCreator paginationHeadersCreator;
     private final DataTransformer dataTransformer;
@@ -62,14 +60,15 @@ public class ProfileAPIController {
         return ResponseEntity.ok(dataTransformer.profileToDto(entity));
     }
 
-    @GetMapping("/single/{id}/images/{page}")
-    public ResponseEntity getProfileImagesByIdAndPageNumber(@PathVariable int id, @PathVariable int page){
-        Profile entity = profileService.findById(id);
-        Pageable pageable = PageRequest.of(page, 50);
-        Page<Image> images = imageService.findAllProfileImages(id, pageable);
-        HttpHeaders responseHeaders = paginationHeadersCreator.pageWithTotalElementsHeadersCreate(images);
-        return ResponseEntity.ok().headers(responseHeaders).body(dataTransformer.imageListToDto(images.getContent()));
-    }
+    // TODO transfer to image service ?
+//    @GetMapping("/single/{id}/images/{page}")
+//    public ResponseEntity getProfileImagesByIdAndPageNumber(@PathVariable int id, @PathVariable int page){
+//        Profile entity = profileService.findById(id);
+//        Pageable pageable = PageRequest.of(page, 50);
+//        Page<Image> images = imageService.findAllProfileImages(id, pageable);
+//        HttpHeaders responseHeaders = paginationHeadersCreator.pageWithTotalElementsHeadersCreate(images);
+//        return ResponseEntity.ok().headers(responseHeaders).body(dataTransformer.imageListToDto(images.getContent()));
+//    }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity handleValidationExceptions(){

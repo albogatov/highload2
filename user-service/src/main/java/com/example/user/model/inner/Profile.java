@@ -23,7 +23,7 @@ public class Profile {
 
     @OneToOne
     @JoinColumn(name = "image_id", referencedColumnName = "id")
-    private Image image;
+    private Integer imageId;
 
     @NotBlank
     @Column(name = "name", nullable = false)
@@ -39,15 +39,6 @@ public class Profile {
     @Pattern(regexp = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{1,4}$")
     @Column(name = "mail", nullable = false)
     private String mail;
-
-    @OneToMany(mappedBy = "profile", fetch = FetchType.EAGER)
-    private List<ImageObject> images;
-
-    @OneToMany(mappedBy = "receiverProfile")
-    private List<Notification> receivedNotifications;
-
-    @OneToMany(mappedBy = "senderProfile")
-    private List<Notification> sentNotifications;
 
     @Override
     public String toString() {

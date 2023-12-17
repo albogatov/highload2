@@ -1,6 +1,5 @@
 package com.example.user.services;
 
-import com.example.user.model.inner.Image;
 import com.example.user.model.inner.Profile;
 import com.example.user.model.network.ProfileDto;
 import com.example.user.model.network.UserDto;
@@ -21,5 +20,5 @@ public interface ProfileService {
     Page<Profile> findAllProfiles(Pageable pageable);
 
     // TODO ???
-    Image setNewMainImage(int profileId, Image newImage);
+//    Image setNewMainImage(int profileId, Image newImage);
 }
