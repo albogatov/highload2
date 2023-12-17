@@ -8,16 +8,16 @@ import java.io.Serializable;
 
 @Data
 public class ProfileDto implements Serializable {
-    // TODO: DTO should be commons or in dependency
-    int id;
-    int userId;
-    Integer imageId;
+
+    private int id;
+    private int userId;
+    private Integer imageId;
     @NotBlank
-    String name;
-    String experience;
-    String education;
-    String about;
+    private String name;
+    private String experience;
+    private String education;
+    private String about;
     @NotBlank
     @Pattern(regexp = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{1,4}$")
-    String mail;
+    private String mail;
 }

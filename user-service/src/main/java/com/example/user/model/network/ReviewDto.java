@@ -8,9 +8,9 @@ import java.io.Serializable;
 @Data
 public class ReviewDto implements Serializable {
 
-    int id;
-    int profileId;
-    String userName;
+    private int id;
+    private int profileId;
+    private String userName;
     @NotBlank
-    String text;
+    private String text;
 }

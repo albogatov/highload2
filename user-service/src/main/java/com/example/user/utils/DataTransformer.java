@@ -2,24 +2,18 @@ package com.example.user.utils;
 
 import com.example.user.model.enums.RoleType;
 import com.example.user.model.inner.*;
-import com.example.user.model.network.ProfileDto;
-import com.example.user.model.network.ReviewDto;
-import com.example.user.model.network.UserDto;
-import com.example.user.model.network.UserRequestDto;
-import com.example.user.repos.ProfileRepository;
-import com.example.user.repos.RoleRepository;
-import com.example.user.repos.UserRepository;
+import com.example.user.model.network.*;
+import com.example.user.repos.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-@Component("userService.dataTransformer")
+@Component("dataTransformer")
 @Data
 @AllArgsConstructor
 public class DataTransformer {
-
 
     private final RoleRepository roleRepository;
     private final ProfileRepository profileRepository;
@@ -38,6 +32,7 @@ public class DataTransformer {
         user.setIsActual(true);
         return user;
     }
+
 
     /* reviews */
 
@@ -62,7 +57,6 @@ public class DataTransformer {
     public List<ReviewDto> reviewListToDto(List<Review> entities) {
         return entities.stream().map(this::reviewToDto).toList();
     }
-
 
     /* user requests */
 
@@ -91,13 +85,14 @@ public class DataTransformer {
 
     /* profiles */
 
+    // TODO: Separate profile and image
     public ProfileDto profileToDto(Profile profile) {
         ProfileDto profileDto = new ProfileDto();
         profileDto.setId(profile.getId());
         profileDto.setName(profile.getName());
         profileDto.setAbout(profile.getAbout());
-        if (profile.getImageId() != null) {
-            profileDto.setImageId(profile.getImageId());
+        if (profile.getImage() != null) {
+            profileDto.setImage(imageToDto(profile.getImage()));
         }
         profileDto.setMail(profile.getMail());
         profileDto.setEducation(profile.getEducation());
@@ -111,8 +106,9 @@ public class DataTransformer {
         profile.setId(profileDto.getId());
         profile.setName(profileDto.getName());
         profile.setAbout(profileDto.getAbout());
-        if (profileDto.getImageId() != null) {
-            profile.setImageId(profileDto.getImageId());
+        if (profileDto.getImage() != null) {
+            Image image = imageRepository.findById(profileDto.getImage().getId()).orElseThrow();
+            profile.setImage(image);
         }
         profile.setMail(profileDto.getMail());
         profile.setEducation(profileDto.getEducation());
@@ -125,4 +121,5 @@ public class DataTransformer {
     public List<ProfileDto> profileListToDto(List<Profile> entities) {
         return entities.stream().map(this::profileToDto).toList();
     }
+
 }

@@ -1,7 +1,9 @@
 package com.example.user.services.impl;
 
+import com.example.user.model.inner.Image;
 import com.example.user.model.inner.Profile;
 import com.example.user.model.network.ProfileDto;
+import com.example.user.repos.ImageRepository;
 import com.example.user.repos.ProfileRepository;
 import com.example.user.services.ProfileService;
 import com.example.user.utils.DataTransformer;
@@ -41,12 +43,21 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
-    public Profile findByUserId(int userId) {
+    public Profile findByUserIdElseNull(int userId) {
         return profileRepository.findByUser_Id(userId).orElse(null);
     }
 
     @Override
     public Page<Profile> findAllProfiles(Pageable pageable) {
         return profileRepository.findAll(pageable);
+    }
+
+    // TODO ???
+    @Override
+    public Image setNewMainImage(int profileId, Image newImage) {
+        Profile profile = profileRepository.findById(profileId).orElseThrow();
+        Image oldImage = profile.getImage();
+        profile.setImage(newImage);
+        return oldImage;
     }
 }

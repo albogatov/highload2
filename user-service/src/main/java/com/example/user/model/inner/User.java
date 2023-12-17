@@ -21,26 +21,26 @@ public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Integer id;
+    private Integer id;
 
     @NotBlank
     @Size(min = 1, max = 50)
     @Column(name = "login", nullable = false, unique = true)
-    String login;
+    private String login;
 
     @OneToOne(mappedBy = "user")
-    Profile profile;
+    private Profile profile;
 
     @NotBlank
     @Column(name = "hash_password", nullable = false)
-    String hashPassword;
+    private String hashPassword;
 
     @ManyToOne
     @JoinColumn(name = "role_id", referencedColumnName = "id", updatable = false)
-    Role role;
+    private Role role;
 
     @Column(name = "is_actual", nullable = false)
-    Boolean isActual;
+    private Boolean isActual;
 
     @Column(name = "when_deleted_time", columnDefinition = "TIMESTAMP")
     private LocalDateTime whenDeletedTime;

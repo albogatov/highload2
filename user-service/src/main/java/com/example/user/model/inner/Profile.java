@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.Data;
+import lombok.ToString;
 
 import java.util.List;
 
@@ -11,34 +12,42 @@ import java.util.List;
 @Entity
 @Table(name = "profile", schema = "public")
 public class Profile {
-    // TODO: Make DTO commons or add proper dependency
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Integer id;
+    private Integer id;
 
     @OneToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id", updatable = false)
-    User user;
+    private User user;
 
     @OneToOne
     @JoinColumn(name = "image_id", referencedColumnName = "id")
-    Integer imageId;
+    private Image image;
 
     @NotBlank
     @Column(name = "name", nullable = false)
-    String name;
+    private String name;
     @Column(name = "experience")
-    String experience;
+    private String experience;
     @Column(name = "education")
-    String education;
+    private String education;
     @Column(name = "about")
-    String about;
+    private String about;
 
     @NotBlank
     @Pattern(regexp = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{1,4}$")
     @Column(name = "mail", nullable = false)
-    String mail;
+    private String mail;
+
+    @OneToMany(mappedBy = "profile", fetch = FetchType.EAGER)
+    private List<ImageObject> images;
+
+    @OneToMany(mappedBy = "receiverProfile")
+    private List<Notification> receivedNotifications;
+
+    @OneToMany(mappedBy = "senderProfile")
+    private List<Notification> sentNotifications;
 
     @Override
     public String toString() {

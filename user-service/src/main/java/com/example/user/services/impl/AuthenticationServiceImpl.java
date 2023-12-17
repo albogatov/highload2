@@ -1,5 +1,6 @@
 package com.example.user.services.impl;
 
+import com.example.user.model.inner.User;
 import com.example.user.security.jwt.JwtUtil;
 import com.example.user.services.AuthenticationService;
 import com.example.user.services.UserService;
@@ -16,6 +17,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
 
+    @Override
     public String authProcess(String login, String password, String role) {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(login, password));
         return jwtUtil.generateToken(login, role);

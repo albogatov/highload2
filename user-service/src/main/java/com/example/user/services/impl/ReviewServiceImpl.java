@@ -19,7 +19,7 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     public Page<Review> findAllProfileReviews(int profileId, Pageable pageable) {
-        return reviewRepository.findAllByProfile_Id(profileId, pageable);
+        return reviewRepository.findAllByProfile_Id(profileId, pageable).orElse(Page.empty());
     }
 
     @Override

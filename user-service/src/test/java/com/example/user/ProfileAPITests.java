@@ -1,14 +1,16 @@
 package com.example.user;
 
+import com.example.user.model.enums.ImageObjectType;
+import com.example.user.model.inner.Image;
+import com.example.user.model.inner.ImageObject;
 import com.example.user.model.inner.Profile;
 import com.example.user.model.inner.User;
-import com.example.highload.model.network.*;
-import com.example.user.model.network.ProfileDto;
+import com.example.user.model.network.*;
+import com.example.user.repos.ImageObjectRepository;
+import com.example.user.repos.ImageRepository;
 import com.example.user.repos.ProfileRepository;
 import com.example.user.repos.UserRepository;
 import com.example.user.utils.DataTransformer;
-import com.example.user.model.network.JwtRequest;
-import com.example.user.model.network.JwtResponse;
 import io.restassured.RestAssured;
 import io.restassured.parsing.Parser;
 import io.restassured.response.ExtractableResponse;
@@ -88,14 +90,14 @@ public class ProfileAPITests {
                 .and()
                 .body(new JwtRequest(userName, userName, user.getRole().getName().toString()))
                 .when()
-                .post("/api/app/user/login")
+                .post("/api/user/login")
                 .then()
                 .extract().body().as(JwtResponse.class).getToken();
     }
 
     @Test
     @Order(1)
-    public void editProfile() { /* TODO: RUN (+) */
+    public void editProfile() {
 
         User artist1 = userRepository.findByLogin("artist1").orElseThrow();
 
@@ -124,7 +126,7 @@ public class ProfileAPITests {
                         .and()
                         .body(artistProfileDto)
                         .when()
-                        .post("/api/app/profile/edit/" + artistProfileWithId.getId())
+                        .post("/api/profile/edit")
                         .then()
                         .extract();
 
@@ -148,7 +150,7 @@ public class ProfileAPITests {
                         .and()
                         .body(artistProfileDto)
                         .when()
-                        .post("/api/app/profile/edit/" + artistProfileWithId.getId())
+                        .post("/api/profile/edit")
                         .then()
                         .extract();
 
@@ -185,7 +187,7 @@ public class ProfileAPITests {
                         .header("Authorization", "Bearer " + tokenResponse)
                         .header("Content-type", "application/json")
                         .when()
-                        .get("/api/app/profile/single/" + clientProfileWithId.getId().toString())
+                        .get("/api/profile/single/" + clientProfileWithId.getId().toString())
                         .then()
                         .extract();
 
@@ -206,7 +208,7 @@ public class ProfileAPITests {
                         .header("Authorization", "Bearer " + tokenResponse)
                         .header("Content-type", "application/json")
                         .when()
-                        .get("/api/app/profile/single/" + badId)
+                        .get("/api/profile/single/" + badId)
                         .then()
                         .extract();
 
@@ -231,7 +233,7 @@ public class ProfileAPITests {
                         .header("Authorization", "Bearer " + tokenResponse)
                         .header("Content-type", "application/json")
                         .when()
-                        .get("/api/app/profile/all/0")
+                        .get("/api/profile/all/0")
                         .then()
                         .extract();
 
@@ -293,7 +295,7 @@ public class ProfileAPITests {
                         .header("Authorization", "Bearer " + tokenResponse)
                         .header("Content-type", "application/json")
                         .when()
-                        .get("/api/app/profile/single/" + artistProfile.getId() + "/images/0")
+                        .get("/api/profile/single/" + artistProfile.getId() + "/images/0")
                         .then()
                         .extract();
 
@@ -320,7 +322,7 @@ public class ProfileAPITests {
                         .header("Authorization", "Bearer " + tokenResponse)
                         .header("Content-type", "application/json")
                         .when()
-                        .get("/api/app/profile/single/" + (artistProfile.getId() + 2) + "/images/0")
+                        .get("/api/profile/single/" + (artistProfile.getId() + 2) + "/images/0")
                         .then()
                         .extract();
 
