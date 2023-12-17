@@ -2,13 +2,14 @@ package com.example.user.services.impl;
 
 import com.example.user.consumer.ImageRestConsumer;
 import com.example.user.consumer.OrderRestConsumer;
+import com.example.user.model.inner.ClientOrder;
 import com.example.user.model.inner.Profile;
 import com.example.user.model.inner.User;
 import com.example.user.model.inner.UserRequest;
 import com.example.user.model.network.UserDto;
-import com.example.user.repos.UserRepository;
-import com.example.user.repos.UserRequestRepository;
 import com.example.user.services.AdminService;
+import com.example.user.services.ImageService;
+import com.example.user.services.UserService;
 import com.example.user.utils.DataTransformer;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -27,17 +28,16 @@ import java.util.NoSuchElementException;
 @RequiredArgsConstructor
 public class AdminServiceImpl implements AdminService {
 
-    // TODO: Separate admin and image processing or think about microservice structure a bit more
-    private final UserRepository userRepository;
-    private final UserRequestRepository userRequestRepository;
+    private final UserService userService;
+    private final ImageService imageService;
+    private final DataTransformer dataTransformer;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Autowired
     private ImageRestConsumer imageRestConsumer;
 
     @Autowired
     private OrderRestConsumer orderRestConsumer;
-    private final DataTransformer dataTransformer;
-    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Transactional(value = Transactional.TxType.REQUIRES_NEW, rollbackOn = {Exception.class})
     public void deleteLogicallyDeletedUsers(int daysToExpire) {
@@ -47,41 +47,43 @@ public class AdminServiceImpl implements AdminService {
         int i = 0;
         do {
             pageable = PageRequest.of(i, 50);
-            usersToDelete = userRepository.findAllByIsActualFalseAndWhenDeletedTimeLessThan(dateTimeLTDelete, pageable);
+            usersToDelete = userService.findAllExpired(dateTimeLTDelete, pageable);
             for (User user :
                     usersToDelete.getContent()) {
 
                 Profile profile = user.getProfile();
-                // TODO: Deletion of images and orders to be done by image and order services
                 imageRestConsumer.deleteImages(profile.getId());
                 orderRestConsumer.deleteOrders(profile.getId());
 //                if (profile != null) {
-//                    imageRepository.deleteAllByImageObject_Profile(profile);
-//                    imageRepository.deleteById(profile.getImage().getId());
+//                    imageService.removeAllImagesForProfile(profile);
+//                    if (profile.getImage() != null) {
+//                        imageService.removeImageById(profile.getImage().getId());
+//                    }
+//
 //                }
 //
 //                List<ClientOrder> orders = user.getOrders();
-//                if (orders.size() > 0)
-//                    orders.forEach(imageRepository::deleteAllByImageObject_Order);
+//                if (!orders.isEmpty())
+//                    orders.forEach(imageService::removeAllImagesForOrder);
             }
             i++;
         } while (usersToDelete.getContent().size() == 50);
 
-        userRepository.deleteAllByIsActualFalseAndWhenDeletedTimeLessThan(dateTimeLTDelete);
+        userService.deleteAllExpired(dateTimeLTDelete);
 
     }
 
     @Override
     @Transactional(value = Transactional.TxType.REQUIRES_NEW, rollbackOn = {NoSuchElementException.class, Exception.class})
     public User approveUser(int userRequestId) {
-        UserRequest userRequest = userRequestRepository.findById(userRequestId).orElseThrow();
+        UserRequest userRequest = userService.findUserRequestById(userRequestId);
         User user = new User();
         user.setLogin(userRequest.getLogin());
         user.setHashPassword(userRequest.getHashPassword());
         user.setRole(userRequest.getRole());
         user.setIsActual(true);
-        user = userRepository.save(user);
-        userRequestRepository.delete(userRequest);
+        user = userService.save(user);
+        userService.deleteUserRequest(userRequest);
         return user;
     }
 
@@ -89,12 +91,12 @@ public class AdminServiceImpl implements AdminService {
     public User addUser(UserDto userDto) {
         User user = dataTransformer.userFromDto(userDto);
         user.setHashPassword(bCryptPasswordEncoder.encode(userDto.getPassword()));
-        return userRepository.save(user);
+        return userService.save(user);
     }
 
     @Override
     public void deleteUser(int userId) {
-        User user = userRepository.findById(userId).orElseThrow();
-        userRepository.deleteById(user.getId());
+        User user = userService.findById(userId);
+        userService.deleteById(user.getId());
     }
 }

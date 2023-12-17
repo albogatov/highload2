@@ -13,6 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -38,11 +39,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserRequest findUserRequestByLogin(String login) {
+    public UserRequest findUserRequestByLoginElseNull(String login) {
         return userRequestRepository.findByLogin(login).orElse(null);
     }
 
-    public User findByLogin(String login) {
+    public User findByLoginElseNull(String login) {
         return userRepository.findByLogin(login).orElse(null);
     }
 
@@ -67,8 +68,38 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public Page<User> findAllExpired(LocalDateTime dateTimeLTDelete, Pageable pageable) {
+        return userRepository.findAllByIsActualFalseAndWhenDeletedTimeLessThan(dateTimeLTDelete, pageable).orElse(Page.empty());
+    }
+
+    @Override
+    public void deleteAllExpired(LocalDateTime dateTimeLTDelete) {
+        userRepository.deleteAllByIsActualFalseAndWhenDeletedTimeLessThan(dateTimeLTDelete);
+    }
+
+    @Override
+    public UserRequest findUserRequestById(int userRequestId) {
+        return userRequestRepository.findById(userRequestId).orElseThrow();
+    }
+
+    @Override
+    public User save(User user) {
+        return userRepository.save(user);
+    }
+
+    @Override
+    public void deleteUserRequest(UserRequest userRequest) {
+        userRequestRepository.deleteById(userRequest.getId());
+    }
+
+    @Override
+    public void deleteById(Integer id) {
+        userRepository.deleteById(id);
+    }
+
+    @Override
     public User findById(int id) {
-        return userRepository.findById(id).orElse(null);
+        return userRepository.findById(id).orElseThrow();
     }
 
 

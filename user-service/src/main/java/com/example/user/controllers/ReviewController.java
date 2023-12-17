@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 @RestController
-@RequestMapping(value = "/api/app/review")
+@RequestMapping(value = "/api/review")
 @RequiredArgsConstructor
 public class ReviewController {
 
@@ -32,7 +32,6 @@ public class ReviewController {
     private final PaginationHeadersCreator paginationHeadersCreator;
     private final DataTransformer dataTransformer;
 
-    @CrossOrigin
     @PostMapping("/save")
     @PreAuthorize("hasAnyAuthority('CLIENT')")
     public ResponseEntity save(@Valid @RequestBody ReviewDto data){
@@ -41,7 +40,6 @@ public class ReviewController {
         else return ResponseEntity.badRequest().body("Couldn't save review, check data");
     }
 
-    @CrossOrigin
     @GetMapping("/all/{profileId}/{page}")
     @PreAuthorize("hasAnyAuthority('CLIENT', 'ARTIST')")
     public ResponseEntity getAllByProfile(@PathVariable int profileId, @PathVariable int page) {
@@ -53,7 +51,6 @@ public class ReviewController {
         return ResponseEntity.ok().headers(responseHeaders).body(dtoList);
     }
 
-    @CrossOrigin
     @GetMapping("/single/{id}")
     @PreAuthorize("hasAnyAuthority('CLIENT', 'ARTIST')")
     public ResponseEntity getById(@PathVariable int id){

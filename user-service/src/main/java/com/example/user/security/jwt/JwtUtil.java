@@ -1,7 +1,9 @@
 package com.example.user.security.jwt;
 
+import com.example.user.model.inner.User;
 import io.jsonwebtoken.*;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;

@@ -11,13 +11,13 @@ public class Review {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Integer id;
+    private Integer id;
 
     @ManyToOne
     @JoinColumn(name = "profile_id", referencedColumnName = "id")
-    Profile profile;
+    private Profile profile;
 
     @NotBlank
     @Column(name = "text", nullable = false)
-    String text;
+    private String text;
 }
